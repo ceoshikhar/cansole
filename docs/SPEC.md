@@ -1,6 +1,6 @@
 # Specs
 
-This is the specifications for (Cansole)[https://github.com/ceoshikhar/cansole].
+This is the specifications for [Cansole](https://github.com/ceoshikhar/cansole).
 
 ## `Cansole`
 

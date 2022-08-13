@@ -1,6 +1,6 @@
 # API
 
-This is the API for (Cansole)[https://github.com/ceoshikhar/cansole].
+This is the API for [Cansole](https://github.com/ceoshikhar/cansole).
 
 ## `Cansole.create(options?: Cansole.Options) -> Cansole.Cansole`
 

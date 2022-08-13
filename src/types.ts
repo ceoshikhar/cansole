@@ -1,17 +1,18 @@
 /**
- * Options to configure a `Cansole` instance.
- */
-type Options = {
-    element: HTMLCanvasElement | HTMLDivElement;
-};
-
-/**
  * Represents a `Cansole`.
  */
 type Cansole = {
     target: Target;
     visibility: Visibility;
 };
+
+/**
+ * Options to configure a `Cansole` instance.
+ */
+type Options = {
+    element: HTMLCanvasElement | HTMLDivElement;
+};
+
 
 /**
  * Where and how to render the `Cansole`.
