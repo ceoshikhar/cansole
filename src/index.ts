@@ -27,6 +27,8 @@ function renderLoop(t1: number) {
         // stats.begin();
 
         if (t2 - t1 > 16.66) {
+            const ctx = canvas.getContext('2d');
+            ctx!.clearRect(0, 0, canvas.width, canvas.height);
             cansole.render(myCansole);
             requestAnimationFrame(renderLoop(t2));
         } else {

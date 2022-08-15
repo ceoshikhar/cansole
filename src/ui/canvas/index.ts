@@ -13,7 +13,7 @@ function setup(cansole: types.Cansole): void {
     }
 
     const myWindow = window.create({
-        x: 100,
+        x: 150,
         y: 150,
         w: 300,
         h: 300,
@@ -48,14 +48,16 @@ function render(cansole: types.Cansole): void {
         return;
     }
 
-    console.info("Rendering Cansole to a HTMLCanvasElement.");
-
     if (!cansole.window) {
-      throw new Error(
-          "ui.canvas.render: no cansole.window found, maybe you" +
-          " forgot to run ui.canvas.setup."
-      );
+        throw new Error(
+            "ui.canvas.render: no cansole.window found, maybe you" +
+                " forgot to run ui.canvas.setup."
+        );
     }
+
+    //
+    // Start drawing.
+    //
 
     window.render(cansole.window, ctx);
 }

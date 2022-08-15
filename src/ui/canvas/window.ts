@@ -1,6 +1,7 @@
 import * as constants from "../../constants";
 import * as events from "./events";
 import * as shapes from "./shapes";
+import * as math from "../../math";
 
 type Window = {
     rect: shapes.rect.Rect;
@@ -17,7 +18,7 @@ type Options = {
 };
 
 function create({ x, y, w, h, title, canvas }: Options): Window {
-    const rect: shapes.rect.Rect = shapes.rect.create({
+    const myRect: shapes.rect.Rect = shapes.rect.create({
         x,
         y,
         w,
@@ -25,19 +26,33 @@ function create({ x, y, w, h, title, canvas }: Options): Window {
         bgColor: constants.BG_COLOR,
     });
 
-    shapes.rect.makeClickable(rect, canvas);
+    shapes.rect.makeClickable(myRect, canvas);
 
-    rect.eventEmitter.on(events.Mouse.Click, function(msg: string) {
+    shapes.rect.makeDraggable(myRect, canvas);
+
+    myRect.eventEmitter.on(events.Mouse.Click, function (msg: string) {
         console.log("event.Mouse.Click", { msg });
     });
 
+    myRect.eventEmitter.on(
+        events.Mouse.Dragging,
+        function (msg: string, {deltaTotal, deltaMovement}) {
+            console.log("event.Mouse.Dragging", {msg, deltaTotal, deltaMovement});
+
+            x += deltaMovement[0];
+            y += deltaMovement[1];
+
+            shapes.rect.setPos(myRect, math.vec2.create(x, y));
+        }
+    );
+
     return {
-        rect,
+        rect: myRect,
         title,
     };
 }
 
-function render(window: Window, ctx: CanvasRenderingContext2D) {
+function render(window: Window, ctx: CanvasRenderingContext2D): void {
     shapes.rect.render(window.rect, ctx);
 }
 
