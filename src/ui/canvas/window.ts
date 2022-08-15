@@ -36,9 +36,7 @@ function create({ x, y, w, h, title, canvas }: Options): Window {
 
     myRect.eventEmitter.on(
         events.Mouse.Dragging,
-        function (msg: string, {deltaTotal, deltaMovement}) {
-            console.log("event.Mouse.Dragging", {msg, deltaTotal, deltaMovement});
-
+        function (msg: string, { deltaMovement }) {
             x += deltaMovement[0];
             y += deltaMovement[1];
 

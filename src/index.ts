@@ -11,7 +11,7 @@ const div: HTMLDivElement = document.getElementById("my-div") as HTMLDivElement;
 
 const myCansole = cansole.create({ element: canvas });
 
-// console.log(cansole);
+console.log(myCansole);
 
 // Make sure Cansole is visible, else nothing will render.
 cansole.show(myCansole);
