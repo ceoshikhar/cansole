@@ -1,3 +1,5 @@
+import * as ui from "./ui";
+
 /**
  * HTML element where `Cansole` will be rendered.
  */
@@ -10,12 +12,9 @@ type Cansole = {
     element: CansoleElement;
     target: Target;
     visibility: Visibility;
-};
 
-/**
- * Rendering context for `Target.Canvas`.
- */
-type Context2D = CanvasRenderingContext2D;
+    window?: ui.canvas.window.Window | null;
+};
 
 /**
  * Options to configure a `Cansole` instance.
@@ -56,4 +55,4 @@ enum Visibility {
     Hidden = "Hidden",
 }
 
-export { Cansole, Context2D, Options, Target, Visibility };
+export { Cansole, Options, Target, Visibility };
