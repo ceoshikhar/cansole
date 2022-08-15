@@ -1,16 +1,12 @@
-import * as Constants from "../constants";
-import * as Types from "../types";
-import * as Utils from "../utils";
+import * as types from "../../types";
+import * as utils from "../../utils";
+import * as window from "./window";
 
-type Context = CanvasRenderingContext2D;
-
-function renderWindow(cansole: Types.Cansole, ctx: Context) {
-    ctx.fillStyle = Constants.BG_COLOR;
-    ctx.fillRect(10, 10, 150, 100);
-}
-
-function render(cansole: Types.Cansole) {
-    if (!Utils.isCanvas(cansole.element)) {
+/**
+ * Render a `Cansole` to a `HTMLCanvasElement`.
+ */
+function render(cansole: types.Cansole) {
+    if (!utils.isCanvas(cansole.element)) {
         throw new Error(
             "UI.canvas.render: cansole.element is not an HTMLCanvasElement."
         );
@@ -26,13 +22,14 @@ function render(cansole: Types.Cansole) {
     }
 
     // Cansole is hidden, so don't render anything.
-    if (cansole.visibility === Types.Visibility.Hidden) {
+    if (cansole.visibility === types.Visibility.Hidden) {
         return;
     }
 
     console.info("Rendering Cansole to a HTMLCanvasElement.");
 
-    renderWindow(cansole, ctx);
+    const myWindow = window.create(10, 10, 200, 300, "Cansole");
+    window.render(myWindow, ctx);
 }
 
 export { render };
