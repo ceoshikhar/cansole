@@ -1,7 +1,13 @@
 /**
+ * HTML element where `Cansole` will be rendered.
+ */
+type CansoleElement = HTMLCanvasElement | HTMLDivElement;
+
+/**
  * Represents a `Cansole`.
  */
 type Cansole = {
+    element: CansoleElement;
     target: Target;
     visibility: Visibility;
 };
@@ -10,9 +16,8 @@ type Cansole = {
  * Options to configure a `Cansole` instance.
  */
 type Options = {
-    element: HTMLCanvasElement | HTMLDivElement;
+    element: CansoleElement;
 };
-
 
 /**
  * Where and how to render the `Cansole`.
