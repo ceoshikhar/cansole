@@ -13,6 +13,11 @@ type Cansole = {
 };
 
 /**
+ * Rendering context for `Target.Canvas`.
+ */
+type Context2D = CanvasRenderingContext2D;
+
+/**
  * Options to configure a `Cansole` instance.
  */
 type Options = {
@@ -51,4 +56,4 @@ enum Visibility {
     Hidden = "Hidden",
 }
 
-export { Cansole, Options, Target, Visibility };
+export { Cansole, Context2D, Options, Target, Visibility };
