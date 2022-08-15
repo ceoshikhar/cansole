@@ -3,9 +3,31 @@ import * as utils from "../../utils";
 import * as window from "./window";
 
 /**
+ * Setup a `Cansole` so that it can be rendered to a `HTMLCanvasElement`.
+ */
+function setup(cansole: types.Cansole): void {
+    if (!utils.isCanvas(cansole.element)) {
+        throw new Error(
+            "UI.canvas.setup: cansole.element is not an HTMLCanvasElement."
+        );
+    }
+
+    const myWindow = window.create({
+        x: 100,
+        y: 150,
+        w: 300,
+        h: 300,
+        title: "Cansole",
+        canvas: cansole.element,
+    });
+
+    cansole.window = myWindow;
+}
+
+/**
  * Render a `Cansole` to a `HTMLCanvasElement`.
  */
-function render(cansole: types.Cansole) {
+function render(cansole: types.Cansole): void {
     if (!utils.isCanvas(cansole.element)) {
         throw new Error(
             "UI.canvas.render: cansole.element is not an HTMLCanvasElement."
@@ -28,8 +50,14 @@ function render(cansole: types.Cansole) {
 
     console.info("Rendering Cansole to a HTMLCanvasElement.");
 
-    const myWindow = window.create(10, 10, 200, 300, "Cansole");
-    window.render(myWindow, ctx);
+    if (!cansole.window) {
+      throw new Error(
+          "ui.canvas.render: no cansole.window found, maybe you" +
+          " forgot to run ui.canvas.setup."
+      );
+    }
+
+    window.render(cansole.window, ctx);
 }
 
-export { render };
+export { render, setup, window };

@@ -30,6 +30,10 @@ function create(options: types.Options): types.Cansole {
         visibility,
     };
 
+    if (cansole.target === types.Target.Canvas) {
+        ui.canvas.setup(cansole);
+    }
+
     return cansole;
 }
 
@@ -74,7 +78,7 @@ function toggle(cansole: types.Cansole): void {
  * `HTMLCanvasElement`.
  */
 function render(cansole: types.Cansole): void {
-    if (utils.isCanvas(cansole.element)) {
+    if (cansole.target === types.Target.Canvas) {
         ui.canvas.render(cansole);
     } else {
         throw new Error(
