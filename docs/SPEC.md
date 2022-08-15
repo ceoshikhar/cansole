@@ -8,6 +8,7 @@ Represents a `Cansole`.
 
 ```ts
 type Cansole {
+    element: CansoleElement;
     target: Target,
     visibility: Visibility,
 }
