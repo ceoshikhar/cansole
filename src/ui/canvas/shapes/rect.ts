@@ -34,16 +34,48 @@ type Options = {
     borderRadius?: number;
 };
 
-function setPos(rect: Rect, pos: math.vec2.Vec2<number>): void {
-    const newX = pos[0];
-    const newY = pos[1];
-
+function setX(rect: Rect, newX: number): void {
     rect.x = newX;
-    rect.y = newY;
     rect.l = newX;
-    rect.t = newY;
     rect.r = newX + rect.w;
+}
+
+function setY(rect: Rect, newY: number): void {
+    rect.y = newY;
+    rect.t = newY;
     rect.b = newY + rect.h;
+}
+
+function setL(rect: Rect, newL: number): void {
+    const newR = newL + rect.w;
+
+    rect.l = newL;
+    rect.x = newL;
+    rect.r = newR;
+}
+
+function setT(rect: Rect, newT: number): void {
+    const newB = newT + rect.h;
+
+    rect.t = newT;
+    rect.y = newT;
+    rect.b = newB;
+}
+
+function setR(rect: Rect, newR: number): void {
+    const newX = newR - rect.w;
+
+    rect.r = newR;
+    rect.x = newX;
+    rect.l = newX;
+}
+
+function setB(rect: Rect, newB: number): void {
+    const newY = newB - rect.h;
+
+    rect.b = newB;
+    rect.y = newY;
+    rect.t = newY;
 }
 
 function create({
@@ -95,7 +127,7 @@ function makeClickable(rect: Rect, canvas: HTMLCanvasElement): void {
             if (!contains(rect, math.vec2.create(event.x, event.y))) return;
             if (rect.isDragging) return;
 
-            rect.eventEmitter.emit(events.Mouse.Click, "Clicked");
+            rect.eventEmitter.emit(events.Mouse.Click);
         }
 
         canvas.addEventListener("mouseup", handleMouseUp);
@@ -142,4 +174,17 @@ function render(rect: Rect, ctx: CanvasRenderingContext2D): void {
     ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
 }
 
-export { Rect, contains, create, makeClickable, makeDraggable, render, setPos };
+export {
+    Rect,
+    contains,
+    create,
+    makeClickable,
+    makeDraggable,
+    render,
+    setB,
+    setL,
+    setR,
+    setT,
+    setX,
+    setY,
+};
