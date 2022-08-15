@@ -1,7 +1,9 @@
 import * as constants from "../../constants";
+import * as utils from "../../utils";
+import * as types from "../../types";
+
 import * as events from "./events";
 import * as shapes from "./shapes";
-import * as math from "../../math";
 
 type Window = {
     rect: shapes.rect.Rect;
@@ -14,11 +16,11 @@ type Options = {
     w: number;
     h: number;
     title: string;
-    canvas: HTMLCanvasElement;
+    cansole: types.Cansole;
 };
 
-function create({ x, y, w, h, title, canvas }: Options): Window {
-    const myRect: shapes.rect.Rect = shapes.rect.create({
+function create({ x, y, w, h, title, cansole }: Options): Window {
+    const rect: shapes.rect.Rect = shapes.rect.create({
         x,
         y,
         w,
@@ -26,26 +28,22 @@ function create({ x, y, w, h, title, canvas }: Options): Window {
         bgColor: constants.BG_COLOR,
     });
 
-    shapes.rect.makeClickable(myRect, canvas);
+    const canvas = cansole.element as HTMLCanvasElement;
 
-    shapes.rect.makeDraggable(myRect, canvas);
+    shapes.rect.makeDraggable(rect, canvas);
 
-    myRect.eventEmitter.on(events.Mouse.Click, function (msg: string) {
-        console.log("event.Mouse.Click", { msg });
-    });
-
-    myRect.eventEmitter.on(
+    rect.eventEmitter.on(
         events.Mouse.Dragging,
         function (msg: string, { deltaMovement }) {
-            x += deltaMovement[0];
-            y += deltaMovement[1];
+            shapes.rect.setX(rect, rect.x + deltaMovement[0]);
+            shapes.rect.setY(rect, rect.y + deltaMovement[1]);
 
-            shapes.rect.setPos(myRect, math.vec2.create(x, y));
+            utils.positionButtonRelativeToWindow(cansole);
         }
     );
 
     return {
-        rect: myRect,
+        rect,
         title,
     };
 }

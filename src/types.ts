@@ -14,6 +14,7 @@ type Cansole = {
     visibility: Visibility;
 
     window?: ui.canvas.window.Window | null;
+    button?: ui.canvas.button.Button | null;
 };
 
 /**
