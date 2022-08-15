@@ -1,4 +1,4 @@
-import * as Cansole from "./cansole";
-import * as Types from "./types";
+import * as cansole from "./cansole";
+import * as types from "./types";
 
-export { Cansole, Types };
+export { cansole, types };

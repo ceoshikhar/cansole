@@ -1,13 +1,13 @@
-import * as Utils from "./utils";
-import * as Types from "./types";
-import * as UI from "./ui";
+import * as utils from "./utils";
+import * as types from "./types";
+import * as ui from "./ui";
 
-function getTarget(element: HTMLElement): Types.Target {
-    if (Utils.isCanvas(element)) {
-        return Types.Target.Canvas;
+function getTarget(element: HTMLElement): types.Target {
+    if (utils.isCanvas(element)) {
+        return types.Target.Canvas;
     }
 
-    return Types.Target.NotCanvas;
+    return types.Target.NotCanvas;
 }
 
 /**
@@ -18,13 +18,13 @@ function getTarget(element: HTMLElement): Types.Target {
  * their first argument.
  *
  */
-function create(options: Types.Options): Types.Cansole {
+function create(options: types.Options): types.Cansole {
     const { element } = options;
 
-    const target: Types.Target = getTarget(element);
-    const visibility: Types.Visibility = Types.Visibility.Hidden;
+    const target: types.Target = getTarget(element);
+    const visibility: types.Visibility = types.Visibility.Hidden;
 
-    const cansole: Types.Cansole = {
+    const cansole: types.Cansole = {
         element,
         target,
         visibility,
@@ -36,15 +36,15 @@ function create(options: Types.Options): Types.Cansole {
 /**
  * Shows the console.
  */
-function show(cansole: Types.Cansole): void {
-    cansole.visibility = Types.Visibility.Visible;
+function show(cansole: types.Cansole): void {
+    cansole.visibility = types.Visibility.Visible;
 }
 
 /**
  * Hides the console.
  */
-function hide(cansole: Types.Cansole): void {
-    cansole.visibility = Types.Visibility.Hidden;
+function hide(cansole: types.Cansole): void {
+    cansole.visibility = types.Visibility.Hidden;
 }
 
 /**
@@ -52,8 +52,8 @@ function hide(cansole: Types.Cansole): void {
  *
  * If `show` -> `hide` else `hide` -> `show`.
  */
-function toggle(cansole: Types.Cansole): void {
-    if (cansole.visibility === Types.Visibility.Visible) {
+function toggle(cansole: types.Cansole): void {
+    if (cansole.visibility === types.Visibility.Visible) {
         hide(cansole);
     } else {
         show(cansole);
@@ -73,9 +73,9 @@ function toggle(cansole: Types.Cansole): void {
  * `Cansole` is rendered at the top of everything else rnedered on the
  * `HTMLCanvasElement`.
  */
-function render(cansole: Types.Cansole): void {
-    if (Utils.isCanvas(cansole.element)) {
-        UI.canvas.render(cansole);
+function render(cansole: types.Cansole): void {
+    if (utils.isCanvas(cansole.element)) {
+        ui.canvas.render(cansole);
     } else {
         throw new Error(
             "Cansole.render: currently we can render to HTMLCanvasElement only" +

@@ -1,4 +1,4 @@
-import { Cansole } from "./api";
+import { cansole } from "./api";
 
 const canvas: HTMLCanvasElement = document.getElementById(
     "my-canvas"
@@ -9,15 +9,15 @@ canvas.width = window.innerWidth - 10;
 
 const div: HTMLDivElement = document.getElementById("my-div") as HTMLDivElement;
 
-const cansole = Cansole.create({ element: canvas });
+const myCansole = cansole.create({ element: canvas });
 
 // console.log(cansole);
 
 // Make sure Cansole is visible, else nothing will render.
-Cansole.show(cansole);
+cansole.show(myCansole);
 
 // Only **First** render is outside the render loop.
-Cansole.render(cansole);
+cansole.render(myCansole);
 
 // Start render loop.
 window.requestAnimationFrame(renderLoop(0));
@@ -27,7 +27,7 @@ function renderLoop(t1: number) {
         // stats.begin();
 
         if (t2 - t1 > 16.66) {
-            Cansole.render(cansole);
+            cansole.render(myCansole);
             requestAnimationFrame(renderLoop(t2));
         } else {
             requestAnimationFrame(renderLoop(t1));
