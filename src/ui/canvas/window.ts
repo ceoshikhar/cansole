@@ -1,38 +1,44 @@
 import * as constants from "../../constants";
-import * as math from "../../math";
+import * as events from "./events";
 import * as shapes from "./shapes";
-import * as types from "../../types";
 
 type Window = {
-    pos: math.vec2.Vec2<number>;
-    size: math.vec2.Vec2<number>;
+    rect: shapes.rect.Rect;
     title: string;
 };
 
-function create(
-    left: number,
-    top: number,
-    width: number,
-    height: number,
-    title: string
-): Window {
+type Options = {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    title: string;
+    canvas: HTMLCanvasElement;
+};
+
+function create({ x, y, w, h, title, canvas }: Options): Window {
+    const rect: shapes.rect.Rect = shapes.rect.create({
+        x,
+        y,
+        w,
+        h,
+        bgColor: constants.BG_COLOR,
+    });
+
+    shapes.rect.makeClickable(rect, canvas);
+
+    rect.eventEmitter.on(events.Mouse.Click, function(msg: string) {
+        console.log("event.Mouse.Click", { msg });
+    });
+
     return {
-        pos: math.vec2.create(left, top),
-        size: math.vec2.create(width, height),
+        rect,
         title,
     };
 }
 
-function render(window: Window, ctx: types.Context2D) {
-    const myRect: shapes.rect.Rect = shapes.rect.create({
-        x: window.pos[0],
-        y: window.pos[1],
-        w: window.size[0],
-        h: window.size[1],
-        bgColor: constants.BG_COLOR,
-    });
-
-    shapes.rect.render(myRect, ctx);
+function render(window: Window, ctx: CanvasRenderingContext2D) {
+    shapes.rect.render(window.rect, ctx);
 }
 
 export { Window, create, render };
