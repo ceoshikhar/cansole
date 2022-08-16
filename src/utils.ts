@@ -13,7 +13,7 @@ function positionButtonRelativeToWindow(cansole: types.Cansole): void {
 
     const button = renderables.button;
     const window = renderables.window;
-    const buttonPaddingWithWindow = 10;
+    const buttonPaddingWithWindow = 16;
 
     ui.canvas.shapes.rect.setR(
         button.rect,

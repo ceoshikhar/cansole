@@ -12,23 +12,42 @@ type Button = {
 type Options = {
     x?: number;
     y?: number;
+    w?: number;
+    h?: number;
     label: string;
     cansole: types.Cansole;
 };
 
-function create({ x = 0, y = 0, label, cansole }: Options): Button {
-    // TODO: Calculate `w` and `h` from `label`.
+function create({ x = 0, y = 0, w = 0, h = 0, label, cansole }: Options): Button {
     const rect = shapes.rect.create(
         cansole.element as HTMLCanvasElement,
         {
             x,
             y,
-            w: 200,
-            h: 50,
+            w,
+            h,
             bgColor: constants.colors.primary,
             interactive: true
         }
     );
+
+    // TODO: this is duplicated from `render` and I think a `Theme` oject
+    // would be a good idea for sure now.
+    const fontSize = 18;
+    const fontSizePx = `${fontSize}px`;
+    const fontWeight = "normal";
+    const fontFamily = "Perfect DOS VGA 437 Win";
+
+    const canvas = cansole.element as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
+    const textWidth = ctx.measureText(label).width;
+
+    const padding = 16;
+
+    rect.w = textWidth + padding;
+    rect.h = 24 + padding;
 
     rect.eventEmitter.on(events.Mouse.Click, function () {
         console.log("Clicked on Submit");
@@ -41,10 +60,6 @@ function create({ x = 0, y = 0, label, cansole }: Options): Button {
 }
 
 function render(button: Button, ctx: CanvasRenderingContext2D): void {
-    //
-    // Draw button's rectangle.
-    //
-
     // Resetting these to default first and then maybe later change them.
     button.rect.bgColor = constants.colors.primary;
     document.body.style.cursor = "default";
@@ -62,24 +77,31 @@ function render(button: Button, ctx: CanvasRenderingContext2D): void {
         document.body.style.cursor = "pointer";
     }
 
+    //
+    // Draw button's rectangle.
+    //
+
     shapes.rect.render(button.rect, ctx);
 
     //
     // Draw button's label.
     //
 
-    const fontSize = "24px";
+    // TODO: Make this a part of `Button Theme` ?
+    const fontSize = 18;
+    const fontSizePx = `${fontSize}px`;
     const fontWeight = "normal";
     const fontFamily = "Perfect DOS VGA 437 Win";
 
-    ctx.font = `${fontWeight} ${fontSize} '${fontFamily}'`;
+    ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
     ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
     ctx.fillStyle = constants.colors.onPrimary;
 
     ctx.fillText(
         button.label,
         (button.rect.x + button.rect.w / 2),
-        button.rect.b - 16
+        (button.rect.y + button.rect.h / 2)
     );
 }
 

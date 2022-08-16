@@ -24,8 +24,8 @@ function setup(cansole: types.Cansole): void {
     const myWindow = window.create({
         x: 150,
         y: 150,
-        w: 300,
-        h: 300,
+        w: 640,
+        h: 480,
         title: "Cansole",
         cansole,
     });
