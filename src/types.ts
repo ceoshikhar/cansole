@@ -14,7 +14,7 @@ type Cansole = {
     visibility: Visibility;
 
     // When `Cansole` is rendered to `Target.Canvas`, this is what we render.
-    toRenderForCanvas?: ui.canvas.ToRender;
+    canvasRenderables?: ui.canvas.Renderables;
 };
 
 /**

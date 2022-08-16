@@ -6,7 +6,7 @@ import * as window from "./window";
 
 import * as shapes from "./shapes";
 
-type ToRender = {
+type Renderables = {
     window: window.Window;
     button: button.Button;
 };
@@ -35,7 +35,7 @@ function setup(cansole: types.Cansole): void {
         cansole,
     });
 
-    cansole.toRenderForCanvas = {
+    cansole.canvasRenderables = {
         window: myWindow,
         button: myButton,
     }
@@ -67,11 +67,11 @@ function render(cansole: types.Cansole): void {
         return;
     }
 
-    const toRender = cansole.toRenderForCanvas;
+    const renderables = cansole.canvasRenderables;
 
-    if (!toRender) {
+    if (!renderables) {
         throw new Error(
-            "ui.canvas.render: no cansole.toRenderForCanvas found, maybe you" +
+            "ui.canvas.render: no cansole.canvasRenderables found, maybe you" +
                 " forgot to run ui.canvas.setup."
         );
     }
@@ -80,8 +80,8 @@ function render(cansole: types.Cansole): void {
     // Start drawing.
     //
 
-    window.render(toRender.window, ctx);
-    button.render(toRender.button, ctx);
+    window.render(renderables.window, ctx);
+    button.render(renderables.button, ctx);
 }
 
-export { ToRender, render, setup, shapes, window, button };
+export { Renderables, render, setup, shapes, window, button };

@@ -8,13 +8,13 @@ function isCanvas(element: HTMLElement): element is HTMLCanvasElement {
 function positionButtonRelativeToWindow(
     cansole: types.Cansole
 ): void {
-    const toRender = cansole.toRenderForCanvas;
+    const renderables = cansole.canvasRenderables;
 
-    // Sanity check.
-    if (!toRender) return;
+    // Sanity check because at this moment 
+    if (!renderables) return;
 
-    const button = toRender.button;
-    const window = toRender.window;
+    const button = renderables.button;
+    const window = renderables.window;
     const buttonPaddingWithWindow = 10;
 
     ui.canvas.shapes.rect.setR(
