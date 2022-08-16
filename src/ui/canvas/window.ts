@@ -20,21 +20,22 @@ type Options = {
 };
 
 function create({ x, y, w, h, title, cansole }: Options): Window {
-    const rect: shapes.rect.Rect = shapes.rect.create({
-        x,
-        y,
-        w,
-        h,
-        bgColor: constants.colors.background,
-    });
-
-    const canvas = cansole.element as HTMLCanvasElement;
-
-    shapes.rect.makeDraggable(rect, canvas);
+    const rect: shapes.rect.Rect = shapes.rect.create(
+        cansole.element as HTMLCanvasElement,
+        {
+            x,
+            y,
+            w,
+            h,
+            bgColor: constants.colors.background,
+            interactive: true
+        }
+    );
 
     rect.eventEmitter.on(
         events.Mouse.Dragging,
-        function (msg: string, { deltaMovement }) {
+        function ({ deltaMovement }) {
+            console.log("Dragging Window");
             shapes.rect.setX(rect, rect.x + deltaMovement[0]);
             shapes.rect.setY(rect, rect.y + deltaMovement[1]);
 

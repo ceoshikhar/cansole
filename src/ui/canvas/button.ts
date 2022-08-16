@@ -18,20 +18,20 @@ type Options = {
 
 function create({ x = 0, y = 0, label, cansole }: Options): Button {
     // TODO: Calculate `w` and `h` from `label`.
-    const rect = shapes.rect.create({
-        x,
-        y,
-        w: 200,
-        h: 50,
-        bgColor: constants.colors.primary,
-    });
-
-    const canvas = cansole.element as HTMLCanvasElement;
-
-    shapes.rect.makeClickable(rect, canvas);
+    const rect = shapes.rect.create(
+        cansole.element as HTMLCanvasElement,
+        {
+            x,
+            y,
+            w: 200,
+            h: 50,
+            bgColor: constants.colors.primary,
+            interactive: true
+        }
+    );
 
     rect.eventEmitter.on(events.Mouse.Click, function () {
-        console.log("Clicked on button");
+        console.log("Clicked on Submit button!");
     });
 
     return {

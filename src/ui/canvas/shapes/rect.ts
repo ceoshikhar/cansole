@@ -1,6 +1,6 @@
-import * as events from "../events";
 import * as eventEmitter from "../../../event-emitter";
 import * as math from "../../../math";
+import * as events from "../events";
 
 type Rect = {
     x: number;
@@ -8,6 +8,7 @@ type Rect = {
     w: number;
     h: number;
 
+    // TODO: instead of these being atom data why not have a `Theme` object?
     bgColor: string;
     borderColor: string | null;
     borderRadius: number;
@@ -17,8 +18,8 @@ type Rect = {
     r: number;
     b: number;
 
+    interactive: boolean;
     eventEmitter: eventEmitter.EventEmitter;
-
     isDragging: boolean;
 };
 
@@ -32,7 +33,43 @@ type Options = {
     // If `null`, skip rendering border.
     borderColor?: string | null;
     borderRadius?: number;
+
+    interactive?: boolean;
 };
+
+function create(canvas: HTMLCanvasElement, {
+    x,
+    y,
+    w,
+    h,
+    bgColor = "#000",
+    borderColor = null,
+    borderRadius = 0,
+    interactive = false,
+}: Options): Rect {
+    const rect: Rect = {
+        x,
+        y,
+        w,
+        h,
+        bgColor,
+        borderColor,
+        borderRadius,
+        l: x,
+        t: y,
+        r: x + w,
+        b: y + h,
+        interactive,
+        eventEmitter: eventEmitter.create(),
+        isDragging: false,
+    };
+
+
+    makeClickable(rect, canvas);
+    makeDraggable(rect, canvas);
+
+    return rect;
+}
 
 function setX(rect: Rect, newX: number): void {
     rect.x = newX;
@@ -78,32 +115,6 @@ function setB(rect: Rect, newB: number): void {
     rect.t = newY;
 }
 
-function create({
-    x,
-    y,
-    w,
-    h,
-    bgColor = "#000",
-    borderColor = null,
-    borderRadius = 0,
-}: Options): Rect {
-    return {
-        x,
-        y,
-        w,
-        h,
-        bgColor,
-        borderColor,
-        borderRadius,
-        l: x,
-        t: y,
-        r: x + w,
-        b: y + h,
-        eventEmitter: eventEmitter.create(),
-        isDragging: false,
-    };
-}
-
 function contains(rect: Rect, coords: math.vec2.Vec2<number>): boolean {
     const x = coords[0];
     const y = coords[1];
@@ -127,7 +138,9 @@ function makeClickable(rect: Rect, canvas: HTMLCanvasElement): void {
             if (!contains(rect, math.vec2.create(event.x, event.y))) return;
             if (rect.isDragging) return;
 
-            rect.eventEmitter.emit(events.Mouse.Click);
+            if (rect.interactive) {
+                rect.eventEmitter.emit(events.Mouse.Click);
+            }
         }
 
         canvas.addEventListener("mouseup", handleMouseUp);
@@ -151,10 +164,12 @@ function makeDraggable(rect: Rect, canvas: HTMLCanvasElement): void {
                 event.movementY
             );
 
-            rect.eventEmitter.emit(events.Mouse.Dragging, "Dragging", {
-                deltaTotal,
-                deltaMovement,
-            });
+            if (rect.interactive) {
+                rect.eventEmitter.emit(events.Mouse.Dragging, {
+                    deltaTotal,
+                    deltaMovement,
+                });
+            }
         }
 
         function handleMouseUp(event: MouseEvent) {
@@ -194,8 +209,6 @@ export {
     Rect,
     contains,
     create,
-    makeClickable,
-    makeDraggable,
     render,
     setB,
     setL,
