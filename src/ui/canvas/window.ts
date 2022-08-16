@@ -33,7 +33,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
     );
 
     rect.eventEmitter.on(
-        events.Mouse.Dragging,
+        events.Mouse.Drag,
         function ({ deltaMovement }) {
             console.log("Dragging Window");
             shapes.rect.setX(rect, rect.x + deltaMovement[0]);

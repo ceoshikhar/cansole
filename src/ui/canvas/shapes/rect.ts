@@ -18,9 +18,12 @@ type Rect = {
     r: number;
     b: number;
 
-    interactive: boolean;
     eventEmitter: eventEmitter.EventEmitter;
+
+    interactive: boolean;
+    isActive: boolean;
     isDragging: boolean;
+    isHovered: boolean;
 };
 
 type Options = {
@@ -61,12 +64,14 @@ function create(canvas: HTMLCanvasElement, {
         b: y + h,
         interactive,
         eventEmitter: eventEmitter.create(),
+        isActive: false,
         isDragging: false,
+        isHovered: false,
     };
-
 
     makeClickable(rect, canvas);
     makeDraggable(rect, canvas);
+    makeHoverable(rect, canvas);
 
     return rect;
 }
@@ -126,14 +131,35 @@ function contains(rect: Rect, coords: math.vec2.Vec2<number>): boolean {
     return false;
 }
 
+function makeHoverable(rect:Rect, canvas: HTMLCanvasElement): void {
+    canvas.addEventListener("mousemove", function (event) {
+        if (contains(rect, math.vec2.create(event.x, event.y))) {
+            rect.isHovered = true;
+        } else {
+            rect.isHovered = false;
+        }
+    })
+
+    canvas.addEventListener("mouseleave", function () {
+        rect.isHovered = false;
+    })
+}
+
 function makeClickable(rect: Rect, canvas: HTMLCanvasElement): void {
     // The `mousedown` and `mouseup` should both happen inside the `rect` for
     // it to be considered as a `events.Mouse.Click`.
     canvas.addEventListener("mousedown", function (event) {
-        if (!contains(rect, math.vec2.create(event.x, event.y))) return;
+        if (!contains(rect, math.vec2.create(event.x, event.y))) {
+            rect.isActive = false;
+            return;
+        }
+
+        rect.isActive = true;
 
         function handleMouseUp(event: MouseEvent) {
             canvas.removeEventListener("mouseup", handleMouseUp);
+
+            rect.isActive = false;
 
             if (!contains(rect, math.vec2.create(event.x, event.y))) return;
             if (rect.isDragging) return;
@@ -165,14 +191,14 @@ function makeDraggable(rect: Rect, canvas: HTMLCanvasElement): void {
             );
 
             if (rect.interactive) {
-                rect.eventEmitter.emit(events.Mouse.Dragging, {
+                rect.eventEmitter.emit(events.Mouse.Drag, {
                     deltaTotal,
                     deltaMovement,
                 });
             }
         }
 
-        function handleMouseUp(event: MouseEvent) {
+        function handleMouseUp() {
             // Drag end?
             canvas.removeEventListener("mouseup", handleMouseUp);
             canvas.removeEventListener("mousemove", handleMouseMove);

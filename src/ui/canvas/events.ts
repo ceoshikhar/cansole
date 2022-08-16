@@ -1,6 +1,6 @@
 enum Mouse {
     Click = "Click",
-    Dragging = "Dragging",
+    Drag = "Drag",
 }
 
 export { Mouse };
