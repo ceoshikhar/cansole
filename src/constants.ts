@@ -2,12 +2,13 @@
  * Global constants.
  */
 
-/**
- * Background color for `Cansole`.
- */
-export const BG_COLOR = "#1B1B1B";
+const colors = {
+    background: "#00171F",
 
-/**
- * Foreground color for `Cansole`.
- */
-export const FG_COLOR = "#666666";
+    primary: "#00A8E8",
+    onPrimary: "#FFFFFF",
+
+    textPrimary: "#F1F1F1",
+}
+
+export { colors };

@@ -170,8 +170,24 @@ function makeDraggable(rect: Rect, canvas: HTMLCanvasElement): void {
 }
 
 function render(rect: Rect, ctx: CanvasRenderingContext2D): void {
+    // Draw the rectangle shape.
     ctx.fillStyle = rect.bgColor;
     ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+
+    // Draw a border if we have a `borderColor`.
+    if (rect.borderColor !== null) {
+        // Border's width.
+        const bw = 10; // TODO: This could be a part of a "button.Theme"?
+        ctx.lineWidth = bw;
+        ctx.strokeStyle = rect.borderColor;
+
+        ctx.strokeRect(
+            rect.x + bw / 2,
+            rect.y + bw / 2,
+            rect.w - bw,
+            rect.h - bw,
+        );
+    }
 }
 
 export {

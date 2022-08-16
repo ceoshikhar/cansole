@@ -25,7 +25,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         y,
         w,
         h,
-        bgColor: constants.BG_COLOR,
+        bgColor: constants.colors.background,
     });
 
     const canvas = cansole.element as HTMLCanvasElement;
