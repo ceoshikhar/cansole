@@ -13,8 +13,8 @@ type Cansole = {
     target: Target;
     visibility: Visibility;
 
-    window?: ui.canvas.window.Window | null;
-    button?: ui.canvas.button.Button | null;
+    // When `Cansole` is rendered to `Target.Canvas`, this is what we render.
+    toRenderForCanvas?: ui.canvas.ToRender;
 };
 
 /**

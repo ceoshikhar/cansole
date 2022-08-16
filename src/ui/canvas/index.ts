@@ -6,6 +6,11 @@ import * as window from "./window";
 
 import * as shapes from "./shapes";
 
+type ToRender = {
+    window: window.Window;
+    button: button.Button;
+};
+
 /**
  * Setup a `Cansole` so that it can be rendered to a `HTMLCanvasElement`.
  */
@@ -25,14 +30,15 @@ function setup(cansole: types.Cansole): void {
         cansole,
     });
 
-    cansole.window = myWindow;
-
     const myButton = button.create({
         label: "Submit",
         cansole,
     });
 
-    cansole.button = myButton;
+    cansole.toRenderForCanvas = {
+        window: myWindow,
+        button: myButton,
+    }
 
     utils.positionButtonRelativeToWindow(cansole);
 }
@@ -61,16 +67,11 @@ function render(cansole: types.Cansole): void {
         return;
     }
 
-    if (!cansole.window) {
-        throw new Error(
-            "ui.canvas.render: no cansole.window found, maybe you" +
-                " forgot to run ui.canvas.setup."
-        );
-    }
+    const toRender = cansole.toRenderForCanvas;
 
-    if (!cansole.button) {
+    if (!toRender) {
         throw new Error(
-            "ui.canvas.render: no cansole.button found, maybe you" +
+            "ui.canvas.render: no cansole.toRenderForCanvas found, maybe you" +
                 " forgot to run ui.canvas.setup."
         );
     }
@@ -79,8 +80,8 @@ function render(cansole: types.Cansole): void {
     // Start drawing.
     //
 
-    window.render(cansole.window, ctx);
-    button.render(cansole.button, ctx);
+    window.render(toRender.window, ctx);
+    button.render(toRender.button, ctx);
 }
 
-export { render, setup, shapes, window, button };
+export { ToRender, render, setup, shapes, window, button };
