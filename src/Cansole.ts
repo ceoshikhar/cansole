@@ -1,5 +1,5 @@
 import * as utils from "./utils";
-import * as ui from "./ui";
+import * as ui from "./ui"; 
 import { Drawable } from "./ui/canvas/interfaces/Drawable";
 
 /**
@@ -46,24 +46,16 @@ type CansoleOptions = {
     element: CansoleElement;
 };
 
-function detectTarget(element: HTMLElement): Target {
-    if (utils.isCanvas(element)) {
-        return Target.Canvas;
-    }
-
-    return Target.NotCanvas;
-}
-
 /**
  * Represents a `Cansole`.
  */
 class Cansole implements Drawable {
-    element: CansoleElement;
-    target: Target;
-    visibility: Visibility;
+    public element: CansoleElement;
+    public target: Target;
+    public visibility: Visibility;
 
     // When `Cansole` is rendered to `Target.Canvas`, this is what we render.
-    canvasRenderables?: ui.canvas.Renderables;
+    public canvasRenderables?: ui.canvas.Renderables;
 
     /**
      * Create a new instance of `Cansole`.
@@ -72,7 +64,7 @@ class Cansole implements Drawable {
         const { element } = options;
 
         this.element = element;
-        this.target = detectTarget(element);
+        this.target = this.detectTarget(element);
         this.visibility = Visibility.Hidden;
 
         if (this.target === Target.Canvas) {
@@ -129,6 +121,14 @@ class Cansole implements Drawable {
                     " only and the provided cansole.element is not HTMLCanvasElement."
             );
         }
+    }
+
+    private detectTarget(element: HTMLElement): Target {
+        if (utils.isCanvas(element)) {
+            return Target.Canvas;
+        }
+
+        return Target.NotCanvas;
     }
 }
 
