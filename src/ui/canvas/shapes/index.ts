@@ -1,3 +1,3 @@
-import * as rect from "./rect";
+import * as rect from "./box";
 
 export { rect };

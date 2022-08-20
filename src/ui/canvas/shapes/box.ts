@@ -1,6 +1,82 @@
 import * as eventEmitter from "../../../event-emitter";
 import * as math from "../../../math";
+
 import * as events from "../events";
+import * as utils from "../utils";
+
+import { Drawable } from "../drawable";
+import { Clickable, ClickEventCallback } from "../clickable";
+
+type BoxOptions = {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+};
+
+type BoxTheme = {
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+    foregroundColor: string;
+};
+
+const DEFAULT_BOX_OPTIONS: BoxOptions = {
+    x: 0,
+    y: 0,
+    w: 100,
+    h: 100,
+}
+
+const DEFAULT_BOX_THEME: BoxTheme = {
+    backgroundColor: "#000000",
+    borderWidth: 10,
+    borderColor: "",
+    foregroundColor: "#ffffff",
+}
+
+class Box implements Clickable<Box>, Drawable {
+    canvas: HTMLCanvasElement;
+
+    options: BoxOptions;
+
+    theme: BoxTheme;
+
+    constructor(
+        canvas: HTMLCanvasElement,
+        options: BoxOptions = DEFAULT_BOX_OPTIONS,
+        theme: Partial<BoxTheme> = {},
+    ) {
+        this.canvas = canvas;
+        this.options = options;
+        this.theme = { ...DEFAULT_BOX_THEME, ...theme };
+    }
+
+    public draw(): void {
+        const ctx = utils.getContext2D(this.canvas);
+
+        // Draw the rectangle shape.
+        ctx.fillStyle = this.theme.backgroundColor;
+        ctx.fillRect(this.options.x, this.options.y, this.options.w, this.options.h);
+
+        // Draw a border if we have a `borderColor`.
+        if (this.theme.borderColor !== null) {
+            const bw = this.theme.borderWidth;
+
+            ctx.lineWidth = bw;
+            ctx.strokeStyle = this.theme.borderColor;
+
+            ctx.strokeRect(
+                this.options.x + bw / 2,
+                this.options.y + bw / 2,
+                this.options.w - bw,
+                this.options.h - bw
+            );
+        }
+    }
+
+    public onClick(cb: ClickEventCallback<this>): void {}
+}
 
 type Rect = {
     x: number;
@@ -214,24 +290,6 @@ function makeDraggable(rect: Rect, canvas: HTMLCanvasElement): void {
 }
 
 function render(rect: Rect, ctx: CanvasRenderingContext2D): void {
-    // Draw the rectangle shape.
-    ctx.fillStyle = rect.bgColor;
-    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-
-    // Draw a border if we have a `borderColor`.
-    if (rect.borderColor !== null) {
-        // Border's width.
-        const bw = 10; // TODO: This could be a part of a "button.Theme"?
-        ctx.lineWidth = bw;
-        ctx.strokeStyle = rect.borderColor;
-
-        ctx.strokeRect(
-            rect.x + bw / 2,
-            rect.y + bw / 2,
-            rect.w - bw,
-            rect.h - bw
-        );
-    }
 }
 
 export {
@@ -247,5 +305,5 @@ export {
     setR,
     setT,
     setX,
-    setY
+    setY,
 };
