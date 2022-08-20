@@ -47,6 +47,8 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         }
     );
 
+    shapes.rect.makeDraggable(titleBar, cansole.element as HTMLCanvasElement);
+
     titleBar.eventEmitter.on(events.mouse.Drag, function ({ deltaMovement }) {
         console.log("Dragging Window");
 
