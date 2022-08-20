@@ -39,8 +39,16 @@ function create({
         }
     );
 
+    //
+    // Make `box` interactive.
+    //
+
     box.makeClickable();
     box.makeHoverable();
+
+    //
+    // Attach event listeners to `box`.
+    //
 
     box.onHover(() => {
         box.theme.backgroundColor = constants.colors.primaryHovered;
@@ -52,14 +60,14 @@ function create({
         document.body.style.cursor = "auto";
     });
 
-    box.ee.on(events.mouse.Active, function () {
+    box.onActive(() => {
         if (box.isHovered) {
             box.theme.backgroundColor = constants.colors.primary;
             document.body.style.cursor = "pointer";
         }
     });
 
-    box.ee.on(events.mouse.ActiveLost, function () {
+    box.onActiveLost(() => {
         if (box.isHovered) {
             box.theme.backgroundColor = constants.colors.primaryHovered;
             document.body.style.cursor = "poiner";

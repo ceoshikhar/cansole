@@ -4,6 +4,11 @@ import { EventEmitter } from "../../../event-emitter";
 import * as events from "../events";
 import * as utils from "../utils";
 
+import {
+    Activable,
+    ActiveEventCallback,
+    ActiveLostEventCallback
+} from "../interfaces/Activable";
 import { Clickable, ClickEventCallback } from "../interfaces/Clickable";
 import {
     Hoverable,
@@ -40,7 +45,7 @@ const DEFAULT_BOX_THEME: BoxTheme = {
     borderWidth: 10,
 };
 
-class Box implements Clickable<Box>, Drawable, Hoverable<Box> {
+class Box implements Activable<Box>, Clickable<Box>, Drawable, Hoverable<Box> {
     private canvas: HTMLCanvasElement;
     public theme: BoxTheme;
 
@@ -104,6 +109,14 @@ class Box implements Clickable<Box>, Drawable, Hoverable<Box> {
                 this.h - bw
             );
         }
+    }
+
+    public onActive(cb: ActiveEventCallback<this>): void {
+        this.ee.on(events.mouse.Active, cb);
+    }
+
+    public onActiveLost(cb: ActiveLostEventCallback<this>): void {
+        this.ee.on(events.mouse.ActiveLost, cb);
     }
 
     public onHover(cb: HoverEventCallback<this>): void {
