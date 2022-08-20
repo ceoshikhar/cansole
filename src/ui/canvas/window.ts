@@ -66,8 +66,8 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
 
     titleBar.makeDraggable();
 
-    titleBar.ee.on(events.mouse.Drag, function ({ deltaMovement }) {
-        console.log("Dragging Window");
+    titleBar.onDrag(({ deltaMovement, target }) => {
+        console.log("Dragging Window", { target, name });
 
         const dx = deltaMovement[0];
         const dy = deltaMovement[1];

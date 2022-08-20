@@ -7,13 +7,14 @@ import * as utils from "../utils";
 import {
     Activable,
     ActiveEventCallback,
-    ActiveLostEventCallback
+    ActiveLostEventCallback,
 } from "../interfaces/Activable";
 import { Clickable, ClickEventCallback } from "../interfaces/Clickable";
+import { Draggable, DragEventCallback } from "../interfaces/Draggable";
 import {
     Hoverable,
     HoverEventCallback,
-    HoverLostEventCallback
+    HoverLostEventCallback,
 } from "../interfaces/Hoverable";
 import { Drawable } from "../interfaces/Drawable";
 
@@ -45,7 +46,7 @@ const DEFAULT_BOX_THEME: BoxTheme = {
     borderWidth: 10,
 };
 
-class Box implements Activable<Box>, Clickable<Box>, Drawable, Hoverable<Box> {
+class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, Hoverable<Box> {
     private canvas: HTMLCanvasElement;
     public theme: BoxTheme;
 
@@ -59,7 +60,7 @@ class Box implements Activable<Box>, Clickable<Box>, Drawable, Hoverable<Box> {
     public r: number;
     public b: number;
 
-    public ee: EventEmitter;
+    private ee: EventEmitter;
     public isActive: boolean;
     public isDragging: boolean;
     public isHovered: boolean;
@@ -131,6 +132,10 @@ class Box implements Activable<Box>, Clickable<Box>, Drawable, Hoverable<Box> {
         this.ee.on(events.mouse.Click, cb);
     }
 
+    public onDrag(cb: DragEventCallback<this>): void {
+        this.ee.on(events.mouse.Drag, cb);
+    }
+
     public setX(newX: number): void {
         this.x = newX;
         this.l = newX;
@@ -192,13 +197,13 @@ class Box implements Activable<Box>, Clickable<Box>, Drawable, Hoverable<Box> {
                 if (!this.isHovered) {
                     this.isHovered = true;
 
-                    this.ee.emit(events.mouse.Hover);
+                    this.ee.emit(events.mouse.Hover, { target: this });
                 }
             } else {
                 if (this.isHovered) {
                     this.isHovered = false;
 
-                    this.ee.emit(events.mouse.HoverLost);
+                    this.ee.emit(events.mouse.HoverLost, { target: this });
                 }
             }
         };
@@ -218,13 +223,13 @@ class Box implements Activable<Box>, Clickable<Box>, Drawable, Hoverable<Box> {
             if (this.isActive) {
                 this.isActive = false;
 
-                this.ee.emit(events.mouse.ActiveLost);
+                this.ee.emit(events.mouse.ActiveLost, { target: this });
             }
 
             if (!this.contains(math.vec2.create(event.x, event.y))) return;
             if (this.isDragging) return;
 
-            this.ee.emit(events.mouse.Click);
+            this.ee.emit(events.mouse.Click, { target: this });
         };
 
         const onMouseDown = (event: MouseEvent) => {
@@ -233,7 +238,7 @@ class Box implements Activable<Box>, Clickable<Box>, Drawable, Hoverable<Box> {
             if (!this.isActive) {
                 this.isActive = true;
 
-                this.ee.emit(events.mouse.Active);
+                this.ee.emit(events.mouse.Active, { target: this });
             }
 
             this.canvas.addEventListener("mouseup", handleMouseUp);
@@ -262,6 +267,7 @@ class Box implements Activable<Box>, Clickable<Box>, Drawable, Hoverable<Box> {
                 );
 
                 this.ee.emit(events.mouse.Drag, {
+                    target: this,
                     deltaTotal,
                     deltaMovement,
                 });
