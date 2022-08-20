@@ -4,7 +4,7 @@ import * as types from "../../types";
 
 import * as button from "./button";
 import * as events from "./events";
-import { Box } from "./shapes";
+import { Box } from "./shapes/Box";
 
 type Window = {
     title: string;
@@ -44,10 +44,10 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         w: 30,
         h: 30,
         label: "x",
-        cansole
+        cansole,
     });
 
-    crossButton.box.ee.on(events.mouse.Click, function () {
+    crossButton.box.onClick(() => {
         console.log("Clicked on Cross");
     });
 
@@ -75,7 +75,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         box.setX(box.x + dx);
         box.setY(box.y + dy);
 
-        titleBar.setX( titleBar.x + dx);
+        titleBar.setX(titleBar.x + dx);
         titleBar.setY(titleBar.y + dy);
 
         crossButton.box.setX(crossButton.box.x + dx);

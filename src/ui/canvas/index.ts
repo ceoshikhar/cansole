@@ -2,8 +2,6 @@ import * as types from "../../types";
 import * as utils from "../../utils";
 
 import * as button from "./button";
-import * as events from "./events";
-import * as shapes from "./shapes";
 import * as window from "./window";
 
 type Renderables = {
@@ -35,14 +33,14 @@ function setup(cansole: types.Cansole): void {
         cansole,
     });
 
-    myButton.box.ee.on(events.mouse.Click, function () {
+    myButton.box.onClick(() => {
         console.log("Clicked on Submit");
     });
 
     cansole.canvasRenderables = {
         window: myWindow,
         button: myButton,
-    }
+    };
 
     utils.positionButtonRelativeToWindow(cansole);
 }
@@ -88,4 +86,4 @@ function render(cansole: types.Cansole): void {
     button.render(renderables.button, ctx);
 }
 
-export { Renderables, render, setup, shapes, window, button };
+export { Renderables, render, setup, window, button };

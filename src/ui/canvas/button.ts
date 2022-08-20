@@ -2,7 +2,7 @@ import * as constants from "../../constants";
 import * as types from "../../types";
 
 import * as events from "./events";
-import { Box } from "./shapes";
+import { Box } from "./shapes/Box";
 
 type Button = {
     label: string;
@@ -26,14 +26,17 @@ function create({
     label,
     cansole,
 }: Options): Button {
-    const box = new Box(cansole.element as HTMLCanvasElement, {
-        x,
-        y,
-        w,
-        h,
-    }, {
-        backgroundColor: constants.colors.primary,
-    }
+    const box = new Box(
+        cansole.element as HTMLCanvasElement,
+        {
+            x,
+            y,
+            w,
+            h,
+        },
+        {
+            backgroundColor: constants.colors.primary,
+        }
     );
 
     box.makeClickable();
@@ -75,7 +78,6 @@ function create({
 
     const canvas = cansole.element as HTMLCanvasElement;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
 
     ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
     const textWidth = ctx.measureText(label).width;

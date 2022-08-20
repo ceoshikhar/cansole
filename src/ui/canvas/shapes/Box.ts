@@ -1,11 +1,11 @@
 import * as math from "../../../math";
+import { EventEmitter } from "../../../event-emitter";
 
 import * as events from "../events";
 import * as utils from "../utils";
 
-import { Clickable, ClickEventCallback } from "../clickable";
-import { Drawable } from "../drawable";
-import { EventEmitter } from "../../../event-emitter";
+import { Clickable, ClickEventCallback } from "../interfaces/Clickable";
+import { Drawable } from "../interfaces/Drawable";
 
 type BoxOptions = {
     x: number;
@@ -101,7 +101,9 @@ class Box implements Clickable<Box>, Drawable {
         }
     }
 
-    public onClick(cb: ClickEventCallback<this>): void {}
+    public onClick(cb: ClickEventCallback<this>): void {
+        this.ee.on(events.mouse.Click, cb);
+    }
 
     public setX(newX: number): void {
         this.x = newX;
@@ -211,8 +213,8 @@ class Box implements Clickable<Box>, Drawable {
             this.canvas.addEventListener("mouseup", handleMouseUp);
         };
 
-        // The `mousedown` and `mouseup` should both happen inside the `rect` for
-        // it to be considered as a `events.mouse.Click`.
+        // The `mousedown` and `mouseup` should both happen inside the `box`
+        // for it to be considered as a `events.mouse.Click`.
         this.canvas.addEventListener("mousedown", onMouseDown);
     }
 
