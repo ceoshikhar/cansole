@@ -2,9 +2,9 @@ import * as types from "../../types";
 import * as utils from "../../utils";
 
 import * as button from "./button";
-import * as window from "./window";
-
+import * as events from "./events";
 import * as shapes from "./shapes";
+import * as window from "./window";
 
 type Renderables = {
     window: window.Window;
@@ -33,6 +33,10 @@ function setup(cansole: types.Cansole): void {
     const myButton = button.create({
         label: "Submit",
         cansole,
+    });
+
+    myButton.rect.eventEmitter.on(events.Mouse.Click, function () {
+        console.log("Clicked on Submit");
     });
 
     cansole.canvasRenderables = {
