@@ -46,15 +46,32 @@ function create({
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
     // Attaching listeners for hover and active styles.
-    rect.eventEmitter.on(events.Mouse.Hover, function() {
+    rect.eventEmitter.on(events.mouse.Hover, function() {
         rect.bgColor = constants.colors.primaryHovered;
         document.body.style.cursor = "pointer";
     });
 
-    rect.eventEmitter.on(events.Mouse.HoverLost, function() {
+    rect.eventEmitter.on(events.mouse.HoverLost, function() {
         rect.bgColor = constants.colors.primary;
         document.body.style.cursor = "auto";
     });
+
+    rect.eventEmitter.on(events.mouse.Active, function() {
+        if (rect.isHovered) {
+            rect.bgColor = constants.colors.primary;
+            document.body.style.cursor = "pointer";
+        }
+    })
+
+    rect.eventEmitter.on(events.mouse.ActiveLost, function() {
+        if (rect.isHovered) {
+            rect.bgColor = constants.colors.primaryHovered;
+            document.body.style.cursor = "poiner";
+        } else {
+            rect.bgColor = constants.colors.primary;
+            document.body.style.cursor = "auto";
+        }
+    })
 
     ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
     const textWidth = ctx.measureText(label).width;
@@ -73,13 +90,6 @@ function create({
 function render(button: Button, ctx: CanvasRenderingContext2D): void {
     if (button.rect.isHovered) {
         console.log(button.label, "is hovered");
-    }
-
-    // `isActive` should come after `isHovered` because being active means
-    // its hovered as well so we want `isActive` to come after `isHovered`.
-    if (button.rect.isActive) {
-        button.rect.bgColor = constants.colors.primary;
-        document.body.style.cursor = "pointer";
     }
 
     //

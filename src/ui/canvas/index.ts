@@ -35,7 +35,7 @@ function setup(cansole: types.Cansole): void {
         cansole,
     });
 
-    myButton.rect.eventEmitter.on(events.Mouse.Click, function () {
+    myButton.rect.eventEmitter.on(events.mouse.Click, function () {
         console.log("Clicked on Submit");
     });
 

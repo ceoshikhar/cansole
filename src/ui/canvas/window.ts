@@ -48,7 +48,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         }
     );
 
-    titleBar.eventEmitter.on(events.Mouse.Drag, function ({ deltaMovement }) {
+    titleBar.eventEmitter.on(events.mouse.Drag, function ({ deltaMovement }) {
         console.log("Dragging Window");
 
         const dx = deltaMovement[0];
@@ -75,7 +75,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         cansole
     });
 
-    crossButton.rect.eventEmitter.on(events.Mouse.Click, function () {
+    crossButton.rect.eventEmitter.on(events.mouse.Click, function () {
         console.log("Clicked on Cross");
     });
 

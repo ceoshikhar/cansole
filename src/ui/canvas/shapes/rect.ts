@@ -40,16 +40,19 @@ type Options = {
     interactive?: boolean;
 };
 
-function create(canvas: HTMLCanvasElement, {
-    x,
-    y,
-    w,
-    h,
-    bgColor = "#000",
-    borderColor = null,
-    borderRadius = 0,
-    interactive = false,
-}: Options): Rect {
+function create(
+    canvas: HTMLCanvasElement,
+    {
+        x,
+        y,
+        w,
+        h,
+        bgColor = "#000",
+        borderColor = null,
+        borderRadius = 0,
+        interactive = false,
+    }: Options
+): Rect {
     const rect: Rect = {
         x,
         y,
@@ -131,14 +134,14 @@ function contains(rect: Rect, coords: math.vec2.Vec2<number>): boolean {
     return false;
 }
 
-function makeHoverable(rect:Rect, canvas: HTMLCanvasElement): void {
+function makeHoverable(rect: Rect, canvas: HTMLCanvasElement): void {
     canvas.addEventListener("mousemove", function (event) {
         if (contains(rect, math.vec2.create(event.x, event.y))) {
             if (!rect.isHovered) {
                 rect.isHovered = true;
 
                 if (rect.interactive) {
-                    rect.eventEmitter.emit(events.Mouse.Hover);
+                    rect.eventEmitter.emit(events.mouse.Hover);
                 }
             }
         } else {
@@ -146,38 +149,47 @@ function makeHoverable(rect:Rect, canvas: HTMLCanvasElement): void {
                 rect.isHovered = false;
 
                 if (rect.interactive) {
-                    rect.eventEmitter.emit(events.Mouse.HoverLost);
+                    rect.eventEmitter.emit(events.mouse.HoverLost);
                 }
             }
         }
-    })
+    });
 
     canvas.addEventListener("mouseleave", function () {
         rect.isHovered = false;
-    })
+    });
 }
 
 function makeClickable(rect: Rect, canvas: HTMLCanvasElement): void {
     // The `mousedown` and `mouseup` should both happen inside the `rect` for
-    // it to be considered as a `events.Mouse.Click`.
+    // it to be considered as a `events.mouse.Click`.
     canvas.addEventListener("mousedown", function (event) {
-        if (!contains(rect, math.vec2.create(event.x, event.y))) {
-            rect.isActive = false;
-            return;
-        }
+        if (!contains(rect, math.vec2.create(event.x, event.y))) return;
 
-        rect.isActive = true;
+        if (!rect.isActive) {
+            rect.isActive = true;
+
+            if (rect.interactive) {
+                rect.eventEmitter.emit(events.mouse.Active);
+            }
+        }
 
         function handleMouseUp(event: MouseEvent) {
             canvas.removeEventListener("mouseup", handleMouseUp);
 
-            rect.isActive = false;
+            if (rect.isActive) {
+                rect.isActive = false;
+
+                if (rect.interactive) {
+                    rect.eventEmitter.emit(events.mouse.ActiveLost);
+                }
+            }
 
             if (!contains(rect, math.vec2.create(event.x, event.y))) return;
             if (rect.isDragging) return;
 
             if (rect.interactive) {
-                rect.eventEmitter.emit(events.Mouse.Click);
+                rect.eventEmitter.emit(events.mouse.Click);
             }
         }
 
@@ -203,7 +215,7 @@ function makeDraggable(rect: Rect, canvas: HTMLCanvasElement): void {
             );
 
             if (rect.interactive) {
-                rect.eventEmitter.emit(events.Mouse.Drag, {
+                rect.eventEmitter.emit(events.mouse.Drag, {
                     deltaTotal,
                     deltaMovement,
                 });
@@ -238,20 +250,9 @@ function render(rect: Rect, ctx: CanvasRenderingContext2D): void {
             rect.x + bw / 2,
             rect.y + bw / 2,
             rect.w - bw,
-            rect.h - bw,
+            rect.h - bw
         );
     }
 }
 
-export {
-    Rect,
-    contains,
-    create,
-    render,
-    setB,
-    setL,
-    setR,
-    setT,
-    setX,
-    setY,
-};
+export { Rect, contains, create, render, setB, setL, setR, setT, setX, setY };
