@@ -32,7 +32,36 @@ function create({
         w,
         h,
         bgColor: constants.colors.primary,
-        interactive: true,
+    });
+
+    shapes.rect.makeClickable(rect, cansole.element as HTMLCanvasElement);
+    shapes.rect.makeHoverable(rect, cansole.element as HTMLCanvasElement);
+
+    rect.eventEmitter.on(events.mouse.Hover, function () {
+        rect.bgColor = constants.colors.primaryHovered;
+        document.body.style.cursor = "pointer";
+    });
+
+    rect.eventEmitter.on(events.mouse.HoverLost, function () {
+        rect.bgColor = constants.colors.primary;
+        document.body.style.cursor = "auto";
+    });
+
+    rect.eventEmitter.on(events.mouse.Active, function () {
+        if (rect.isHovered) {
+            rect.bgColor = constants.colors.primary;
+            document.body.style.cursor = "pointer";
+        }
+    });
+
+    rect.eventEmitter.on(events.mouse.ActiveLost, function () {
+        if (rect.isHovered) {
+            rect.bgColor = constants.colors.primaryHovered;
+            document.body.style.cursor = "poiner";
+        } else {
+            rect.bgColor = constants.colors.primary;
+            document.body.style.cursor = "auto";
+        }
     });
 
     // TODO: this is duplicated from `render` and I think a `Theme` oject
@@ -45,33 +74,6 @@ function create({
     const canvas = cansole.element as HTMLCanvasElement;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    // Attaching listeners for hover and active styles.
-    rect.eventEmitter.on(events.mouse.Hover, function() {
-        rect.bgColor = constants.colors.primaryHovered;
-        document.body.style.cursor = "pointer";
-    });
-
-    rect.eventEmitter.on(events.mouse.HoverLost, function() {
-        rect.bgColor = constants.colors.primary;
-        document.body.style.cursor = "auto";
-    });
-
-    rect.eventEmitter.on(events.mouse.Active, function() {
-        if (rect.isHovered) {
-            rect.bgColor = constants.colors.primary;
-            document.body.style.cursor = "pointer";
-        }
-    })
-
-    rect.eventEmitter.on(events.mouse.ActiveLost, function() {
-        if (rect.isHovered) {
-            rect.bgColor = constants.colors.primaryHovered;
-            document.body.style.cursor = "poiner";
-        } else {
-            rect.bgColor = constants.colors.primary;
-            document.body.style.cursor = "auto";
-        }
-    })
 
     ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
     const textWidth = ctx.measureText(label).width;
@@ -90,6 +92,14 @@ function create({
 function render(button: Button, ctx: CanvasRenderingContext2D): void {
     if (button.rect.isHovered) {
         console.log(button.label, "is hovered");
+    }
+
+    if (button.rect.isActive) {
+        console.log(button.label, "is active");
+    }
+
+    if (button.rect.isDragging) {
+        console.log(button.label, "is dragging");
     }
 
     //

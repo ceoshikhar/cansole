@@ -20,7 +20,6 @@ type Rect = {
 
     eventEmitter: eventEmitter.EventEmitter;
 
-    interactive: boolean;
     isActive: boolean;
     isDragging: boolean;
     isHovered: boolean;
@@ -36,8 +35,6 @@ type Options = {
     // If `null`, skip rendering border.
     borderColor?: string | null;
     borderRadius?: number;
-
-    interactive?: boolean;
 };
 
 function create(
@@ -50,7 +47,6 @@ function create(
         bgColor = "#000",
         borderColor = null,
         borderRadius = 0,
-        interactive = false,
     }: Options
 ): Rect {
     const rect: Rect = {
@@ -65,16 +61,11 @@ function create(
         t: y,
         r: x + w,
         b: y + h,
-        interactive,
         eventEmitter: eventEmitter.create(),
         isActive: false,
         isDragging: false,
         isHovered: false,
     };
-
-    makeClickable(rect, canvas);
-    makeDraggable(rect, canvas);
-    makeHoverable(rect, canvas);
 
     return rect;
 }
@@ -140,17 +131,13 @@ function makeHoverable(rect: Rect, canvas: HTMLCanvasElement): void {
             if (!rect.isHovered) {
                 rect.isHovered = true;
 
-                if (rect.interactive) {
-                    rect.eventEmitter.emit(events.mouse.Hover);
-                }
+                rect.eventEmitter.emit(events.mouse.Hover);
             }
         } else {
             if (rect.isHovered) {
                 rect.isHovered = false;
 
-                if (rect.interactive) {
-                    rect.eventEmitter.emit(events.mouse.HoverLost);
-                }
+                rect.eventEmitter.emit(events.mouse.HoverLost);
             }
         }
     });
@@ -169,9 +156,7 @@ function makeClickable(rect: Rect, canvas: HTMLCanvasElement): void {
         if (!rect.isActive) {
             rect.isActive = true;
 
-            if (rect.interactive) {
-                rect.eventEmitter.emit(events.mouse.Active);
-            }
+            rect.eventEmitter.emit(events.mouse.Active);
         }
 
         function handleMouseUp(event: MouseEvent) {
@@ -180,17 +165,13 @@ function makeClickable(rect: Rect, canvas: HTMLCanvasElement): void {
             if (rect.isActive) {
                 rect.isActive = false;
 
-                if (rect.interactive) {
-                    rect.eventEmitter.emit(events.mouse.ActiveLost);
-                }
+                rect.eventEmitter.emit(events.mouse.ActiveLost);
             }
 
             if (!contains(rect, math.vec2.create(event.x, event.y))) return;
             if (rect.isDragging) return;
 
-            if (rect.interactive) {
-                rect.eventEmitter.emit(events.mouse.Click);
-            }
+            rect.eventEmitter.emit(events.mouse.Click);
         }
 
         canvas.addEventListener("mouseup", handleMouseUp);
@@ -214,12 +195,10 @@ function makeDraggable(rect: Rect, canvas: HTMLCanvasElement): void {
                 event.movementY
             );
 
-            if (rect.interactive) {
-                rect.eventEmitter.emit(events.mouse.Drag, {
-                    deltaTotal,
-                    deltaMovement,
-                });
-            }
+            rect.eventEmitter.emit(events.mouse.Drag, {
+                deltaTotal,
+                deltaMovement,
+            });
         }
 
         function handleMouseUp() {
@@ -255,4 +234,18 @@ function render(rect: Rect, ctx: CanvasRenderingContext2D): void {
     }
 }
 
-export { Rect, contains, create, render, setB, setL, setR, setT, setX, setY };
+export {
+    Rect,
+    contains,
+    create,
+    makeClickable,
+    makeDraggable,
+    makeHoverable,
+    render,
+    setB,
+    setL,
+    setR,
+    setT,
+    setX,
+    setY
+};

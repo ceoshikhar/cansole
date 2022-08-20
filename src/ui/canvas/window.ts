@@ -44,7 +44,6 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
             w: w - 30,
             h: 30,
             bgColor: constants.colors.background2,
-            interactive: true,
         }
     );
 
