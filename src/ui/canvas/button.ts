@@ -42,12 +42,12 @@ function create({
     box.makeClickable();
     box.makeHoverable();
 
-    box.ee.on(events.mouse.Hover, function () {
+    box.onHover(() => {
         box.theme.backgroundColor = constants.colors.primaryHovered;
         document.body.style.cursor = "pointer";
     });
 
-    box.ee.on(events.mouse.HoverLost, function () {
+    box.onHoverLost(() => {
         box.theme.backgroundColor = constants.colors.primary;
         document.body.style.cursor = "auto";
     });

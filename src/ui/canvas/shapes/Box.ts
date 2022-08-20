@@ -5,6 +5,11 @@ import * as events from "../events";
 import * as utils from "../utils";
 
 import { Clickable, ClickEventCallback } from "../interfaces/Clickable";
+import {
+    Hoverable,
+    HoverEventCallback,
+    HoverLostEventCallback
+} from "../interfaces/Hoverable";
 import { Drawable } from "../interfaces/Drawable";
 
 type BoxOptions = {
@@ -35,7 +40,7 @@ const DEFAULT_BOX_THEME: BoxTheme = {
     borderWidth: 10,
 };
 
-class Box implements Clickable<Box>, Drawable {
+class Box implements Clickable<Box>, Drawable, Hoverable<Box> {
     private canvas: HTMLCanvasElement;
     public theme: BoxTheme;
 
@@ -99,6 +104,14 @@ class Box implements Clickable<Box>, Drawable {
                 this.h - bw
             );
         }
+    }
+
+    public onHover(cb: HoverEventCallback<this>): void {
+        this.ee.on(events.mouse.Hover, cb);
+    }
+
+    public onHoverLost(cb: HoverLostEventCallback<this>): void {
+        this.ee.on(events.mouse.HoverLost, cb);
     }
 
     public onClick(cb: ClickEventCallback<this>): void {
