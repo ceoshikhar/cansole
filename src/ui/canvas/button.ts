@@ -1,6 +1,7 @@
 import * as constants from "../../constants";
 import * as types from "../../types";
 
+import * as events from "./events";
 import * as shapes from "./shapes";
 
 type Button = {
@@ -44,6 +45,17 @@ function create({
     const canvas = cansole.element as HTMLCanvasElement;
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
+    // Attaching listeners for hover and active styles.
+    rect.eventEmitter.on(events.Mouse.Hover, function() {
+        rect.bgColor = constants.colors.primaryHovered;
+        document.body.style.cursor = "pointer";
+    });
+
+    rect.eventEmitter.on(events.Mouse.HoverLost, function() {
+        rect.bgColor = constants.colors.primary;
+        document.body.style.cursor = "auto";
+    });
+
     ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
     const textWidth = ctx.measureText(label).width;
 
@@ -59,17 +71,8 @@ function create({
 }
 
 function render(button: Button, ctx: CanvasRenderingContext2D): void {
-    // Resetting these to default first and then maybe later change them.
-    button.rect.bgColor = constants.colors.primary;
-    document.body.style.cursor = "auto";
-
-    // FIXME: These styles should be applied and then removed based on 
-    // `mouseover` and `mouseleave` events. Doing it this way, any other button
-    // will override these styles, especially the cursor styles.
     if (button.rect.isHovered) {
         console.log(button.label, "is hovered");
-        button.rect.bgColor = constants.colors.primaryHovered;
-        document.body.style.cursor = "pointer";
     }
 
     // `isActive` should come after `isHovered` because being active means

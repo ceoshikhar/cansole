@@ -134,9 +134,21 @@ function contains(rect: Rect, coords: math.vec2.Vec2<number>): boolean {
 function makeHoverable(rect:Rect, canvas: HTMLCanvasElement): void {
     canvas.addEventListener("mousemove", function (event) {
         if (contains(rect, math.vec2.create(event.x, event.y))) {
-            rect.isHovered = true;
+            if (!rect.isHovered) {
+                rect.isHovered = true;
+
+                if (rect.interactive) {
+                    rect.eventEmitter.emit(events.Mouse.Hover);
+                }
+            }
         } else {
-            rect.isHovered = false;
+            if (rect.isHovered) {
+                rect.isHovered = false;
+
+                if (rect.interactive) {
+                    rect.eventEmitter.emit(events.Mouse.HoverLost);
+                }
+            }
         }
     })
 
