@@ -4,14 +4,14 @@ import * as types from "../../types";
 
 import * as button from "./button";
 import * as events from "./events";
-import * as shapes from "./shapes";
+import { Box } from "./shapes";
 
 type Window = {
     title: string;
 
     // Private
-    rect: shapes.rect.Rect;
-    titleBar: shapes.rect.Rect;
+    box: Box;
+    titleBar: Box;
     crossButton: button.Button;
 };
 
@@ -25,47 +25,18 @@ type Options = {
 };
 
 function create({ x, y, w, h, title, cansole }: Options): Window {
-    const rect: shapes.rect.Rect = shapes.rect.create(
+    const box: Box = new Box(
         cansole.element as HTMLCanvasElement,
         {
             x,
             y,
             w,
             h,
-            bgColor: constants.colors.background,
-        }
-    );
-
-    const titleBar: shapes.rect.Rect = shapes.rect.create(
-        cansole.element as HTMLCanvasElement,
+        },
         {
-            x,
-            y,
-            w: w - 30,
-            h: 30,
-            bgColor: constants.colors.background2,
+            backgroundColor: constants.colors.background,
         }
     );
-
-    shapes.rect.makeDraggable(titleBar, cansole.element as HTMLCanvasElement);
-
-    titleBar.eventEmitter.on(events.mouse.Drag, function ({ deltaMovement }) {
-        console.log("Dragging Window");
-
-        const dx = deltaMovement[0];
-        const dy = deltaMovement[1];
-
-        shapes.rect.setX(rect, rect.x + dx);
-        shapes.rect.setY(rect, rect.y + dy);
-
-        shapes.rect.setX(titleBar, titleBar.x + dx);
-        shapes.rect.setY(titleBar, titleBar.y + dy);
-
-        shapes.rect.setX(crossButton.rect, crossButton.rect.x + dx);
-        shapes.rect.setY(crossButton.rect, crossButton.rect.y + dy);
-
-        utils.positionButtonRelativeToWindow(cansole);
-    });
 
     const crossButton: button.Button = button.create({
         x: x + w - 30,
@@ -76,13 +47,46 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         cansole
     });
 
-    crossButton.rect.eventEmitter.on(events.mouse.Click, function () {
+    crossButton.box.ee.on(events.mouse.Click, function () {
         console.log("Clicked on Cross");
+    });
+
+    const titleBar: Box = new Box(
+        cansole.element as HTMLCanvasElement,
+        {
+            x,
+            y,
+            w: w - 30,
+            h: 30,
+        },
+        {
+            backgroundColor: constants.colors.background2,
+        }
+    );
+
+    titleBar.makeDraggable();
+
+    titleBar.ee.on(events.mouse.Drag, function ({ deltaMovement }) {
+        console.log("Dragging Window");
+
+        const dx = deltaMovement[0];
+        const dy = deltaMovement[1];
+
+        box.setX(box.x + dx);
+        box.setY(box.y + dy);
+
+        titleBar.setX( titleBar.x + dx);
+        titleBar.setY(titleBar.y + dy);
+
+        crossButton.box.setX(crossButton.box.x + dx);
+        crossButton.box.setY(crossButton.box.y + dy);
+
+        utils.positionButtonRelativeToWindow(cansole);
     });
 
     return {
         title,
-        rect,
+        box,
         titleBar,
         crossButton,
     };
@@ -90,10 +94,10 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
 
 function render(window: Window, ctx: CanvasRenderingContext2D): void {
     // Draw the entire window.
-    shapes.rect.render(window.rect, ctx);
+    window.box.draw();
 
     // Draw the window's title bar.
-    shapes.rect.render(window.titleBar, ctx);
+    window.titleBar.draw();
 
     // Draw the title bar's close button.
     button.render(window.crossButton, ctx);

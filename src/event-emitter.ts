@@ -2,7 +2,7 @@ type Listener = (...args: any[]) => void;
 
 type Events = { [event: string]: Listener[] };
 
-class EventEmitterClass {
+class EventEmitter {
     private readonly events: Events;
 
     constructor() {
@@ -43,11 +43,5 @@ class EventEmitterClass {
     }
 }
 
-type EventEmitter = InstanceType< typeof EventEmitterClass>;
 
-function create(): EventEmitter {
-    return new EventEmitterClass();
-}
-
-
-export { EventEmitter, create };
+export { EventEmitter };

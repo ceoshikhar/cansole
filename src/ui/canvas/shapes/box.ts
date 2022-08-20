@@ -1,11 +1,11 @@
-import * as eventEmitter from "../../../event-emitter";
 import * as math from "../../../math";
 
 import * as events from "../events";
 import * as utils from "../utils";
 
-import { Drawable } from "../drawable";
 import { Clickable, ClickEventCallback } from "../clickable";
+import { Drawable } from "../drawable";
+import { EventEmitter } from "../../../event-emitter";
 
 type BoxOptions = {
     x: number;
@@ -16,9 +16,9 @@ type BoxOptions = {
 
 type BoxTheme = {
     backgroundColor: string;
+    foregroundColor: string;
     borderColor: string;
     borderWidth: number;
-    foregroundColor: string;
 };
 
 const DEFAULT_BOX_OPTIONS: BoxOptions = {
@@ -26,30 +26,56 @@ const DEFAULT_BOX_OPTIONS: BoxOptions = {
     y: 0,
     w: 100,
     h: 100,
-}
+};
 
 const DEFAULT_BOX_THEME: BoxTheme = {
     backgroundColor: "#000000",
-    borderWidth: 10,
-    borderColor: "",
     foregroundColor: "#ffffff",
-}
+    borderColor: "", // Empty string so that no border is drawn.
+    borderWidth: 10,
+};
 
 class Box implements Clickable<Box>, Drawable {
-    canvas: HTMLCanvasElement;
+    private canvas: HTMLCanvasElement;
+    public theme: BoxTheme;
 
-    options: BoxOptions;
+    public x: number;
+    public y: number;
+    public w: number;
+    public h: number;
 
-    theme: BoxTheme;
+    public l: number;
+    public t: number;
+    public r: number;
+    public b: number;
+
+    public ee: EventEmitter;
+    public isActive: boolean;
+    public isDragging: boolean;
+    public isHovered: boolean;
 
     constructor(
         canvas: HTMLCanvasElement,
         options: BoxOptions = DEFAULT_BOX_OPTIONS,
-        theme: Partial<BoxTheme> = {},
+        theme: Partial<BoxTheme> = {}
     ) {
         this.canvas = canvas;
-        this.options = options;
         this.theme = { ...DEFAULT_BOX_THEME, ...theme };
+
+        this.x = options.x;
+        this.y = options.y;
+        this.w = options.w;
+        this.h = options.h;
+
+        this.l = this.x;
+        this.t = this.y;
+        this.r = this.x + this.w;
+        this.b = this.y + this.h;
+
+        this.ee = new EventEmitter();
+        this.isActive = false;
+        this.isDragging = false;
+        this.isHovered = false;
     }
 
     public draw(): void {
@@ -57,253 +83,175 @@ class Box implements Clickable<Box>, Drawable {
 
         // Draw the rectangle shape.
         ctx.fillStyle = this.theme.backgroundColor;
-        ctx.fillRect(this.options.x, this.options.y, this.options.w, this.options.h);
+        ctx.fillRect(this.x, this.y, this.w, this.h);
 
         // Draw a border if we have a `borderColor`.
-        if (this.theme.borderColor !== null) {
+        if (this.theme.borderColor) {
             const bw = this.theme.borderWidth;
 
             ctx.lineWidth = bw;
             ctx.strokeStyle = this.theme.borderColor;
 
             ctx.strokeRect(
-                this.options.x + bw / 2,
-                this.options.y + bw / 2,
-                this.options.w - bw,
-                this.options.h - bw
+                this.x + bw / 2,
+                this.y + bw / 2,
+                this.w - bw,
+                this.h - bw
             );
         }
     }
 
     public onClick(cb: ClickEventCallback<this>): void {}
-}
 
-type Rect = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-
-    // TODO: instead of these being atom data why not have a `Theme` object?
-    bgColor: string;
-    borderColor: string | null;
-    borderRadius: number;
-
-    l: number;
-    t: number;
-    r: number;
-    b: number;
-
-    eventEmitter: eventEmitter.EventEmitter;
-
-    isActive: boolean;
-    isDragging: boolean;
-    isHovered: boolean;
-};
-
-type Options = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-
-    bgColor?: string;
-    // If `null`, skip rendering border.
-    borderColor?: string | null;
-    borderRadius?: number;
-};
-
-function create(
-    canvas: HTMLCanvasElement,
-    {
-        x,
-        y,
-        w,
-        h,
-        bgColor = "#000",
-        borderColor = null,
-        borderRadius = 0,
-    }: Options
-): Rect {
-    const rect: Rect = {
-        x,
-        y,
-        w,
-        h,
-        bgColor,
-        borderColor,
-        borderRadius,
-        l: x,
-        t: y,
-        r: x + w,
-        b: y + h,
-        eventEmitter: eventEmitter.create(),
-        isActive: false,
-        isDragging: false,
-        isHovered: false,
-    };
-
-    return rect;
-}
-
-function setX(rect: Rect, newX: number): void {
-    rect.x = newX;
-    rect.l = newX;
-    rect.r = newX + rect.w;
-}
-
-function setY(rect: Rect, newY: number): void {
-    rect.y = newY;
-    rect.t = newY;
-    rect.b = newY + rect.h;
-}
-
-function setL(rect: Rect, newL: number): void {
-    const newR = newL + rect.w;
-
-    rect.l = newL;
-    rect.x = newL;
-    rect.r = newR;
-}
-
-function setT(rect: Rect, newT: number): void {
-    const newB = newT + rect.h;
-
-    rect.t = newT;
-    rect.y = newT;
-    rect.b = newB;
-}
-
-function setR(rect: Rect, newR: number): void {
-    const newX = newR - rect.w;
-
-    rect.r = newR;
-    rect.x = newX;
-    rect.l = newX;
-}
-
-function setB(rect: Rect, newB: number): void {
-    const newY = newB - rect.h;
-
-    rect.b = newB;
-    rect.y = newY;
-    rect.t = newY;
-}
-
-function contains(rect: Rect, coords: math.vec2.Vec2<number>): boolean {
-    const x = coords[0];
-    const y = coords[1];
-
-    if (x >= rect.l && x <= rect.r && y >= rect.t && y <= rect.b) {
-        return true;
+    public setX(newX: number): void {
+        this.x = newX;
+        this.l = newX;
+        this.r = newX + this.w;
     }
 
-    return false;
-}
+    public setY(newY: number): void {
+        this.y = newY;
+        this.t = newY;
+        this.b = newY + this.h;
+    }
 
-function makeHoverable(rect: Rect, canvas: HTMLCanvasElement): void {
-    canvas.addEventListener("mousemove", function (event) {
-        if (contains(rect, math.vec2.create(event.x, event.y))) {
-            if (!rect.isHovered) {
-                rect.isHovered = true;
+    public setL(newL: number): void {
+        const newR = newL + this.w;
 
-                rect.eventEmitter.emit(events.mouse.Hover);
+        this.l = newL;
+        this.x = newL;
+        this.r = newR;
+    }
+
+    public setT(newT: number): void {
+        const newB = newT + this.h;
+
+        this.t = newT;
+        this.y = newT;
+        this.b = newB;
+    }
+
+    public setR(newR: number): void {
+        const newX = newR - this.w;
+
+        this.r = newR;
+        this.x = newX;
+        this.l = newX;
+    }
+
+    public setB(newB: number): void {
+        const newY = newB - this.h;
+
+        this.b = newB;
+        this.y = newY;
+        this.t = newY;
+    }
+
+    public contains(coords: math.vec2.Vec2<number>): boolean {
+        const x = coords[0];
+        const y = coords[1];
+
+        if (x >= this.l && x <= this.r && y >= this.t && y <= this.b) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public makeHoverable(): void {
+        const onMouseMove = (event: MouseEvent) => {
+            if (this.contains(math.vec2.create(event.x, event.y))) {
+                if (!this.isHovered) {
+                    this.isHovered = true;
+
+                    this.ee.emit(events.mouse.Hover);
+                }
+            } else {
+                if (this.isHovered) {
+                    this.isHovered = false;
+
+                    this.ee.emit(events.mouse.HoverLost);
+                }
             }
-        } else {
-            if (rect.isHovered) {
-                rect.isHovered = false;
+        };
+        this.canvas.addEventListener("mousemove", onMouseMove);
 
-                rect.eventEmitter.emit(events.mouse.HoverLost);
-            }
-        }
-    });
+        const onMouseLeave = () => {
+            this.isHovered = false;
+        };
 
-    canvas.addEventListener("mouseleave", function () {
-        rect.isHovered = false;
-    });
-}
+        this.canvas.addEventListener("mouseleave", onMouseLeave);
+    }
 
-function makeClickable(rect: Rect, canvas: HTMLCanvasElement): void {
-    // The `mousedown` and `mouseup` should both happen inside the `rect` for
-    // it to be considered as a `events.mouse.Click`.
-    canvas.addEventListener("mousedown", function (event) {
-        if (!contains(rect, math.vec2.create(event.x, event.y))) return;
+    public makeClickable(): void {
+        const handleMouseUp = (event: MouseEvent) => {
+            this.canvas.removeEventListener("mouseup", handleMouseUp);
 
-        if (!rect.isActive) {
-            rect.isActive = true;
+            if (this.isActive) {
+                this.isActive = false;
 
-            rect.eventEmitter.emit(events.mouse.Active);
-        }
-
-        function handleMouseUp(event: MouseEvent) {
-            canvas.removeEventListener("mouseup", handleMouseUp);
-
-            if (rect.isActive) {
-                rect.isActive = false;
-
-                rect.eventEmitter.emit(events.mouse.ActiveLost);
+                this.ee.emit(events.mouse.ActiveLost);
             }
 
-            if (!contains(rect, math.vec2.create(event.x, event.y))) return;
-            if (rect.isDragging) return;
+            if (!this.contains(math.vec2.create(event.x, event.y))) return;
+            if (this.isDragging) return;
 
-            rect.eventEmitter.emit(events.mouse.Click);
-        }
+            this.ee.emit(events.mouse.Click);
+        };
 
-        canvas.addEventListener("mouseup", handleMouseUp);
-    });
+        const onMouseDown = (event: MouseEvent) => {
+            if (!this.contains(math.vec2.create(event.x, event.y))) return;
+
+            if (!this.isActive) {
+                this.isActive = true;
+
+                this.ee.emit(events.mouse.Active);
+            }
+
+            this.canvas.addEventListener("mouseup", handleMouseUp);
+        };
+
+        // The `mousedown` and `mouseup` should both happen inside the `rect` for
+        // it to be considered as a `events.mouse.Click`.
+        this.canvas.addEventListener("mousedown", onMouseDown);
+    }
+
+    public makeDraggable(): void {
+        const onMouseDown = (event: MouseEvent) => {
+            if (!this.contains(math.vec2.create(event.x, event.y))) return;
+
+            const start = math.vec2.create(event.x, event.y);
+
+            const onMouseMove = (event: MouseEvent) => {
+                // Drag start?
+                this.isDragging = true;
+
+                const curr = math.vec2.create(event.x, event.y);
+                const deltaTotal = math.vec2.sub(curr, start);
+                const deltaMovement = math.vec2.create(
+                    event.movementX,
+                    event.movementY
+                );
+
+                this.ee.emit(events.mouse.Drag, {
+                    deltaTotal,
+                    deltaMovement,
+                });
+            };
+
+            const onMouseUp = () => {
+                // Drag end?
+                this.canvas.removeEventListener("mouseup", onMouseUp);
+                this.canvas.removeEventListener("mousemove", onMouseMove);
+                this.isDragging = false;
+            };
+
+            this.canvas.addEventListener("mousemove", onMouseMove);
+            this.canvas.addEventListener("mouseup", onMouseUp);
+        };
+
+        this.canvas.addEventListener("mousedown", onMouseDown);
+    }
 }
 
-function makeDraggable(rect: Rect, canvas: HTMLCanvasElement): void {
-    canvas.addEventListener("mousedown", function (event) {
-        if (!contains(rect, math.vec2.create(event.x, event.y))) return;
-
-        const start = math.vec2.create(event.x, event.y);
-
-        function handleMouseMove(event: MouseEvent) {
-            // Drag start?
-            rect.isDragging = true;
-
-            const curr = math.vec2.create(event.x, event.y);
-            const deltaTotal = math.vec2.sub(curr, start);
-            const deltaMovement = math.vec2.create(
-                event.movementX,
-                event.movementY
-            );
-
-            rect.eventEmitter.emit(events.mouse.Drag, {
-                deltaTotal,
-                deltaMovement,
-            });
-        }
-
-        function handleMouseUp() {
-            // Drag end?
-            canvas.removeEventListener("mouseup", handleMouseUp);
-            canvas.removeEventListener("mousemove", handleMouseMove);
-            rect.isDragging = false;
-        }
-
-        canvas.addEventListener("mousemove", handleMouseMove);
-        canvas.addEventListener("mouseup", handleMouseUp);
-    });
-}
-
-function render(rect: Rect, ctx: CanvasRenderingContext2D): void {
-}
-
-export {
-    Rect,
-    contains,
-    create,
-    makeClickable,
-    makeDraggable,
-    makeHoverable,
-    render,
-    setB,
-    setL,
-    setR,
-    setT,
-    setX,
-    setY,
-};
+export { Box };

@@ -2,11 +2,11 @@ import * as constants from "../../constants";
 import * as types from "../../types";
 
 import * as events from "./events";
-import * as shapes from "./shapes";
+import { Box } from "./shapes";
 
 type Button = {
     label: string;
-    rect: shapes.rect.Rect;
+    box: Box;
 };
 
 type Options = {
@@ -26,40 +26,42 @@ function create({
     label,
     cansole,
 }: Options): Button {
-    const rect = shapes.rect.create(cansole.element as HTMLCanvasElement, {
+    const box = new Box(cansole.element as HTMLCanvasElement, {
         x,
         y,
         w,
         h,
-        bgColor: constants.colors.primary,
-    });
+    }, {
+        backgroundColor: constants.colors.primary,
+    }
+    );
 
-    shapes.rect.makeClickable(rect, cansole.element as HTMLCanvasElement);
-    shapes.rect.makeHoverable(rect, cansole.element as HTMLCanvasElement);
+    box.makeClickable();
+    box.makeHoverable();
 
-    rect.eventEmitter.on(events.mouse.Hover, function () {
-        rect.bgColor = constants.colors.primaryHovered;
+    box.ee.on(events.mouse.Hover, function () {
+        box.theme.backgroundColor = constants.colors.primaryHovered;
         document.body.style.cursor = "pointer";
     });
 
-    rect.eventEmitter.on(events.mouse.HoverLost, function () {
-        rect.bgColor = constants.colors.primary;
+    box.ee.on(events.mouse.HoverLost, function () {
+        box.theme.backgroundColor = constants.colors.primary;
         document.body.style.cursor = "auto";
     });
 
-    rect.eventEmitter.on(events.mouse.Active, function () {
-        if (rect.isHovered) {
-            rect.bgColor = constants.colors.primary;
+    box.ee.on(events.mouse.Active, function () {
+        if (box.isHovered) {
+            box.theme.backgroundColor = constants.colors.primary;
             document.body.style.cursor = "pointer";
         }
     });
 
-    rect.eventEmitter.on(events.mouse.ActiveLost, function () {
-        if (rect.isHovered) {
-            rect.bgColor = constants.colors.primaryHovered;
+    box.ee.on(events.mouse.ActiveLost, function () {
+        if (box.isHovered) {
+            box.theme.backgroundColor = constants.colors.primaryHovered;
             document.body.style.cursor = "poiner";
         } else {
-            rect.bgColor = constants.colors.primary;
+            box.theme.backgroundColor = constants.colors.primary;
             document.body.style.cursor = "auto";
         }
     });
@@ -80,25 +82,25 @@ function create({
 
     const padding = 16;
 
-    rect.w = w || textWidth + padding;
-    rect.h = h || 24 + padding;
+    box.w = w || textWidth + padding;
+    box.h = h || 24 + padding;
 
     return {
         label,
-        rect,
+        box,
     };
 }
 
 function render(button: Button, ctx: CanvasRenderingContext2D): void {
-    if (button.rect.isHovered) {
+    if (button.box.isHovered) {
         console.log(button.label, "is hovered");
     }
 
-    if (button.rect.isActive) {
+    if (button.box.isActive) {
         console.log(button.label, "is active");
     }
 
-    if (button.rect.isDragging) {
+    if (button.box.isDragging) {
         console.log(button.label, "is dragging");
     }
 
@@ -106,7 +108,7 @@ function render(button: Button, ctx: CanvasRenderingContext2D): void {
     // Draw button's rectangle.
     //
 
-    shapes.rect.render(button.rect, ctx);
+    button.box.draw();
 
     //
     // Draw button's label.
@@ -125,8 +127,8 @@ function render(button: Button, ctx: CanvasRenderingContext2D): void {
 
     ctx.fillText(
         button.label,
-        button.rect.x + button.rect.w / 2,
-        button.rect.y + button.rect.h / 2
+        button.box.x + button.box.w / 2,
+        button.box.y + button.box.h / 2
     );
 }
 

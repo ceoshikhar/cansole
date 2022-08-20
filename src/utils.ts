@@ -1,5 +1,4 @@
 import * as types from "./types";
-import * as ui from "./ui";
 
 function isCanvas(element: HTMLElement): element is HTMLCanvasElement {
     return element instanceof HTMLCanvasElement;
@@ -15,14 +14,8 @@ function positionButtonRelativeToWindow(cansole: types.Cansole): void {
     const window = renderables.window;
     const buttonPaddingWithWindow = 16;
 
-    ui.canvas.shapes.rect.setR(
-        button.rect,
-        window.rect.r - buttonPaddingWithWindow
-    );
-    ui.canvas.shapes.rect.setB(
-        button.rect,
-        window.rect.b - buttonPaddingWithWindow
-    );
+    button.box.setR(window.box.r - buttonPaddingWithWindow);
+    button.box.setB(window.box.b - buttonPaddingWithWindow);
 }
 
 export { isCanvas, positionButtonRelativeToWindow };
