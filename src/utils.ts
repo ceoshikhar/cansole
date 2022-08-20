@@ -1,10 +1,10 @@
-import * as types from "./types";
+import { Cansole } from "./Cansole";
 
 function isCanvas(element: HTMLElement): element is HTMLCanvasElement {
     return element instanceof HTMLCanvasElement;
 }
 
-function positionButtonRelativeToWindow(cansole: types.Cansole): void {
+function positionButtonRelativeToWindow(cansole: Cansole): void {
     const renderables = cansole.canvasRenderables;
 
     // Sanity check because at this moment

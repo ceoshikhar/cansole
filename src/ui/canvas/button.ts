@@ -1,7 +1,6 @@
 import * as constants from "../../constants";
-import * as types from "../../types";
+import { Cansole } from "../../Cansole";
 
-import * as events from "./events";
 import { Box } from "./shapes/Box";
 
 type Button = {
@@ -15,7 +14,7 @@ type Options = {
     w?: number;
     h?: number;
     label: string;
-    cansole: types.Cansole;
+    cansole: Cansole;
 };
 
 function create({

@@ -1,9 +1,8 @@
 import * as constants from "../../constants";
 import * as utils from "../../utils";
-import * as types from "../../types";
+import { Cansole } from "../../Cansole";
 
 import * as button from "./button";
-import * as events from "./events";
 import { Box } from "./shapes/Box";
 
 type Window = {
@@ -21,7 +20,7 @@ type Options = {
     w: number;
     h: number;
     title: string;
-    cansole: types.Cansole;
+    cansole: Cansole;
 };
 
 function create({ x, y, w, h, title, cansole }: Options): Window {

@@ -1,4 +1,4 @@
-import * as types from "../../types";
+import { Cansole, Visibility } from "../../Cansole";
 import * as utils from "../../utils";
 
 import * as button from "./button";
@@ -12,7 +12,7 @@ type Renderables = {
 /**
  * Setup a `Cansole` so that it can be rendered to a `HTMLCanvasElement`.
  */
-function setup(cansole: types.Cansole): void {
+function setup(cansole: Cansole): void {
     if (!utils.isCanvas(cansole.element)) {
         throw new Error(
             "UI.canvas.setup: cansole.element is not an HTMLCanvasElement."
@@ -48,7 +48,7 @@ function setup(cansole: types.Cansole): void {
 /**
  * Render a `Cansole` to a `HTMLCanvasElement`.
  */
-function render(cansole: types.Cansole): void {
+function render(cansole: Cansole): void {
     if (!utils.isCanvas(cansole.element)) {
         throw new Error(
             "UI.canvas.render: cansole.element is not an HTMLCanvasElement."
@@ -65,7 +65,7 @@ function render(cansole: types.Cansole): void {
     }
 
     // Cansole is hidden, so don't render anything.
-    if (cansole.visibility === types.Visibility.Hidden) {
+    if (cansole.visibility === Visibility.Hidden) {
         return;
     }
 
