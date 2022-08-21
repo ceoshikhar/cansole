@@ -42,6 +42,7 @@ function create({
     // Make `box` interactive.
     //
 
+    box.makeActivable();
     box.makeClickable();
     box.makeHoverable();
 

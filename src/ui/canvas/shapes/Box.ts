@@ -216,20 +216,15 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
         this.canvas.addEventListener("mouseleave", onMouseLeave);
     }
 
-    public makeClickable(): void {
-        const handleMouseUp = (event: MouseEvent) => {
-            this.canvas.removeEventListener("mouseup", handleMouseUp);
+    public makeActivable(target: unknown = this): void {
+        const onMouseUp = () => {
+            this.canvas.removeEventListener("mouseup", onMouseUp);
 
             if (this.isActive) {
                 this.isActive = false;
 
-                this.ee.emit(events.mouse.ActiveLost, { target: this });
+                this.ee.emit(events.mouse.ActiveLost, { target });
             }
-
-            if (!this.contains(math.vec2.create(event.x, event.y))) return;
-            if (this.isDragging) return;
-
-            this.ee.emit(events.mouse.Click, { target: this });
         };
 
         const onMouseDown = (event: MouseEvent) => {
@@ -240,6 +235,25 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
 
                 this.ee.emit(events.mouse.Active, { target: this });
             }
+
+            this.canvas.addEventListener("mouseup", onMouseUp);
+        };
+
+        this.canvas.addEventListener("mousedown", onMouseDown);
+    }
+
+    public makeClickable(target: unknown = this): void {
+        const handleMouseUp = (event: MouseEvent) => {
+            this.canvas.removeEventListener("mouseup", handleMouseUp);
+
+            if (!this.contains(math.vec2.create(event.x, event.y))) return;
+            if (this.isDragging) return;
+
+            this.ee.emit(events.mouse.Click, { target });
+        };
+
+        const onMouseDown = (event: MouseEvent) => {
+            if (!this.contains(math.vec2.create(event.x, event.y))) return;
 
             this.canvas.addEventListener("mouseup", handleMouseUp);
         };
