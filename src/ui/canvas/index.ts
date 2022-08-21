@@ -30,8 +30,8 @@ function setup(cansole: Cansole): void {
 
     const submitButton = new Button(cansole.element as HTMLCanvasElement, "Submit");
 
-    submitButton.onClick((e) => {
-        console.log("Clicked on Submit", e);
+    submitButton.onClick(() => {
+        console.log("Clicked on Submit");
     });
 
     cansole.canvasRenderables = {

@@ -3,7 +3,7 @@ import * as utils from "../../utils";
 import { Cansole } from "../../Cansole";
 
 import { Box } from "./shapes/Box";
-import { Button }from "./Button";
+import { Button } from "./Button";
 
 type Window = {
     title: string;
@@ -48,8 +48,8 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         }
     );
 
-    xButton.onClick((e) => {
-        console.info("Clicked on X", e);
+    xButton.onClick(() => {
+        console.log("Clicked on X");
     });
 
     const titleBar: Box = new Box(
@@ -65,14 +65,10 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         }
     );
 
-    titleBar.makeClickable();
     titleBar.makeDraggable();
 
-    titleBar.onClick((e) => console.log("Clicked on window", e));
-
     titleBar.onDrag((e) => {
-        console.log("Dragging window", e);
-
+        console.log("Dragging window");
         const { deltaMovement } = e;
         const dx = deltaMovement[0];
         const dy = deltaMovement[1];
