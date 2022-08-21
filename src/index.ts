@@ -23,6 +23,8 @@ function renderLoop(t1: number) {
         if (t2 - t1 > 16.66) {
             const ctx = canvas.getContext('2d');
             ctx!.clearRect(0, 0, canvas.width, canvas.height);
+            ctx!.fillStyle = "#888888";
+            ctx!.fillRect(0, 0, canvas.width, canvas.height);
             cansole.draw();
             requestAnimationFrame(renderLoop(t2));
         } else {

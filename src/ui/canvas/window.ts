@@ -47,7 +47,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
     });
 
     crossButton.box.onClick(() => {
-        console.log("Clicked on Cross");
+        console.info("Clicked on Cross");
     });
 
     const titleBar: Box = new Box(
@@ -65,9 +65,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
 
     titleBar.makeDraggable();
 
-    titleBar.onDrag(({ deltaMovement, target }) => {
-        console.log("Dragging Window", { target, name });
-
+    titleBar.onDrag(({ deltaMovement }) => {
         const dx = deltaMovement[0];
         const dy = deltaMovement[1];
 
