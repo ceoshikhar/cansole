@@ -2,8 +2,8 @@ import * as constants from "../../constants";
 import * as utils from "../../utils";
 import { Cansole } from "../../Cansole";
 
-import * as button from "./button";
 import { Box } from "./shapes/Box";
+import { Button }from "./Button";
 
 type Window = {
     title: string;
@@ -11,7 +11,7 @@ type Window = {
     // Private
     box: Box;
     titleBar: Box;
-    crossButton: button.Button;
+    crossButton: Button;
 };
 
 type Options = {
@@ -37,17 +37,19 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         }
     );
 
-    const crossButton: button.Button = button.create({
-        x: x + w - 30,
-        y,
-        w: 30,
-        h: 30,
-        label: "x",
-        cansole,
-    });
+    const xButton: Button = new Button(
+        cansole.element as HTMLCanvasElement,
+        "X",
+        {
+            x: x + w - 30,
+            y,
+            w: 30,
+            h: 30,
+        }
+    );
 
-    crossButton.box.onClick(() => {
-        console.info("Clicked on Cross");
+    xButton.onClick((e) => {
+        console.info("Clicked on X", e);
     });
 
     const titleBar: Box = new Box(
@@ -63,9 +65,15 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         }
     );
 
+    titleBar.makeClickable();
     titleBar.makeDraggable();
 
-    titleBar.onDrag(({ deltaMovement }) => {
+    titleBar.onClick((e) => console.log("Clicked on window", e));
+
+    titleBar.onDrag((e) => {
+        console.log("Dragging window", e);
+
+        const { deltaMovement } = e;
         const dx = deltaMovement[0];
         const dy = deltaMovement[1];
 
@@ -75,8 +83,8 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         titleBar.setX(titleBar.x + dx);
         titleBar.setY(titleBar.y + dy);
 
-        crossButton.box.setX(crossButton.box.x + dx);
-        crossButton.box.setY(crossButton.box.y + dy);
+        xButton.setX(xButton.x + dx);
+        xButton.setY(xButton.y + dy);
 
         utils.positionButtonRelativeToWindow(cansole);
     });
@@ -85,11 +93,11 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         title,
         box,
         titleBar,
-        crossButton,
+        crossButton: xButton,
     };
 }
 
-function render(window: Window, ctx: CanvasRenderingContext2D): void {
+function render(window: Window): void {
     // Draw the entire window.
     window.box.draw();
 
@@ -97,7 +105,7 @@ function render(window: Window, ctx: CanvasRenderingContext2D): void {
     window.titleBar.draw();
 
     // Draw the title bar's close button.
-    button.render(window.crossButton, ctx);
+    window.crossButton.draw();
 }
 
 export { Window, create, render };

@@ -42,5 +42,5 @@ export {
     ActiveEvent,
     ActiveEventCallback,
     ActiveLostEvent,
-    ActiveLostEventCallback
+    ActiveLostEventCallback,
 };

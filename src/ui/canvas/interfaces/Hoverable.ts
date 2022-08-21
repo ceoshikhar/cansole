@@ -42,5 +42,5 @@ export {
     HoverEvent,
     HoverEventCallback,
     HoverLostEvent,
-    HoverLostEventCallback
+    HoverLostEventCallback,
 };

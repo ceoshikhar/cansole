@@ -1,12 +1,12 @@
 import { Cansole, Visibility } from "../../Cansole";
 import * as utils from "../../utils";
 
-import * as button from "./button";
+import { Button } from "./Button";
 import * as window from "./window";
 
 type Renderables = {
     window: window.Window;
-    button: button.Button;
+    submitButton: Button;
 };
 
 /**
@@ -28,18 +28,15 @@ function setup(cansole: Cansole): void {
         cansole,
     });
 
-    const myButton = button.create({
-        label: "Submit",
-        cansole,
-    });
+    const submitButton = new Button(cansole.element as HTMLCanvasElement, "Submit");
 
-    myButton.box.onClick(() => {
-        console.log("Clicked on Submit");
+    submitButton.onClick((e) => {
+        console.log("Clicked on Submit", e);
     });
 
     cansole.canvasRenderables = {
         window: myWindow,
-        button: myButton,
+        submitButton,
     };
 
     utils.positionButtonRelativeToWindow(cansole);
@@ -82,8 +79,8 @@ function render(cansole: Cansole): void {
     // Start drawing.
     //
 
-    window.render(renderables.window, ctx);
-    button.render(renderables.button, ctx);
+    window.render(renderables.window);
+    renderables.submitButton.draw();
 }
 
-export { Renderables, render, setup, window, button };
+export { Renderables, render, setup, window };
