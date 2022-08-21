@@ -195,7 +195,7 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
 
     public makeHoverable(): void {
         const onMouseMove = (event: MouseEvent) => {
-            if (this.contains(math.vec2.create(event.x, event.y))) {
+            if (this.contains(math.vec2.create(event.offsetX, event.offsetY))) {
                 if (!this.isHovered) {
                     this.isHovered = true;
 
@@ -230,7 +230,8 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
         };
 
         const onMouseDown = (event: MouseEvent) => {
-            if (!this.contains(math.vec2.create(event.x, event.y))) return;
+            if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
+                return;
 
             if (!this.isActive) {
                 this.isActive = true;
@@ -248,14 +249,16 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
         const handleMouseUp = (event: MouseEvent) => {
             this.canvas.removeEventListener("mouseup", handleMouseUp);
 
-            if (!this.contains(math.vec2.create(event.x, event.y))) return;
+            if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
+                return;
             if (this.isDragging) return;
 
             this.ee.emit(events.mouse.Click, { target: this });
         };
 
         const onMouseDown = (event: MouseEvent) => {
-            if (!this.contains(math.vec2.create(event.x, event.y))) return;
+            if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
+                return;
 
             this.canvas.addEventListener("mouseup", handleMouseUp);
         };
@@ -267,15 +270,16 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
 
     public makeDraggable(): void {
         const onMouseDown = (event: MouseEvent) => {
-            if (!this.contains(math.vec2.create(event.x, event.y))) return;
+            if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
+                return;
 
-            const start = math.vec2.create(event.x, event.y);
+            const start = math.vec2.create(event.offsetX, event.offsetY);
 
             const onMouseMove = (event: MouseEvent) => {
                 // Drag start?
                 this.isDragging = true;
 
-                const curr = math.vec2.create(event.x, event.y);
+                const curr = math.vec2.create(event.offsetX, event.offsetX);
                 const deltaTotal = math.vec2.sub(curr, start);
                 const deltaMovement = math.vec2.create(
                     event.movementX,
