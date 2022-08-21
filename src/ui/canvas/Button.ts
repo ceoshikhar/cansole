@@ -1,7 +1,7 @@
 import { EventEmitter } from "../../event-emitter";
 import * as constants from "../../constants";
 
-import { Box } from "./shapes/Box";
+import { Box, BoxTheme, defaultBoxTheme } from "./shapes/Box";
 import { Clickable, ClickEventCallback } from "./interfaces/Clickable";
 import { Drawable } from "./interfaces/Drawable";
 import * as events from "./events";
@@ -14,10 +14,7 @@ type ButtonOptions = {
     h: number;
 };
 
-type ButtonTheme = {
-    backgroundColor: string;
-    foregroundColor: string;
-};
+type ButtonTheme = BoxTheme;
 
 const defaultButtonOptions: ButtonOptions = {
     x: 0,
@@ -27,8 +24,21 @@ const defaultButtonOptions: ButtonOptions = {
 };
 
 const defaultButtonTheme: ButtonTheme = {
+    ...defaultBoxTheme,
     backgroundColor: constants.colors.primary,
     foregroundColor: constants.colors.onPrimary,
+
+    active: {
+        ...defaultBoxTheme.active,
+        backgroundColor: constants.colors.primary,
+        cursor: "pointer",
+    },
+
+    hover: {
+        ...defaultBoxTheme.hover,
+        backgroundColor: constants.colors.primaryHovered,
+        cursor: "pointer",
+    }
 };
 
 class Button implements Drawable, Clickable<Button> {
@@ -89,30 +99,33 @@ class Button implements Drawable, Clickable<Button> {
         // Attach event listeners to `box`.
         //
 
+        // TODO: Use `this.theme` for hovering and active styles.
+
         box.onHover(() => {
-            box.theme.backgroundColor = constants.colors.primaryHovered;
-            document.body.style.cursor = "pointer";
+            box.theme.backgroundColor = this.theme.hover.backgroundColor;
+            canvas.style.cursor = this.theme.hover.cursor;
         });
 
         box.onHoverLost(() => {
-            box.theme.backgroundColor = constants.colors.primary;
-            document.body.style.cursor = "auto";
+            box.theme.backgroundColor = this.theme.backgroundColor;
+            canvas.style.cursor = this.theme.cursor;
         });
 
         box.onActive(() => {
             if (box.isHovered) {
-                box.theme.backgroundColor = constants.colors.primary;
-                document.body.style.cursor = "pointer";
+                box.theme.backgroundColor = this.theme.active.backgroundColor;
+                canvas.style.cursor = this.theme.active.cursor;
             }
+            // Is it even possible for Button to be active if it's not hvoered?
         });
 
         box.onActiveLost(() => {
             if (box.isHovered) {
-                box.theme.backgroundColor = constants.colors.primaryHovered;
-                document.body.style.cursor = "poiner";
+                box.theme.backgroundColor = this.theme.hover.backgroundColor;
+                canvas.style.cursor = this.theme.hover.cursor;
             } else {
-                box.theme.backgroundColor = constants.colors.primary;
-                document.body.style.cursor = "auto";
+                box.theme.backgroundColor = this.theme.backgroundColor;
+                canvas.style.cursor = this.theme.cursor;
             }
         });
 
@@ -238,11 +251,7 @@ class Button implements Drawable, Clickable<Button> {
         ctx.textBaseline = "middle";
         ctx.fillStyle = this.theme.foregroundColor;
 
-        ctx.fillText(
-            this.label,
-            this.x + this.w / 2,
-            this.y + this.h / 2
-        );
+        ctx.fillText(this.label, this.x + this.w / 2, this.y + this.h / 2);
     }
 }
 

@@ -17,6 +17,7 @@ import {
     HoverLostEventCallback,
 } from "../interfaces/Hoverable";
 import { Drawable } from "../interfaces/Drawable";
+import { Themeables, Theme, Themeable } from "../interfaces/Themeable";
 
 type BoxOptions = {
     x: number;
@@ -25,28 +26,52 @@ type BoxOptions = {
     h: number;
 };
 
-type BoxTheme = {
-    backgroundColor: string;
-    foregroundColor: string;
-    borderColor: string;
-    borderWidth: number;
-};
+type BoxThemeables = Themeables;
 
-const DEFAULT_BOX_OPTIONS: BoxOptions = {
+type BoxTheme = Theme<BoxThemeables>;
+
+const defaultBoxOptions: BoxOptions = {
     x: 0,
     y: 0,
     w: 100,
     h: 100,
 };
 
-const DEFAULT_BOX_THEME: BoxTheme = {
-    backgroundColor: "#000000",
-    foregroundColor: "#ffffff",
-    borderColor: "", // Empty string so that no border is drawn.
-    borderWidth: 10,
+const defaultBoxThemeables: BoxThemeables = {
+    backgroundColor: "#EFEFEF",
+    foregroundColor: "#000000",
+    // No border by default.
+    borderColor: "",
+    borderWidth: 0,
+    cursor: "auto",
+    fontFamily: "Perfect DOS VGA 437 Win",
+    fontSize: 18,
+    fontWeight: "normal",
+    textAlign: "center",
+    textBaseline: "middle",
 };
 
-class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, Hoverable<Box> {
+const defaultBoxTheme: BoxTheme = {
+    ...defaultBoxThemeables,
+
+    active: {
+        ...defaultBoxThemeables,
+    },
+
+    hover: {
+        ...defaultBoxThemeables,
+    },
+};
+
+class Box
+    implements
+        Activable<Box>,
+        Clickable<Box>,
+        Draggable<Box>,
+        Drawable,
+        Hoverable<Box>,
+        Themeable<BoxThemeables>
+{
     public x: number;
     public y: number;
     public w: number;
@@ -69,11 +94,11 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
 
     constructor(
         canvas: HTMLCanvasElement,
-        options: BoxOptions = DEFAULT_BOX_OPTIONS,
+        options: BoxOptions = defaultBoxOptions,
         theme: Partial<BoxTheme> = {}
     ) {
         this.canvas = canvas;
-        this.theme = { ...DEFAULT_BOX_THEME, ...theme };
+        this.theme = { ...defaultBoxTheme, ...theme };
 
         this.x = options.x;
         this.y = options.y;
@@ -98,8 +123,8 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
         ctx.fillStyle = this.theme.backgroundColor;
         ctx.fillRect(this.x, this.y, this.w, this.h);
 
-        // Draw a border if we have a `borderColor`.
-        if (this.theme.borderColor) {
+        // Draw a border if we have a `borderColor` & `borderWidth`.
+        if (this.theme.borderColor && this.theme.borderWidth) {
             const bw = this.theme.borderWidth;
 
             ctx.lineWidth = bw;
@@ -308,4 +333,4 @@ class Box implements Activable<Box>, Clickable<Box>, Draggable<Box>, Drawable, H
     }
 }
 
-export { Box };
+export { Box, BoxTheme, defaultBoxTheme };
