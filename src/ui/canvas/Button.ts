@@ -1,9 +1,20 @@
 import { EventEmitter } from "../../event-emitter";
 import * as constants from "../../constants";
 
-import { Box, BoxTheme, defaultBoxTheme } from "./shapes/Box";
+import { Box, BoxTheme } from "./shapes/Box";
+import { Themeable } from "./interfaces/Themeable";
+import {
+    Activable,
+    ActiveEventCallback,
+    ActiveLostEventCallback,
+} from "./interfaces/Activable";
 import { Clickable, ClickEventCallback } from "./interfaces/Clickable";
 import { Drawable } from "./interfaces/Drawable";
+import {
+    Hoverable,
+    HoverEventCallback,
+    HoverLostEventCallback,
+} from "./interfaces/Hoverable";
 import * as events from "./events";
 import * as utils from "./utils";
 
@@ -14,7 +25,23 @@ type ButtonOptions = {
     h: number;
 };
 
-type ButtonTheme = BoxTheme;
+type ButtonThemeables = BoxTheme & {
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+    cursor: string;
+    foregroundColor: string;
+};
+
+type ButtonTheme = Omit<ButtonThemeables, 'cursor'> & {
+    hover: ButtonThemeables;
+    active: ButtonThemeables;
+};
+
+type PartialButtonTheme = Partial<Omit<ButtonThemeables, 'cursor'>> & {
+    hover?: Partial<ButtonThemeables>;
+    active?: Partial<ButtonThemeables>;
+};
 
 const defaultButtonOptions: ButtonOptions = {
     x: 0,
@@ -23,29 +50,35 @@ const defaultButtonOptions: ButtonOptions = {
     h: 0,
 };
 
-const defaultButtonTheme: ButtonTheme = {
-    ...defaultBoxTheme,
+const defaultButtonThemeables: ButtonThemeables = {
     backgroundColor: constants.colors.primary,
+    borderWidth: 0,
+    borderColor: "white",
+    cursor: "auto",
     foregroundColor: constants.colors.onPrimary,
+};
+
+const defaultButtonTheme: ButtonTheme = {
+    ...defaultButtonThemeables,
 
     active: {
-        ...defaultBoxTheme.active,
+        ...defaultButtonThemeables,
         backgroundColor: constants.colors.primary,
         cursor: "pointer",
     },
 
     hover: {
-        ...defaultBoxTheme.hover,
+        ...defaultButtonThemeables,
         backgroundColor: constants.colors.primaryHovered,
         cursor: "pointer",
-    }
+    },
 };
 
-class Button implements Drawable, Clickable<Button> {
+class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverable<Button>, Themeable<ButtonTheme> {
     public label: string;
 
     private canvas: HTMLCanvasElement;
-    private theme: ButtonTheme;
+    public readonly theme: ButtonTheme;
 
     private box: Box;
 
@@ -58,12 +91,21 @@ class Button implements Drawable, Clickable<Button> {
         canvas: HTMLCanvasElement,
         label: string,
         options: Partial<ButtonOptions> = {},
-        theme: Partial<ButtonTheme> = {}
+        theme: PartialButtonTheme = {}
     ) {
         this.canvas = canvas;
         this.label = label;
 
-        this.theme = { ...defaultButtonTheme, ...theme };
+        this.theme = { 
+            ...defaultButtonTheme,
+            ...theme,
+            hover: {
+                ...defaultButtonTheme.hover, ...theme.hover
+            },
+            active: {
+                ...defaultButtonTheme.active, ...theme.active
+            }
+        }
 
         const finalOptions: ButtonOptions = {
             ...defaultButtonOptions,
@@ -80,6 +122,8 @@ class Button implements Drawable, Clickable<Button> {
             },
             {
                 backgroundColor: this.theme.backgroundColor,
+                borderWidth: this.theme.borderWidth,
+                borderColor: this.theme.borderColor,
             }
         );
 
@@ -92,40 +136,38 @@ class Button implements Drawable, Clickable<Button> {
         this.ee = new EventEmitter();
 
         this.makeClickable();
-        box.makeActivable();
-        box.makeHoverable();
+        this.makeActivable();
+        this.makeHoverable();
 
         //
         // Attach event listeners to `box`.
         //
 
-        // TODO: Use `this.theme` for hovering and active styles.
-
         box.onHover(() => {
-            box.theme.backgroundColor = this.theme.hover.backgroundColor;
-            canvas.style.cursor = this.theme.hover.cursor;
+            box.theme = this.theme.hover;
+            this.canvas.style.cursor = this.theme.hover.cursor;
         });
 
         box.onHoverLost(() => {
-            box.theme.backgroundColor = this.theme.backgroundColor;
-            canvas.style.cursor = this.theme.cursor;
+            box.theme = this.theme;
+            this.canvas.style.cursor = "auto";
         });
 
         box.onActive(() => {
-            if (box.isHovered) {
-                box.theme.backgroundColor = this.theme.active.backgroundColor;
-                canvas.style.cursor = this.theme.active.cursor;
+            if (this.box.isHovered) {
+                box.theme= this.theme.active;
+                this.canvas.style.cursor = this.theme.active.cursor;
             }
             // Is it even possible for Button to be active if it's not hvoered?
         });
 
         box.onActiveLost(() => {
             if (box.isHovered) {
-                box.theme.backgroundColor = this.theme.hover.backgroundColor;
-                canvas.style.cursor = this.theme.hover.cursor;
+                box.theme = this.theme.hover;
+                this.canvas.style.cursor = this.theme.hover.cursor;
             } else {
-                box.theme.backgroundColor = this.theme.backgroundColor;
-                canvas.style.cursor = this.theme.cursor;
+                box.theme = this.theme;
+                this.canvas.style.cursor = "auto";
             }
         });
 
@@ -202,11 +244,56 @@ class Button implements Drawable, Clickable<Button> {
         this.box.setB(newB);
     }
 
+    private makeHoverable(): void {
+        this.box.makeHoverable();
+
+        this.box.onHover(() => {
+            this.isHovered = true;
+            this.ee.emit(events.mouse.Hover, { target: this })
+        });
+
+        this.box.onHoverLost(() => {
+            this.isHovered = false;
+            this.ee.emit(events.mouse.HoverLost, { target: this })
+        });
+    }
+
+    private makeActivable(): void {
+        this.box.makeActivable();
+
+        this.box.onActive(() => {
+            this.isActive = true;
+            this.ee.emit(events.mouse.Active, { target: this })
+        });
+
+        this.box.onActiveLost(() => {
+            this.isActive = false;
+            this.ee.emit(events.mouse.ActiveLost, { target: this })
+        });
+    }
+
     private makeClickable(): void {
         this.box.makeClickable();
-        this.box.onClick(() =>
+
+        this.box.onClick(() => {
             this.ee.emit(events.mouse.Click, { target: this })
-        );
+        });
+    }
+
+    public onHover(cb: HoverEventCallback<this>): void {
+        this.ee.on(events.mouse.Hover, cb);
+    }
+
+    public onHoverLost(cb: HoverLostEventCallback<this>): void {
+        this.ee.on(events.mouse.HoverLost, cb);
+    }
+
+    public onActive(cb: ActiveEventCallback<this>): void {
+        this.ee.on(events.mouse.Active, cb);
+    }
+
+    public onActiveLost(cb: ActiveLostEventCallback<this>): void {
+        this.ee.on(events.mouse.ActiveLost, cb);
     }
 
     public onClick(cb: ClickEventCallback<this>): void {
@@ -214,19 +301,13 @@ class Button implements Drawable, Clickable<Button> {
     }
 
     public draw(): void {
-        /*
-        if (this.box.isHovered) {
+        if (this.isHovered) {
             console.log(this.label, "is hovered");
         }
 
-        if (this.box.isActive) {
+        if (this.isActive) {
             console.log(this.label, "is active");
         }
-
-        if (this.box.isDragging) {
-            console.log(this.label, "is dragging");
-        }
-        */
 
         //
         // Draw button's rectangle.
@@ -243,13 +324,19 @@ class Button implements Drawable, Clickable<Button> {
         const fontSizePx = `${fontSize}px`;
         const fontWeight = "normal";
         const fontFamily = "Perfect DOS VGA 437 Win";
+        
+        let fillStyle = this.isHovered
+          ? this.theme.hover.foregroundColor
+          : this.isActive
+          ? this.theme.active.foregroundColor
+          : this.theme.foregroundColor;
 
         const ctx = utils.getContext2D(this.canvas);
 
         ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillStyle = this.theme.foregroundColor;
+        ctx.fillStyle = fillStyle;
 
         ctx.fillText(this.label, this.x + this.w / 2, this.y + this.h / 2);
     }

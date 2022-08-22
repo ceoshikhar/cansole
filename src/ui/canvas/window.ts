@@ -37,7 +37,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         }
     );
 
-    const xButton: Button = new Button(
+    const crossButton: Button = new Button(
         cansole.element as HTMLCanvasElement,
         "X",
         {
@@ -48,7 +48,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         }
     );
 
-    xButton.onClick(() => {
+    crossButton.onClick(() => {
         console.log("Clicked on X");
     });
 
@@ -79,8 +79,8 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         titleBar.setX(titleBar.x + dx);
         titleBar.setY(titleBar.y + dy);
 
-        xButton.setX(xButton.x + dx);
-        xButton.setY(xButton.y + dy);
+        crossButton.setX(crossButton.x + dx);
+        crossButton.setY(crossButton.y + dy);
 
         utils.positionButtonRelativeToWindow(cansole);
     });
@@ -89,7 +89,7 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         title,
         box,
         titleBar,
-        crossButton: xButton,
+        crossButton,
     };
 }
 

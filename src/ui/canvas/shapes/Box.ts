@@ -17,7 +17,7 @@ import {
     HoverLostEventCallback,
 } from "../interfaces/Hoverable";
 import { Drawable } from "../interfaces/Drawable";
-import { Themeables, Theme, Themeable } from "../interfaces/Themeable";
+import { Themeable } from "../interfaces/Themeable";
 
 type BoxOptions = {
     x: number;
@@ -26,9 +26,11 @@ type BoxOptions = {
     h: number;
 };
 
-type BoxThemeables = Themeables;
-
-type BoxTheme = Theme<BoxThemeables>;
+type BoxTheme = {
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+};
 
 const defaultBoxOptions: BoxOptions = {
     x: 0,
@@ -37,30 +39,11 @@ const defaultBoxOptions: BoxOptions = {
     h: 100,
 };
 
-const defaultBoxThemeables: BoxThemeables = {
+const defaultBoxTheme: BoxTheme = {
     backgroundColor: "#EFEFEF",
-    foregroundColor: "#000000",
     // No border by default.
     borderColor: "",
     borderWidth: 0,
-    cursor: "auto",
-    fontFamily: "Perfect DOS VGA 437 Win",
-    fontSize: 18,
-    fontWeight: "normal",
-    textAlign: "center",
-    textBaseline: "middle",
-};
-
-const defaultBoxTheme: BoxTheme = {
-    ...defaultBoxThemeables,
-
-    active: {
-        ...defaultBoxThemeables,
-    },
-
-    hover: {
-        ...defaultBoxThemeables,
-    },
 };
 
 class Box
@@ -70,7 +53,7 @@ class Box
         Draggable<Box>,
         Drawable,
         Hoverable<Box>,
-        Themeable<BoxThemeables>
+        Themeable<BoxTheme>
 {
     public x: number;
     public y: number;
@@ -139,20 +122,20 @@ class Box
         }
     }
 
-    public onActive(cb: ActiveEventCallback<this>): void {
-        this.ee.on(events.mouse.Active, cb);
-    }
-
-    public onActiveLost(cb: ActiveLostEventCallback<this>): void {
-        this.ee.on(events.mouse.ActiveLost, cb);
-    }
-
     public onHover(cb: HoverEventCallback<this>): void {
         this.ee.on(events.mouse.Hover, cb);
     }
 
     public onHoverLost(cb: HoverLostEventCallback<this>): void {
         this.ee.on(events.mouse.HoverLost, cb);
+    }
+
+    public onActive(cb: ActiveEventCallback<this>): void {
+        this.ee.on(events.mouse.Active, cb);
+    }
+
+    public onActiveLost(cb: ActiveLostEventCallback<this>): void {
+        this.ee.on(events.mouse.ActiveLost, cb);
     }
 
     public onClick<T extends unknown = this>(cb: ClickEventCallback<T>): void {
@@ -234,6 +217,7 @@ class Box
                 }
             }
         };
+
         this.canvas.addEventListener("mousemove", onMouseMove);
 
         const onMouseLeave = () => {
