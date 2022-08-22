@@ -45,6 +45,17 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
             y,
             w: 30,
             h: 30,
+        },
+        {
+            backgroundColor: constants.colors.error,
+
+            hover: {
+                backgroundColor: constants.colors.errorHovered,
+            },
+
+            active: {
+                backgroundColor: constants.colors.error,
+            }
         }
     );
 
