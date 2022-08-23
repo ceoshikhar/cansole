@@ -1,6 +1,8 @@
+import * as events from "./events";
 import * as utils from "./utils";
-import * as ui from "./ui"; 
+import * as ui from "./ui";
 import { Drawable } from "./ui/canvas/interfaces/Drawable";
+import { EventEmitter } from "./event-emitter";
 
 /**
  * Where and how to render the `Cansole`.
@@ -57,6 +59,8 @@ class Cansole implements Drawable {
     // When `Cansole` is rendered to `Target.Canvas`, this is what we render.
     public canvasRenderables?: ui.canvas.Renderables;
 
+    private ee: EventEmitter;
+
     /**
      * Create a new instance of `Cansole`.
      */
@@ -67,16 +71,11 @@ class Cansole implements Drawable {
         this.target = this.detectTarget(element);
         this.visibility = Visibility.Hidden;
 
+        this.ee = new EventEmitter();
+
         if (this.target === Target.Canvas) {
             ui.canvas.setup(this);
         }
-    }
-
-    /**
-     * Shows the console.
-     */
-    public show(): void {
-        this.visibility = Visibility.Visible;
     }
 
     /**
@@ -84,6 +83,28 @@ class Cansole implements Drawable {
      */
     public hide(): void {
         this.visibility = Visibility.Hidden;
+
+        this.ee.emit(events.CansoleEvents.Hide, this);
+        // TODO: Idk where to put this. This exist because I don't want to
+        // leave the cursor to be anything other than `auto`.
+        this.element.style.cursor = "auto";
+    }
+
+    public onHide(cb: (cansole: Cansole) => void): void {
+        this.ee.on(events.CansoleEvents.Hide, cb);
+    }
+
+    /**
+     * Shows the console.
+     */
+    public show(): void {
+        this.visibility = Visibility.Visible;
+
+        this.ee.emit(events.CansoleEvents.Show, this);
+    }
+
+    public onShow(cb: (cansole: Cansole) => void): void {
+        this.ee.on(events.CansoleEvents.Show, cb);
     }
 
     /**

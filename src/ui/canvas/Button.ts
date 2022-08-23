@@ -10,12 +10,13 @@ import {
 } from "./interfaces/Activable";
 import { Clickable, ClickEventCallback } from "./interfaces/Clickable";
 import { Drawable } from "./interfaces/Drawable";
+import { Destroyable } from "./interfaces/Destroyable";
 import {
     Hoverable,
     HoverEventCallback,
     HoverLostEventCallback,
 } from "./interfaces/Hoverable";
-import * as events from "./events";
+import * as events from "../../events";
 import * as utils from "./utils";
 
 type ButtonOptions = {
@@ -33,12 +34,12 @@ type ButtonThemeables = BoxTheme & {
     foregroundColor: string;
 };
 
-type ButtonTheme = Omit<ButtonThemeables, 'cursor'> & {
+type ButtonTheme = Omit<ButtonThemeables, "cursor"> & {
     hover: ButtonThemeables;
     active: ButtonThemeables;
 };
 
-type PartialButtonTheme = Partial<Omit<ButtonThemeables, 'cursor'>> & {
+type PartialButtonTheme = Partial<Omit<ButtonThemeables, "cursor">> & {
     hover?: Partial<ButtonThemeables>;
     active?: Partial<ButtonThemeables>;
 };
@@ -74,7 +75,15 @@ const defaultButtonTheme: ButtonTheme = {
     },
 };
 
-class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverable<Button>, Themeable<ButtonTheme> {
+class Button
+    implements
+        Activable<Button>,
+        Clickable<Button>,
+        Destroyable,
+        Drawable,
+        Hoverable<Button>,
+        Themeable<ButtonTheme>
+{
     public label: string;
 
     private canvas: HTMLCanvasElement;
@@ -96,16 +105,18 @@ class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverabl
         this.canvas = canvas;
         this.label = label;
 
-        this.theme = { 
+        this.theme = {
             ...defaultButtonTheme,
             ...theme,
             hover: {
-                ...defaultButtonTheme.hover, ...theme.hover
+                ...defaultButtonTheme.hover,
+                ...theme.hover,
             },
             active: {
-                ...defaultButtonTheme.active, ...theme.active
-            }
-        }
+                ...defaultButtonTheme.active,
+                ...theme.active,
+            },
+        };
 
         const finalOptions: ButtonOptions = {
             ...defaultButtonOptions,
@@ -155,7 +166,7 @@ class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverabl
 
         box.onActive(() => {
             if (this.box.isHovered) {
-                box.theme= this.theme.active;
+                box.theme = this.theme.active;
                 this.canvas.style.cursor = this.theme.active.cursor;
             }
             // Is it even possible for Button to be active if it's not hvoered?
@@ -249,12 +260,12 @@ class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverabl
 
         this.box.onHover(() => {
             this.isHovered = true;
-            this.ee.emit(events.mouse.Hover, { target: this })
+            this.ee.emit(events.MouseEvents.Hover, { target: this });
         });
 
         this.box.onHoverLost(() => {
             this.isHovered = false;
-            this.ee.emit(events.mouse.HoverLost, { target: this })
+            this.ee.emit(events.MouseEvents.HoverLost, { target: this });
         });
     }
 
@@ -263,12 +274,12 @@ class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverabl
 
         this.box.onActive(() => {
             this.isActive = true;
-            this.ee.emit(events.mouse.Active, { target: this })
+            this.ee.emit(events.MouseEvents.Active, { target: this });
         });
 
         this.box.onActiveLost(() => {
             this.isActive = false;
-            this.ee.emit(events.mouse.ActiveLost, { target: this })
+            this.ee.emit(events.MouseEvents.ActiveLost, { target: this });
         });
     }
 
@@ -276,28 +287,28 @@ class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverabl
         this.box.makeClickable();
 
         this.box.onClick(() => {
-            this.ee.emit(events.mouse.Click, { target: this })
+            this.ee.emit(events.MouseEvents.Click, { target: this });
         });
     }
 
     public onHover(cb: HoverEventCallback<this>): void {
-        this.ee.on(events.mouse.Hover, cb);
+        this.ee.on(events.MouseEvents.Hover, cb);
     }
 
     public onHoverLost(cb: HoverLostEventCallback<this>): void {
-        this.ee.on(events.mouse.HoverLost, cb);
+        this.ee.on(events.MouseEvents.HoverLost, cb);
     }
 
     public onActive(cb: ActiveEventCallback<this>): void {
-        this.ee.on(events.mouse.Active, cb);
+        this.ee.on(events.MouseEvents.Active, cb);
     }
 
     public onActiveLost(cb: ActiveLostEventCallback<this>): void {
-        this.ee.on(events.mouse.ActiveLost, cb);
+        this.ee.on(events.MouseEvents.ActiveLost, cb);
     }
 
     public onClick(cb: ClickEventCallback<this>): void {
-        this.ee.on(events.mouse.Click, cb);
+        this.ee.on(events.MouseEvents.Click, cb);
     }
 
     public draw(): void {
@@ -324,12 +335,12 @@ class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverabl
         const fontSizePx = `${fontSize}px`;
         const fontWeight = "normal";
         const fontFamily = "Perfect DOS VGA 437 Win";
-        
+
         let fillStyle = this.isHovered
-          ? this.theme.hover.foregroundColor
-          : this.isActive
-          ? this.theme.active.foregroundColor
-          : this.theme.foregroundColor;
+            ? this.theme.hover.foregroundColor
+            : this.isActive
+            ? this.theme.active.foregroundColor
+            : this.theme.foregroundColor;
 
         const ctx = utils.getContext2D(this.canvas);
 
@@ -339,6 +350,10 @@ class Button implements Activable<Button>, Clickable<Button>, Drawable, Hoverabl
         ctx.fillStyle = fillStyle;
 
         ctx.fillText(this.label, this.x + this.w / 2, this.y + this.h / 2);
+    }
+
+    public destroy(): void {
+        this.box.destroy();
     }
 }
 

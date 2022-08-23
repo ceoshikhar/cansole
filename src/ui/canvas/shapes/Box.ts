@@ -1,7 +1,7 @@
 import * as math from "../../../math";
 import { EventEmitter } from "../../../event-emitter";
 
-import * as events from "../events";
+import * as events from "../../../events";
 import * as utils from "../utils";
 
 import {
@@ -17,6 +17,7 @@ import {
     HoverLostEventCallback,
 } from "../interfaces/Hoverable";
 import { Drawable } from "../interfaces/Drawable";
+import { Destroyable } from "../interfaces/Destroyable";
 import { Themeable } from "../interfaces/Themeable";
 
 type BoxOptions = {
@@ -52,6 +53,7 @@ class Box
         Clickable<Box>,
         Draggable<Box>,
         Drawable,
+        Destroyable,
         Hoverable<Box>,
         Themeable<BoxTheme>
 {
@@ -123,27 +125,27 @@ class Box
     }
 
     public onHover(cb: HoverEventCallback<this>): void {
-        this.ee.on(events.mouse.Hover, cb);
+        this.ee.on(events.MouseEvents.Hover, cb);
     }
 
     public onHoverLost(cb: HoverLostEventCallback<this>): void {
-        this.ee.on(events.mouse.HoverLost, cb);
+        this.ee.on(events.MouseEvents.HoverLost, cb);
     }
 
     public onActive(cb: ActiveEventCallback<this>): void {
-        this.ee.on(events.mouse.Active, cb);
+        this.ee.on(events.MouseEvents.Active, cb);
     }
 
     public onActiveLost(cb: ActiveLostEventCallback<this>): void {
-        this.ee.on(events.mouse.ActiveLost, cb);
+        this.ee.on(events.MouseEvents.ActiveLost, cb);
     }
 
     public onClick<T extends unknown = this>(cb: ClickEventCallback<T>): void {
-        this.ee.on(events.mouse.Click, cb);
+        this.ee.on(events.MouseEvents.Click, cb);
     }
 
     public onDrag(cb: DragEventCallback<this>): void {
-        this.ee.on(events.mouse.Drag, cb);
+        this.ee.on(events.MouseEvents.Drag, cb);
     }
 
     public setX(newX: number): void {
@@ -207,24 +209,31 @@ class Box
                 if (!this.isHovered) {
                     this.isHovered = true;
 
-                    this.ee.emit(events.mouse.Hover, { target: this });
+                    this.ee.emit(events.MouseEvents.Hover, { target: this });
                 }
             } else {
                 if (this.isHovered) {
                     this.isHovered = false;
 
-                    this.ee.emit(events.mouse.HoverLost, { target: this });
+                    this.ee.emit(events.MouseEvents.HoverLost, {
+                        target: this,
+                    });
                 }
             }
         };
-
-        this.canvas.addEventListener("mousemove", onMouseMove);
 
         const onMouseLeave = () => {
             this.isHovered = false;
         };
 
+        this.canvas.addEventListener("mousemove", onMouseMove);
         this.canvas.addEventListener("mouseleave", onMouseLeave);
+        this.onDestroy(() =>
+            this.canvas.removeEventListener("mousemove", onMouseMove)
+        );
+        this.onDestroy(() =>
+            this.canvas.removeEventListener("mouseleave", onMouseLeave)
+        );
     }
 
     public makeActivable(): void {
@@ -234,7 +243,7 @@ class Box
             if (this.isActive) {
                 this.isActive = false;
 
-                this.ee.emit(events.mouse.ActiveLost, { target: this });
+                this.ee.emit(events.MouseEvents.ActiveLost, { target: this });
             }
         };
 
@@ -245,36 +254,48 @@ class Box
             if (!this.isActive) {
                 this.isActive = true;
 
-                this.ee.emit(events.mouse.Active, { target: this });
+                this.ee.emit(events.MouseEvents.Active, { target: this });
             }
 
             this.canvas.addEventListener("mouseup", onMouseUp);
+            this.onDestroy(() =>
+                this.canvas.removeEventListener("mouseup", onMouseUp)
+            );
         };
 
         this.canvas.addEventListener("mousedown", onMouseDown);
+        this.onDestroy(() =>
+            this.canvas.removeEventListener("mousedown", onMouseDown)
+        );
     }
 
     public makeClickable(): void {
-        const handleMouseUp = (event: MouseEvent) => {
-            this.canvas.removeEventListener("mouseup", handleMouseUp);
+        const onMouseUp = (event: MouseEvent) => {
+            this.canvas.removeEventListener("mouseup", onMouseUp);
 
             if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
                 return;
             if (this.isDragging) return;
 
-            this.ee.emit(events.mouse.Click, { target: this });
+            this.ee.emit(events.MouseEvents.Click, { target: this });
         };
 
         const onMouseDown = (event: MouseEvent) => {
             if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
                 return;
 
-            this.canvas.addEventListener("mouseup", handleMouseUp);
+            this.canvas.addEventListener("mouseup", onMouseUp);
+            this.onDestroy(() =>
+                this.canvas.removeEventListener("mouseup", onMouseUp)
+            );
         };
 
         // The `mousedown` and `mouseup` should both happen inside the `box`
         // for it to be considered as a `events.mouse.Click`.
         this.canvas.addEventListener("mousedown", onMouseDown);
+        this.onDestroy(() =>
+            this.canvas.removeEventListener("mousedown", onMouseDown)
+        );
     }
 
     public makeDraggable(): void {
@@ -295,7 +316,7 @@ class Box
                     event.movementY
                 );
 
-                this.ee.emit(events.mouse.Drag, {
+                this.ee.emit(events.MouseEvents.Drag, {
                     target: this,
                     deltaTotal,
                     deltaMovement,
@@ -311,9 +332,26 @@ class Box
 
             this.canvas.addEventListener("mousemove", onMouseMove);
             this.canvas.addEventListener("mouseup", onMouseUp);
+            this.onDestroy(() =>
+                this.canvas.removeEventListener("mousemove", onMouseMove)
+            );
+            this.onDestroy(() =>
+                this.canvas.removeEventListener("mouseup", onMouseUp)
+            );
         };
 
         this.canvas.addEventListener("mousedown", onMouseDown);
+        this.onDestroy(() =>
+            this.canvas.removeEventListener("mousedown", onMouseDown)
+        );
+    }
+
+    public destroy(): void {
+        this.ee.emit(events.CoreEvents.Destroy);
+    }
+
+    private onDestroy(cb: () => void): void {
+        this.ee.on(events.CoreEvents.Destroy, cb);
     }
 }
 

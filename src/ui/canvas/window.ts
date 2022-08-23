@@ -55,12 +55,12 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
 
             active: {
                 backgroundColor: constants.colors.error,
-            }
+            },
         }
     );
 
     crossButton.onClick(() => {
-        console.log("Clicked on X");
+        cansole.hide();
     });
 
     const titleBar: Box = new Box(
@@ -96,12 +96,16 @@ function create({ x, y, w, h, title, cansole }: Options): Window {
         utils.positionButtonRelativeToWindow(cansole);
     });
 
-    return {
+    const window: Window = {
         title,
         box,
         titleBar,
         crossButton,
     };
+
+    cansole.onHide(() => destroy(window));
+
+    return window;
 }
 
 function render(window: Window): void {
@@ -115,4 +119,10 @@ function render(window: Window): void {
     window.crossButton.draw();
 }
 
-export { Window, create, render };
+function destroy(window: Window): void {
+    window.box.destroy();
+    window.titleBar.destroy();
+    window.crossButton.destroy();
+}
+
+export { Window, create, destroy, render };
