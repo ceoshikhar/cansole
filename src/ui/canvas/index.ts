@@ -2,12 +2,9 @@ import { Cansole, Visibility } from "../../Cansole";
 import * as utils from "../../utils";
 
 import { Button } from "./Button";
-import * as window from "./window";
-
-type Renderables = {
-    window: window.Window;
-    submitButton: Button;
-};
+import { Drawable } from "./interfaces/Drawable";
+import { Destroyable } from "./interfaces/Destroyable";
+import { Window } from "./Window";
 
 /**
  * Setup a `Cansole` so that it can be rendered to a `HTMLCanvasElement`.
@@ -19,7 +16,7 @@ function setup(cansole: Cansole): void {
         );
     }
 
-    const myWindow = window.create({
+    const myWindow = new Window({
         x: 150,
         y: 150,
         w: 640,
@@ -37,14 +34,16 @@ function setup(cansole: Cansole): void {
         console.log("Clicked on Submit");
     });
 
-    cansole.canvasRenderables = {
-        window: myWindow,
-        submitButton,
-    };
+    cansole.canvasItems.push(myWindow);
+    cansole.canvasItems.push(submitButton);
 
     cansole.onHide(() => destroy(cansole));
 
-    utils.positionButtonRelativeToWindow(cansole);
+    utils.positionButtonRelativeToWindow(submitButton, myWindow);
+
+    myWindow.onDrag(() =>
+        utils.positionButtonRelativeToWindow(submitButton, myWindow)
+    );
 }
 
 /**
@@ -71,37 +70,16 @@ function render(cansole: Cansole): void {
         return;
     }
 
-    const renderables = cansole.canvasRenderables;
-
-    if (!renderables) {
-        throw new Error(
-            "ui.canvas.render: no cansole.canvasRenderables found, maybe you" +
-                " forgot to run ui.canvas.setup."
-        );
-    }
-
     //
     // Start drawing.
     //
 
-    window.render(renderables.window);
-    renderables.submitButton.draw();
+    cansole.canvasItems.forEach((item) => item.draw());
 }
 
 function destroy(cansole: Cansole): void {
-    const renderables = cansole.canvasRenderables;
-
-    if (!renderables) {
-        throw new Error(
-            "ui.canvas.render: no cansole.canvasRenderables found, maybe you" +
-                " forgot to run ui.canvas.setup."
-        );
-    }
-
     console.log("Destroying CanvasUI");
-
-    window.destroy(renderables.window);
-    renderables.submitButton.destroy();
+    cansole.canvasItems.forEach((item) => item.destroy());
 }
 
-export { Renderables, render, setup, window };
+export { Button, Destroyable, Drawable, render, setup, Window };

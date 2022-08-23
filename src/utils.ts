@@ -1,4 +1,4 @@
-import { Cansole } from "./Cansole";
+import { Button, Window } from "./ui/canvas";
 
 function isCanvas(element: HTMLElement): element is HTMLCanvasElement {
     return element instanceof HTMLCanvasElement;
@@ -6,19 +6,11 @@ function isCanvas(element: HTMLElement): element is HTMLCanvasElement {
 
 // TODO: instead of this we should have "child" <-> "parent" elements to be
 // "drawn" relative to each other?
-function positionButtonRelativeToWindow(cansole: Cansole): void {
-    const renderables = cansole.canvasRenderables;
-
-    // Sanity check because at this moment
-    if (!renderables) return;
-
-    const button = renderables.submitButton;
-    const window = renderables.window;
-
+function positionButtonRelativeToWindow(button: Button, window: Window): void {
     const buttonPaddingWithWindow = 16;
 
-    button.setR(window.box.r - buttonPaddingWithWindow);
-    button.setB(window.box.b - buttonPaddingWithWindow);
+    button.setR(window.r - buttonPaddingWithWindow);
+    button.setB(window.b - buttonPaddingWithWindow);
 }
 
 export { isCanvas, positionButtonRelativeToWindow };

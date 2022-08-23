@@ -1,7 +1,7 @@
 import * as events from "./events";
 import * as utils from "./utils";
 import * as ui from "./ui";
-import { Drawable } from "./ui/canvas/interfaces/Drawable";
+import { Destroyable, Drawable } from "./ui/canvas";
 import { EventEmitter } from "./event-emitter";
 
 /**
@@ -48,6 +48,8 @@ type CansoleOptions = {
     element: CansoleElement;
 };
 
+type CanvasItems = Array<Destroyable & Drawable>;
+
 /**
  * Represents a `Cansole`.
  */
@@ -57,7 +59,7 @@ class Cansole implements Drawable {
     public visibility: Visibility;
 
     // When `Cansole` is rendered to `Target.Canvas`, this is what we render.
-    public canvasRenderables?: ui.canvas.Renderables;
+    public canvasItems: CanvasItems;
 
     private ee: EventEmitter;
 
@@ -72,6 +74,8 @@ class Cansole implements Drawable {
         this.visibility = Visibility.Hidden;
 
         this.ee = new EventEmitter();
+
+        this.canvasItems = [];
 
         if (this.target === Target.Canvas) {
             ui.canvas.setup(this);
