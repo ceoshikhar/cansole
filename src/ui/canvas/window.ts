@@ -120,6 +120,8 @@ function render(window: Window): void {
 }
 
 function destroy(window: Window): void {
+    console.log("Destroying Window");
+
     window.box.destroy();
     window.titleBar.destroy();
     window.crossButton.destroy();

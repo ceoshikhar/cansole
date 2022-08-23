@@ -347,6 +347,7 @@ class Box
     }
 
     public destroy(): void {
+        console.log("Destroying Box");
         this.ee.emit(events.CoreEvents.Destroy);
     }
 

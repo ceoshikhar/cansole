@@ -353,6 +353,7 @@ class Button
     }
 
     public destroy(): void {
+        console.log("Destroying Button", this.label);
         this.box.destroy();
     }
 }

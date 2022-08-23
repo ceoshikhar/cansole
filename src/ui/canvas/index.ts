@@ -30,7 +30,7 @@ function setup(cansole: Cansole): void {
 
     const submitButton = new Button(
         cansole.element as HTMLCanvasElement,
-        "Submit",
+        "Submit"
     );
 
     submitButton.onClick(() => {
@@ -41,6 +41,8 @@ function setup(cansole: Cansole): void {
         window: myWindow,
         submitButton,
     };
+
+    cansole.onHide(() => destroy(cansole));
 
     utils.positionButtonRelativeToWindow(cansole);
 }
@@ -84,6 +86,22 @@ function render(cansole: Cansole): void {
 
     window.render(renderables.window);
     renderables.submitButton.draw();
+}
+
+function destroy(cansole: Cansole): void {
+    const renderables = cansole.canvasRenderables;
+
+    if (!renderables) {
+        throw new Error(
+            "ui.canvas.render: no cansole.canvasRenderables found, maybe you" +
+                " forgot to run ui.canvas.setup."
+        );
+    }
+
+    console.log("Destroying CanvasUI");
+
+    window.destroy(renderables.window);
+    renderables.submitButton.destroy();
 }
 
 export { Renderables, render, setup, window };
