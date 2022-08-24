@@ -76,6 +76,8 @@ class Cansole implements Drawable {
         if (this.target === Target.Canvas) {
             this.canvasUI = new CanvasUI(this);
         }
+
+        this.initToggleKeyListener("Backquote");
     }
 
     /**
@@ -163,6 +165,14 @@ class Cansole implements Drawable {
         }
 
         return Target.NotCanvas;
+    }
+
+    private initToggleKeyListener(keycode: string): void {
+        document.addEventListener("keyup", (event) => {
+            if (event.code === keycode) {
+                this.toggle();
+            }
+        });
     }
 }
 

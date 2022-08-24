@@ -9,6 +9,7 @@ import { Window } from "./Window";
 type Entities = Array<Destroyable & Drawable>;
 
 class CanvasUI implements Destroyable, Drawable {
+    private cansole: Cansole;
     private entities: Entities;
 
     constructor(cansole: Cansole) {
@@ -19,17 +20,28 @@ class CanvasUI implements Destroyable, Drawable {
             );
         }
 
+        this.entities = [];
+        this.cansole = cansole;
+
+        this.cansole.onHide(() => this.destroy());
+        this.cansole.onShow(() => this.init());
+
+        this.init();
+    }
+
+    public init(): void {
+        console.log("Initialising CanvasUI");
         const myWindow = new Window({
             x: 150,
             y: 150,
             w: 640,
             h: 480,
             title: "Cansole",
-            cansole,
+            cansole: this.cansole,
         });
 
         const submitButton = new Button(
-            cansole.element as HTMLCanvasElement,
+            this.cansole.element as HTMLCanvasElement,
             "Submit"
         );
 
@@ -41,8 +53,6 @@ class CanvasUI implements Destroyable, Drawable {
 
         this.entities.push(myWindow);
         this.entities.push(submitButton);
-
-        cansole.onHide(() => this.destroy());
 
         utils.positionButtonRelativeToWindow(submitButton, myWindow);
 
@@ -58,6 +68,7 @@ class CanvasUI implements Destroyable, Drawable {
     public destroy(): void {
         console.log("Destroying CanvasUI");
         this.entities.forEach((entity) => entity.destroy());
+        this.entities = [];
     }
 }
 
