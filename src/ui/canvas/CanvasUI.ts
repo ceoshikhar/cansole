@@ -31,6 +31,8 @@ class CanvasUI implements Destroyable, Drawable {
 
     public init(): void {
         console.log("Initialising CanvasUI");
+
+        // TODO: store windows position and size in LocalStorage ?
         const myWindow = new Window({
             x: 150,
             y: 150,
