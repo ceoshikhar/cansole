@@ -9,7 +9,6 @@ import { Window } from "./Window";
 type Entities = Array<Destroyable & Drawable>;
 
 class CanvasUI implements Destroyable, Drawable {
-    private cansole: Cansole;
     private entities: Entities;
 
     constructor(cansole: Cansole) {
@@ -21,15 +20,12 @@ class CanvasUI implements Destroyable, Drawable {
         }
 
         this.entities = [];
-        this.cansole = cansole;
 
-        this.cansole.onHide(() => this.destroy());
-        this.cansole.onShow(() => this.init());
-
-        this.init();
+        cansole.onHide(() => this.destroy());
+        cansole.onShow((cansole) => this.init(cansole));
     }
 
-    public init(): void {
+    public init(cansole: Cansole): void {
         console.log("Initialising CanvasUI");
 
         // TODO: store windows position and size in LocalStorage ?
@@ -39,11 +35,11 @@ class CanvasUI implements Destroyable, Drawable {
             w: 640,
             h: 480,
             title: "Cansole",
-            cansole: this.cansole,
+            cansole: cansole,
         });
 
         const submitButton = new Button(
-            this.cansole.element as HTMLCanvasElement,
+            cansole.element as HTMLCanvasElement,
             "Submit"
         );
 
