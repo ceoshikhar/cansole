@@ -1,7 +1,7 @@
 import * as events from "./events";
 import * as utils from "./utils";
-import * as ui from "./ui";
-import { Destroyable, Drawable } from "./ui/canvas";
+import { CanvasUI } from "./ui/canvas";
+import { Drawable } from "./ui/canvas";
 import { EventEmitter } from "./event-emitter";
 
 /**
@@ -48,8 +48,6 @@ type CansoleOptions = {
     element: CansoleElement;
 };
 
-type CanvasItems = Array<Destroyable & Drawable>;
-
 /**
  * Represents a `Cansole`.
  */
@@ -58,10 +56,9 @@ class Cansole implements Drawable {
     public target: Target;
     public visibility: Visibility;
 
-    // When `Cansole` is rendered to `Target.Canvas`, this is what we render.
-    public canvasItems: CanvasItems;
-
     private ee: EventEmitter;
+
+    private canvasUI: CanvasUI | null;
 
     /**
      * Create a new instance of `Cansole`.
@@ -75,10 +72,10 @@ class Cansole implements Drawable {
 
         this.ee = new EventEmitter();
 
-        this.canvasItems = [];
+        this.canvasUI = null;
 
         if (this.target === Target.Canvas) {
-            ui.canvas.setup(this);
+            this.canvasUI = new CanvasUI(this);
         }
     }
 
@@ -138,8 +135,17 @@ class Cansole implements Drawable {
      * `HTMLCanvasElement`.
      */
     public draw(): void {
+        // Cansole is hidden, so don't draw anything.
+        if (this.visibility === Visibility.Hidden) {
+            return;
+        }
+
         if (this.target === Target.Canvas) {
-            ui.canvas.render(this);
+            if (this.canvasUI === null) {
+                throw new Error("Cansole.draw: this.canvasUI is null.");
+            }
+
+            this.canvasUI.draw();
         } else {
             throw new Error(
                 "Cansole.render: currently we can render to HTMLCanvasElement" +
