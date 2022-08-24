@@ -1,7 +1,6 @@
 import * as events from "./events";
 import * as utils from "./utils";
-import { CanvasUI } from "./ui/canvas";
-import { Drawable } from "./ui/canvas";
+import { CanvasUI, Drawable } from "./ui/canvas";
 import { EventEmitter } from "./event-emitter";
 
 /**
@@ -142,7 +141,11 @@ class Cansole implements Drawable {
 
         if (this.target === Target.Canvas) {
             if (this.canvasUI === null) {
-                throw new Error("Cansole.draw: this.canvasUI is null.");
+                throw new Error(
+                    "Cansole.draw: this.canvasUI is null. This" +
+                        " shouldn't have happened. Did `this.target` change at" +
+                        " runtime during the lifecycle of Cansole?"
+                );
             }
 
             this.canvasUI.draw();
