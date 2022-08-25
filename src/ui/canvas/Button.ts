@@ -1,5 +1,7 @@
-import { EventEmitter } from "../../event-emitter";
 import * as constants from "../../constants";
+import { EventEmitter } from "../../event-emitter";
+import * as events from "../../events";
+import * as utils from "../../utils";
 
 import { Box, BoxTheme } from "./shapes/Box";
 import { Themeable } from "./interfaces/Themeable";
@@ -16,8 +18,6 @@ import {
     HoverEventCallback,
     HoverLostEventCallback,
 } from "./interfaces/Hoverable";
-import * as events from "../../events";
-import * as utils from "./utils";
 
 type ButtonOptions = {
     x: number;

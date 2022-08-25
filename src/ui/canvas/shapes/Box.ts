@@ -2,7 +2,7 @@ import { Vec2 } from "../../../math";
 import { EventEmitter } from "../../../event-emitter";
 
 import * as events from "../../../events";
-import * as utils from "../utils";
+import * as utils from "../../../utils";
 
 import {
     Activable,
@@ -312,10 +312,7 @@ class Box
             const onMouseMove = (event: MouseEvent) => {
                 const end = new Vec2(event.offsetX, event.offsetX);
                 const diff = end.sub(start);
-                const delta = new Vec2(
-                    event.movementX,
-                    event.movementY
-                );
+                const delta = new Vec2(event.movementX, event.movementY);
 
                 // Drag start?
                 if (!this.isDragging) {
@@ -342,10 +339,7 @@ class Box
             const onMouseUp = (event: MouseEvent) => {
                 const end = new Vec2(event.offsetX, event.offsetX);
                 const diff = end.sub(start);
-                const delta = new Vec2(
-                    event.movementX,
-                    event.movementY
-                );
+                const delta = new Vec2(event.movementX, event.movementY);
 
                 this.ee.emit(events.MouseEvents.DragEnd, {
                     diff,
