@@ -12,6 +12,8 @@ enum MouseEvents {
     ActiveLost = "ActiveLost",
     Click = "Click",
     Drag = "Drag",
+    DragEnd = "DragEnd",
+    DragStart = "DragStart",
     Hover = "Hover",
     HoverLost = "HoverLost",
 }

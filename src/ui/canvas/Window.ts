@@ -153,9 +153,9 @@ class Window implements Destroyable, Drawable, Draggable {
 
         this.titleBar.onDrag((e) => {
             console.log("Dragging window");
-            const { deltaMovement } = e;
-            const dx = deltaMovement.v1;
-            const dy = deltaMovement.v2;
+            const { delta } = e;
+            const dx = delta.v1;
+            const dy = delta.v2;
 
             this.box.setX(this.box.x + dx);
             this.box.setY(this.box.y + dy);
@@ -167,13 +167,32 @@ class Window implements Destroyable, Drawable, Draggable {
             this.crossButton.setY(this.crossButton.y + dy);
         });
 
-        this.titleBar.onDrag(() => {
-            this.ee.emit(events.MouseEvents.Drag, { target: this });
+        this.titleBar.onDrag((e) => {
+            const { target, ...rest } = e;
+            this.ee.emit(events.MouseEvents.Drag, { target: this, ...rest });
+        });
+
+        this.titleBar.onDragEnd((e) => {
+            const { target, ...rest } = e;
+            this.ee.emit(events.MouseEvents.DragEnd, { target: this, ...rest });
+        });
+
+        this.titleBar.onDragStart((e) => {
+            const { target, ...rest } = e;
+            this.ee.emit(events.MouseEvents.DragStart, { target: this, ...rest });
         });
     }
 
     public onDrag(cb: DragEventCallback<this>): void {
         this.ee.on(events.MouseEvents.Drag, cb);
+    }
+
+    public onDragEnd(cb: DragEventCallback<this>): void {
+        this.ee.on(events.MouseEvents.DragEnd, cb);
+    }
+
+    public onDragStart(cb: DragEventCallback<this>): void {
+        this.ee.on(events.MouseEvents.DragStart, cb);
     }
 
     public draw(): void {

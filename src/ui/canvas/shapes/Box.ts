@@ -148,6 +148,14 @@ class Box
         this.ee.on(events.MouseEvents.Drag, cb);
     }
 
+    public onDragEnd(cb: DragEventCallback<this>): void {
+        this.ee.on(events.MouseEvents.DragEnd, cb);
+    }
+
+    public onDragStart(cb: DragEventCallback<this>): void {
+        this.ee.on(events.MouseEvents.DragStart, cb);
+    }
+
     public setX(newX: number): void {
         this.x = newX;
         this.l = newX;
@@ -302,25 +310,51 @@ class Box
             const start = new Vec2(event.offsetX, event.offsetY);
 
             const onMouseMove = (event: MouseEvent) => {
-                // Drag start?
-                this.isDragging = true;
-
-                const curr = new Vec2(event.offsetX, event.offsetX);
-                const deltaTotal = curr.sub(start);
-                const deltaMovement = new Vec2(
+                const end = new Vec2(event.offsetX, event.offsetX);
+                const diff = end.sub(start);
+                const delta = new Vec2(
                     event.movementX,
                     event.movementY
                 );
 
+                // Drag start?
+                if (!this.isDragging) {
+                    this.isDragging = true;
+
+                    this.ee.emit(events.MouseEvents.DragStart, {
+                        diff,
+                        delta,
+                        end,
+                        start,
+                        target: this,
+                    });
+                }
+
                 this.ee.emit(events.MouseEvents.Drag, {
+                    diff,
+                    delta,
+                    end,
+                    start,
                     target: this,
-                    deltaTotal,
-                    deltaMovement,
                 });
             };
 
-            const onMouseUp = () => {
-                // Drag end?
+            const onMouseUp = (event: MouseEvent) => {
+                const end = new Vec2(event.offsetX, event.offsetX);
+                const diff = end.sub(start);
+                const delta = new Vec2(
+                    event.movementX,
+                    event.movementY
+                );
+
+                this.ee.emit(events.MouseEvents.DragEnd, {
+                    diff,
+                    delta,
+                    end,
+                    start,
+                    target: this,
+                });
+
                 this.canvas.removeEventListener("mouseup", onMouseUp);
                 this.canvas.removeEventListener("mousemove", onMouseMove);
                 this.isDragging = false;
