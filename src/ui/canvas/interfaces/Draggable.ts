@@ -1,4 +1,4 @@
-import * as math from "../../../math";
+import { Vec2 } from "../../../math";
 
 /**
  * The event that is passed to all the listeners for `onDrag`.
@@ -6,8 +6,8 @@ import * as math from "../../../math";
 type DragEvent<Target> = {
     /** What was dragged. */
     target: Target;
-    deltaTotal: math.vec2.Vec2<number>;
-    deltaMovement: math.vec2.Vec2<number>;
+    deltaTotal: Vec2<number>;
+    deltaMovement: Vec2<number>;
 };
 
 /**

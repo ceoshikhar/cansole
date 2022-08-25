@@ -1,19 +1,24 @@
 /**
- * Represents a collection of 2 vectors.
+ * Represents a collection of 2 values(v1 & v2).
  */
-type Vec2<T> = [T, T];
+class Vec2<T> {
+    public v1: T;
+    public v2: T;
 
-function create<T>(x: T, y: T): Vec2<T> {
-    return [x, y];
+    constructor(v1: T, v2: T) {
+        this.v1 = v1;
+        this.v2 = v2;
+    }
+
+    /**
+     * Subtracts `otehr` from `this`.
+     */
+    public sub(other: Vec2<number>): Vec2<number> {
+        const v1: number = this.v1 as unknown as number;
+        const v2: number = this.v2 as unknown as number;
+
+        return new Vec2(v1 - other.v1, v2 - other.v2);
+    }
 }
 
-/**
- * Subtract `what` from `from`.
- *
- * sub(from, what) = from - what
- */
-function sub(from: Vec2<number>, what: Vec2<number>): Vec2<number> {
-    return [from[0] - what[0], from[1] - what[1]];
-}
-
-export { Vec2, create, sub };
+export { Vec2 };

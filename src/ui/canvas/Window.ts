@@ -154,8 +154,8 @@ class Window implements Destroyable, Drawable, Draggable {
         this.titleBar.onDrag((e) => {
             console.log("Dragging window");
             const { deltaMovement } = e;
-            const dx = deltaMovement[0];
-            const dy = deltaMovement[1];
+            const dx = deltaMovement.v1;
+            const dy = deltaMovement.v2;
 
             this.box.setX(this.box.x + dx);
             this.box.setY(this.box.y + dy);

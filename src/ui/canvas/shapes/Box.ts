@@ -1,4 +1,4 @@
-import * as math from "../../../math";
+import { Vec2 } from "../../../math";
 import { EventEmitter } from "../../../event-emitter";
 
 import * as events from "../../../events";
@@ -192,9 +192,9 @@ class Box
         this.t = newY;
     }
 
-    public contains(coords: math.vec2.Vec2<number>): boolean {
-        const x = coords[0];
-        const y = coords[1];
+    public contains(coords: Vec2<number>): boolean {
+        const x = coords.v1;
+        const y = coords.v2;
 
         if (x >= this.l && x <= this.r && y >= this.t && y <= this.b) {
             return true;
@@ -205,7 +205,7 @@ class Box
 
     public makeHoverable(): void {
         const onMouseMove = (event: MouseEvent) => {
-            if (this.contains(math.vec2.create(event.offsetX, event.offsetY))) {
+            if (this.contains(new Vec2(event.offsetX, event.offsetY))) {
                 if (!this.isHovered) {
                     this.isHovered = true;
 
@@ -248,8 +248,7 @@ class Box
         };
 
         const onMouseDown = (event: MouseEvent) => {
-            if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
-                return;
+            if (!this.contains(new Vec2(event.offsetX, event.offsetY))) return;
 
             if (!this.isActive) {
                 this.isActive = true;
@@ -273,16 +272,14 @@ class Box
         const onMouseUp = (event: MouseEvent) => {
             this.canvas.removeEventListener("mouseup", onMouseUp);
 
-            if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
-                return;
+            if (!this.contains(new Vec2(event.offsetX, event.offsetY))) return;
             if (this.isDragging) return;
 
             this.ee.emit(events.MouseEvents.Click, { target: this });
         };
 
         const onMouseDown = (event: MouseEvent) => {
-            if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
-                return;
+            if (!this.contains(new Vec2(event.offsetX, event.offsetY))) return;
 
             this.canvas.addEventListener("mouseup", onMouseUp);
             this.onDestroy(() =>
@@ -300,18 +297,17 @@ class Box
 
     public makeDraggable(): void {
         const onMouseDown = (event: MouseEvent) => {
-            if (!this.contains(math.vec2.create(event.offsetX, event.offsetY)))
-                return;
+            if (!this.contains(new Vec2(event.offsetX, event.offsetY))) return;
 
-            const start = math.vec2.create(event.offsetX, event.offsetY);
+            const start = new Vec2(event.offsetX, event.offsetY);
 
             const onMouseMove = (event: MouseEvent) => {
                 // Drag start?
                 this.isDragging = true;
 
-                const curr = math.vec2.create(event.offsetX, event.offsetX);
-                const deltaTotal = math.vec2.sub(curr, start);
-                const deltaMovement = math.vec2.create(
+                const curr = new Vec2(event.offsetX, event.offsetX);
+                const deltaTotal = curr.sub(start);
+                const deltaMovement = new Vec2(
                     event.movementX,
                     event.movementY
                 );
