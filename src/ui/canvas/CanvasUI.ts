@@ -62,10 +62,10 @@ class CanvasUI implements Destroyable, Drawable {
         this.entities.push(myWindow);
         this.entities.push(submitButton);
 
-        utils.positionButtonRelativeToWindow(submitButton, myWindow);
+        this.positionButtonRelativeToWindow(submitButton, myWindow);
 
         myWindow.onDrag(() =>
-            utils.positionButtonRelativeToWindow(submitButton, myWindow)
+            this.positionButtonRelativeToWindow(submitButton, myWindow)
         );
 
         myWindow.onDragEnd((e) => { 
@@ -82,6 +82,16 @@ class CanvasUI implements Destroyable, Drawable {
         console.log("Destroying CanvasUI");
         this.entities.forEach((entity) => entity.destroy());
         this.entities = [];
+    }
+
+
+    // TODO: instead of this we should have "child" <-> "parent" elements to be
+    // "drawn" relative to each other?
+    private positionButtonRelativeToWindow(button: Button, window: Window): void {
+        const buttonPaddingWithWindow = 16;
+
+        button.setR(window.r - buttonPaddingWithWindow);
+        button.setB(window.b - buttonPaddingWithWindow);
     }
 }
 
