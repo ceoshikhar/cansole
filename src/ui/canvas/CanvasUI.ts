@@ -35,8 +35,11 @@ class CanvasUI implements Destroyable, Drawable {
     public init(cansole: Cansole): void {
         console.log("Initialising CanvasUI");
 
-        const initPosStr: string | null = window.localStorage.getItem((WINDOW_POS_STORAGE_KEY));
-        const initPos: Vec2<number> = initPosStr === null ? DEFAULT_WINDOW_POS : JSON.parse(initPosStr);
+        const initPosStr: string | null = window.localStorage.getItem(
+            WINDOW_POS_STORAGE_KEY
+        );
+        const initPos: Vec2<number> =
+            initPosStr === null ? DEFAULT_WINDOW_POS : JSON.parse(initPosStr);
 
         // TODO: store windows position and size in LocalStorage ?
         const myWindow = new Window({
@@ -44,7 +47,7 @@ class CanvasUI implements Destroyable, Drawable {
             y: initPos.v2,
             w: 640,
             h: 480,
-            title: "Cansole",
+            title: cansole.options.title,
             cansole: cansole,
         });
 
@@ -68,9 +71,12 @@ class CanvasUI implements Destroyable, Drawable {
             this.positionButtonRelativeToWindow(submitButton, myWindow)
         );
 
-        myWindow.onDragEnd((e) => { 
+        myWindow.onDragEnd((e) => {
             const pos: Vec2<number> = new Vec2(e.target.x, e.target.y);
-            window.localStorage.setItem(WINDOW_POS_STORAGE_KEY, JSON.stringify((pos)));
+            window.localStorage.setItem(
+                WINDOW_POS_STORAGE_KEY,
+                JSON.stringify(pos)
+            );
         });
     }
 
@@ -84,10 +90,12 @@ class CanvasUI implements Destroyable, Drawable {
         this.entities = [];
     }
 
-
     // TODO: instead of this we should have "child" <-> "parent" elements to be
     // "drawn" relative to each other?
-    private positionButtonRelativeToWindow(button: Button, window: Window): void {
+    private positionButtonRelativeToWindow(
+        button: Button,
+        window: Window
+    ): void {
         const buttonPaddingWithWindow = 16;
 
         button.setR(window.r - buttonPaddingWithWindow);

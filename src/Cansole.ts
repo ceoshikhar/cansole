@@ -44,7 +44,13 @@ type CansoleElement = HTMLCanvasElement | HTMLDivElement;
  * Options to configure a `Cansole` instance.
  */
 type CansoleOptions = {
-    element: CansoleElement;
+    title: string;
+    toggleKey: string;
+};
+
+const defaultCansoleOptions: CansoleOptions = {
+    title: "Cansole 🚀",
+    toggleKey: "Backquote",
 };
 
 /**
@@ -54,6 +60,7 @@ class Cansole implements Drawable {
     public element: CansoleElement;
     public target: Target;
     public visibility: Visibility;
+    public options: CansoleOptions;
 
     private ee: EventEmitter;
 
@@ -62,12 +69,14 @@ class Cansole implements Drawable {
     /**
      * Create a new instance of `Cansole`.
      */
-    constructor(options: CansoleOptions) {
-        const { element } = options;
-
+    constructor(
+        element: CansoleElement,
+        options: Partial<CansoleOptions> = {}
+    ) {
         this.element = element;
         this.target = this.detectTarget(element);
         this.visibility = Visibility.Hidden;
+        this.options = { ...defaultCansoleOptions, ...options };
 
         this.ee = new EventEmitter();
 
@@ -77,7 +86,7 @@ class Cansole implements Drawable {
             this.canvasUI = new CanvasUI(this);
         }
 
-        this.initToggleKeyListener("Backquote");
+        this.initToggleKeyListener(this.options.toggleKey);
     }
 
     /**
