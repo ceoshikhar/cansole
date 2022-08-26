@@ -84,6 +84,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
             }
         );
 
+        // TODO: Make a new type called `Resizer`?
         const resizer: Box = new Box(
             cansole.element as HTMLCanvasElement,
             {
