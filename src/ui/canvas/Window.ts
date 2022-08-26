@@ -106,7 +106,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
         this.ee = new EventEmitter();
 
         this.makeDraggable();
-        this.makeResizable();
+        this.makeResizable(cansole);
 
         cansole.onHide(() => this.destroy());
     }
@@ -219,8 +219,18 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
         this.ee.on(events.MouseEvents.DragStart, cb);
     }
 
-    private makeResizable(): void {
+    private makeResizable(cansole: Cansole): void {
+        this.resizer.makeActivable();
         this.resizer.makeDraggable();
+        this.resizer.makeHoverable();
+
+        this.resizer.onHover(() => {
+            cansole.element.style.cursor = "se-resize";
+        });
+
+        this.resizer.onHoverLost(() => {
+            cansole.element.style.cursor = "auto";
+        });
 
         this.resizer.onDragEnd((e) => {
             console.log("Resizing window end");
