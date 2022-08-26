@@ -18,4 +18,10 @@ enum MouseEvents {
     HoverLost = "HoverLost",
 }
 
-export { CansoleEvents, CoreEvents, MouseEvents };
+enum WindowEvents {
+    Resize = "Resize",
+    ResizeEnd = "ResizeEnd",
+    ResizeStart = "ResizeStart",
+}
+
+export { CansoleEvents, CoreEvents, MouseEvents, WindowEvents };

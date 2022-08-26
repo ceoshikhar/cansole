@@ -8,6 +8,7 @@ import { Drawable } from "./interfaces/Drawable";
 import { Draggable, DragEventCallback } from "./interfaces/Draggable";
 import { Box } from "./shapes/Box";
 import { Button } from "./Button";
+import { Resizable, ResizeEventCallback } from "./interfaces/Resizable";
 
 type WindowOptions = {
     x: number;
@@ -18,13 +19,14 @@ type WindowOptions = {
     cansole: Cansole;
 };
 
-class Window implements Destroyable, Drawable, Draggable {
+class Window implements Destroyable, Drawable, Draggable, Resizable {
     public title: string;
 
     // TODO: rename `box` something else like "drawableArea"?
     private box: Box;
-    private titleBar: Box;
     private crossButton: Button;
+    private resizer: Box;
+    private titleBar: Box;
 
     private ee: EventEmitter;
 
@@ -82,13 +84,29 @@ class Window implements Destroyable, Drawable, Draggable {
             }
         );
 
+        const resizer: Box = new Box(
+            cansole.element as HTMLCanvasElement,
+            {
+                x: x + w - 10,
+                y: y + h - 10,
+                w: 10,
+                h: 10,
+            },
+            {
+                backgroundColor: constants.colors.secondary,
+            }
+        );
+
         this.title = title;
         this.box = box;
         this.crossButton = crossButton;
+        this.resizer = resizer;
         this.titleBar = titleBar;
+
         this.ee = new EventEmitter();
 
         this.makeDraggable();
+        this.makeResizable();
 
         cansole.onHide(() => this.destroy());
     }
@@ -160,11 +178,14 @@ class Window implements Destroyable, Drawable, Draggable {
             this.box.setX(this.box.x + dx);
             this.box.setY(this.box.y + dy);
 
-            this.titleBar.setX(this.titleBar.x + dx);
-            this.titleBar.setY(this.titleBar.y + dy);
-
             this.crossButton.setX(this.crossButton.x + dx);
             this.crossButton.setY(this.crossButton.y + dy);
+
+            this.resizer.setX(this.resizer.x + dx);
+            this.resizer.setY(this.resizer.y + dy);
+
+            this.titleBar.setX(this.titleBar.x + dx);
+            this.titleBar.setY(this.titleBar.y + dy);
         });
 
         this.titleBar.onDrag((e) => {
@@ -179,7 +200,10 @@ class Window implements Destroyable, Drawable, Draggable {
 
         this.titleBar.onDragStart((e) => {
             const { target, ...rest } = e;
-            this.ee.emit(events.MouseEvents.DragStart, { target: this, ...rest });
+            this.ee.emit(events.MouseEvents.DragStart, {
+                target: this,
+                ...rest,
+            });
         });
     }
 
@@ -195,15 +219,68 @@ class Window implements Destroyable, Drawable, Draggable {
         this.ee.on(events.MouseEvents.DragStart, cb);
     }
 
+    private makeResizable(): void {
+        this.resizer.makeDraggable();
+
+        this.resizer.onDragEnd((e) => {
+            console.log("Resizing window end");
+            this.ee.emit(events.WindowEvents.ResizeEnd, { target: this.box });
+        });
+
+        this.resizer.onDragStart((e) => {
+            console.log("Resizing window start");
+            this.ee.emit(events.WindowEvents.ResizeStart, { target: this });
+        });
+
+        this.resizer.onDrag((e) => {
+            console.log("Resizing window");
+
+            this.ee.emit(events.WindowEvents.Resize, { target: this });
+
+            const { delta } = e;
+            const dx = delta.v1;
+            const dy = delta.v2;
+
+            // Resize the box's width and height.
+            this.box.setW(this.box.w + dx);
+            this.box.setH(this.box.h + dy);
+
+            // Keep the crossButton at the top right.
+            this.crossButton.setX(this.crossButton.x + dx);
+
+            // Reisze the title bar's width.
+            this.titleBar.setW(this.titleBar.w + dx);
+
+            // Keep the resize at the bottom right.
+            this.resizer.setX(this.resizer.x + dx);
+            this.resizer.setY(this.resizer.y + dy);
+        });
+    }
+
+    public onResize(cb: ResizeEventCallback<this>): void {
+        this.ee.on(events.WindowEvents.Resize, cb);
+    }
+
+    public onResizeEnd(cb: ResizeEventCallback<this>): void {
+        this.ee.on(events.WindowEvents.ResizeEnd, cb);
+    }
+
+    public onResizeStart(cb: ResizeEventCallback<this>): void {
+        this.ee.on(events.WindowEvents.ResizeStart, cb);
+    }
+
     public draw(): void {
         // Draw the entire window.
         this.box.draw();
 
-        // Draw the window's title bar.
-        this.titleBar.draw();
-
         // Draw the title bar's close button.
         this.crossButton.draw();
+
+        // Draw the window's resizer.
+        this.resizer.draw();
+
+        // Draw the window's title bar.
+        this.titleBar.draw();
     }
 
     public destroy(): void {

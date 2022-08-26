@@ -168,6 +168,16 @@ class Box
         this.b = newY + this.h;
     }
 
+    public setW(newW: number): void {
+        this.w = newW;
+        this.r = this.x + newW;
+    }
+
+    public setH(newH: number): void {
+        this.h = newH;
+        this.b = this.y + newH;
+    }
+
     public setL(newL: number): void {
         const newR = newL + this.w;
 

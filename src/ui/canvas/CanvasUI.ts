@@ -41,12 +41,20 @@ class CanvasUI implements Destroyable, Drawable {
         const initPos: Vec2<number> =
             initPosStr === null ? DEFAULT_WINDOW_POS : JSON.parse(initPosStr);
 
+        const initSizeStr: string | null = window.localStorage.getItem(
+            WINDOW_SIZE_STORAGE_KEY
+        );
+        const initSize: Vec2<number> =
+            initSizeStr === null
+                ? DEFAULT_WINDOW_SIZE
+                : JSON.parse(initSizeStr);
+
         // TODO: store windows position and size in LocalStorage ?
         const myWindow = new Window({
             x: initPos.v1,
             y: initPos.v2,
-            w: 640,
-            h: 480,
+            w: initSize.v1,
+            h: initSize.v2,
             title: cansole.options.title,
             cansole: cansole,
         });
@@ -76,6 +84,18 @@ class CanvasUI implements Destroyable, Drawable {
             window.localStorage.setItem(
                 WINDOW_POS_STORAGE_KEY,
                 JSON.stringify(pos)
+            );
+        });
+
+        myWindow.onResize(() =>
+            this.positionButtonRelativeToWindow(submitButton, myWindow)
+        );
+
+        myWindow.onResizeEnd((e) => {
+            const size: Vec2<number> = new Vec2(e.target.w, e.target.h);
+            window.localStorage.setItem(
+                WINDOW_SIZE_STORAGE_KEY,
+                JSON.stringify(size)
             );
         });
     }
