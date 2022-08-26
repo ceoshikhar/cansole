@@ -1,5 +1,6 @@
 import * as constants from "../../constants";
 import * as events from "../../events";
+import * as utils from "../../utils";
 import { EventEmitter } from "../../event-emitter";
 import { Cansole } from "../../Cansole";
 
@@ -22,6 +23,8 @@ type WindowOptions = {
 class Window implements Destroyable, Drawable, Draggable, Resizable {
     public title: string;
 
+    private canvas: HTMLCanvasElement;
+
     // TODO: rename `box` something else like "drawableArea"?
     private box: Box;
     private crossButton: Button;
@@ -31,6 +34,8 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
     private ee: EventEmitter;
 
     constructor({ x, y, w, h, title, cansole }: WindowOptions) {
+        this.canvas = cansole.element as HTMLCanvasElement;
+
         const box: Box = new Box(
             cansole.element as HTMLCanvasElement,
             {
@@ -292,6 +297,25 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
 
         // Draw the window's title bar.
         this.titleBar.draw();
+
+        // Draw the window' title on the `titleBar`.
+        const fontSize = 18;
+        const fontSizePx = `${fontSize}px`;
+        const fontWeight = "normal";
+        const fontFamily = "Perfect DOS VGA 437 Win";
+
+        const ctx = utils.getContext2D(this.canvas);
+
+        ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = constants.colors.onPrimary;
+
+        ctx.fillText(
+            this.title,
+            this.titleBar.x + this.box.w / 2,
+            this.titleBar.y + this.titleBar.h / 2
+        );
     }
 
     public destroy(): void {
