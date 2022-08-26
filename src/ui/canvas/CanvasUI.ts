@@ -9,7 +9,6 @@ import { Window } from "./Window";
 
 const WINDOW_POS_STORAGE_KEY = "window_pos";
 const WINDOW_SIZE_STORAGE_KEY = "window_size";
-
 const DEFAULT_WINDOW_POS: Vec2<number> = new Vec2(150, 150);
 const DEFAULT_WINDOW_SIZE: Vec2<number> = new Vec2(640, 480);
 
@@ -49,7 +48,6 @@ class CanvasUI implements Destroyable, Drawable {
                 ? DEFAULT_WINDOW_SIZE
                 : JSON.parse(initSizeStr);
 
-        // TODO: store windows position and size in LocalStorage ?
         const myWindow = new Window({
             x: initPos.v1,
             y: initPos.v2,
