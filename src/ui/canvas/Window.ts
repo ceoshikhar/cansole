@@ -306,6 +306,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
 
         const ctx = utils.getContext2D(this.canvas);
 
+        // TODO: Make a new type called "Text".
         ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
