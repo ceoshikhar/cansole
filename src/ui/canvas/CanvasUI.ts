@@ -3,8 +3,7 @@ import * as utils from "../../utils";
 import { Vec2 } from "../../math";
 
 import { Button } from "./Button";
-import { Drawable } from "./interfaces/Drawable";
-import { Destroyable } from "./interfaces/Destroyable";
+import { Drawable, Destroyable } from "./interfaces";
 import { Window } from "./Window";
 
 const WINDOW_POS_STORAGE_KEY = "window_pos";

@@ -1,7 +1,4 @@
-import { Button } from "./Button";
-import { CanvasUI } from "./CanvasUI";
-import { Drawable } from "./interfaces/Drawable";
-import { Destroyable } from "./interfaces/Destroyable";
-import { Window } from "./Window";
-
-export { Button, CanvasUI, Destroyable, Drawable, Window };
+export { Button } from "./Button";
+export { CanvasUI } from "./CanvasUI";
+export { Window } from "./Window";
+export * from "./interfaces";

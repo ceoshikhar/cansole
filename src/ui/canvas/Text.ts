@@ -1,7 +1,6 @@
 import * as constants from "../../constants";
 import * as utils from "../../utils";
-import { Drawable } from "./interfaces/Drawable";
-import { Themeable } from "./interfaces/Themeable";
+import { Drawable, Themeable } from "./interfaces";
 
 type TextOptions = {
     x: number;
@@ -26,7 +25,7 @@ const defaultTextOptions: TextOptions = {
 };
 
 const defaultTextTheme: TextTheme = {
-    fontFamily:  "Perfect DOS VGA 437 Win",
+    fontFamily: "Perfect DOS VGA 437 Win",
     fontSize: 18,
     fontWeight: "normal",
     foregroundColor: constants.colors.textPrimary,

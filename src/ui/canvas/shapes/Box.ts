@@ -8,17 +8,17 @@ import {
     Activable,
     ActiveEventCallback,
     ActiveLostEventCallback,
-} from "../interfaces/Activable";
-import { Clickable, ClickEventCallback } from "../interfaces/Clickable";
-import { Draggable, DragEventCallback } from "../interfaces/Draggable";
-import {
+    Clickable,
+    ClickEventCallback,
+    Draggable,
+    DragEventCallback,
     Hoverable,
     HoverEventCallback,
     HoverLostEventCallback,
-} from "../interfaces/Hoverable";
-import { Drawable } from "../interfaces/Drawable";
-import { Destroyable } from "../interfaces/Destroyable";
-import { Themeable } from "../interfaces/Themeable";
+    Drawable,
+    Destroyable,
+    Themeable,
+} from "../interfaces";
 
 type BoxOptions = {
     x: number;

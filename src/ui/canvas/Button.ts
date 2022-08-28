@@ -1,24 +1,22 @@
 import * as constants from "../../constants";
 import { EventEmitter } from "../../event-emitter";
 import * as events from "../../events";
-import * as utils from "../../utils";
 
 import { Box } from "./shapes/Box";
 import { Text } from "./Text";
-import { Themeable } from "./interfaces/Themeable";
 import {
     Activable,
     ActiveEventCallback,
     ActiveLostEventCallback,
-} from "./interfaces/Activable";
-import { Clickable, ClickEventCallback } from "./interfaces/Clickable";
-import { Drawable } from "./interfaces/Drawable";
-import { Destroyable } from "./interfaces/Destroyable";
-import {
+    Clickable,
+    ClickEventCallback,
+    Drawable,
+    Destroyable,
     Hoverable,
     HoverEventCallback,
     HoverLostEventCallback,
-} from "./interfaces/Hoverable";
+    Themeable,
+} from "./interfaces";
 
 type ButtonOptions = {
     x: number;
@@ -182,9 +180,7 @@ class Button
             }
         });
 
-        const text = new Text(canvas, label);
-
-        const textWidth = text.measureText().width;
+        const textWidth = new Text(canvas, label).measureText().width;
         const padding = 16;
 
         box.w = finalOptions.w || textWidth + padding;

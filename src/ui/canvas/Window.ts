@@ -1,15 +1,18 @@
 import * as constants from "../../constants";
 import * as events from "../../events";
-import * as utils from "../../utils";
 import { EventEmitter } from "../../event-emitter";
 import { Cansole } from "../../Cansole";
 
-import { Destroyable } from "./interfaces/Destroyable";
-import { Drawable } from "./interfaces/Drawable";
-import { Draggable, DragEventCallback } from "./interfaces/Draggable";
 import { Box } from "./shapes/Box";
 import { Button } from "./Button";
-import { Resizable, ResizeEventCallback } from "./interfaces/Resizable";
+import {
+    Destroyable,
+    Draggable,
+    DragEventCallback,
+    Drawable,
+    Resizable,
+    ResizeEventCallback,
+} from "./interfaces";
 import { Text } from "./Text";
 
 type WindowOptions = {
