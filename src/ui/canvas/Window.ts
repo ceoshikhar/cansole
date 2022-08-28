@@ -10,6 +10,7 @@ import { Draggable, DragEventCallback } from "./interfaces/Draggable";
 import { Box } from "./shapes/Box";
 import { Button } from "./Button";
 import { Resizable, ResizeEventCallback } from "./interfaces/Resizable";
+import { Text } from "./Text";
 
 type WindowOptions = {
     x: number;
@@ -299,24 +300,19 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
         this.titleBar.draw();
 
         // Draw the window' title on the `titleBar`.
-        const fontSize = 18;
-        const fontSizePx = `${fontSize}px`;
-        const fontWeight = "normal";
-        const fontFamily = "Perfect DOS VGA 437 Win";
-
-        const ctx = utils.getContext2D(this.canvas);
-
-        // TODO: Make a new type called "Text".
-        ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = constants.colors.onPrimary;
-
-        ctx.fillText(
+        new Text(
+            this.canvas,
             this.title,
-            this.titleBar.x + this.box.w / 2,
-            this.titleBar.y + this.titleBar.h / 2
-        );
+            {
+                x: this.titleBar.x + this.box.w / 2,
+                y: this.titleBar.y + this.titleBar.h / 2,
+            },
+            {
+                foregroundColor: constants.colors.onPrimary,
+                textAlign: "center",
+                textBaseline: "middle",
+            }
+        ).draw();
     }
 
     public destroy(): void {

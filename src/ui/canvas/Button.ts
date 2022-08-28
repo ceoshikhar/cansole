@@ -3,7 +3,8 @@ import { EventEmitter } from "../../event-emitter";
 import * as events from "../../events";
 import * as utils from "../../utils";
 
-import { Box, BoxTheme } from "./shapes/Box";
+import { Box } from "./shapes/Box";
+import { Text } from "./Text";
 import { Themeable } from "./interfaces/Themeable";
 import {
     Activable,
@@ -26,7 +27,7 @@ type ButtonOptions = {
     h: number;
 };
 
-type ButtonThemeables = BoxTheme & {
+type ButtonThemeables = {
     backgroundColor: string;
     borderColor: string;
     borderWidth: number;
@@ -34,12 +35,12 @@ type ButtonThemeables = BoxTheme & {
     foregroundColor: string;
 };
 
-type ButtonTheme = Omit<ButtonThemeables, "cursor"> & {
+type ButtonTheme = ButtonThemeables & {
     hover: ButtonThemeables;
     active: ButtonThemeables;
 };
 
-type PartialButtonTheme = Partial<Omit<ButtonThemeables, "cursor">> & {
+type ButtonThemeOptions = Partial<ButtonThemeables> & {
     hover?: Partial<ButtonThemeables>;
     active?: Partial<ButtonThemeables>;
 };
@@ -84,12 +85,11 @@ class Button
         Hoverable<Button>,
         Themeable<ButtonTheme>
 {
-    public label: string;
+    public theme: ButtonTheme;
 
     private canvas: HTMLCanvasElement;
-    public readonly theme: ButtonTheme;
-
     private box: Box;
+    private label: string;
 
     private ee: EventEmitter;
 
@@ -100,7 +100,7 @@ class Button
         canvas: HTMLCanvasElement,
         label: string,
         options: Partial<ButtonOptions> = {},
-        theme: PartialButtonTheme = {}
+        theme: ButtonThemeOptions = {}
     ) {
         this.canvas = canvas;
         this.label = label;
@@ -182,18 +182,9 @@ class Button
             }
         });
 
-        // TODO: this is duplicated from `render` and I think a `Theme` oject
-        // would be a good idea for sure now.
-        const fontSize = 18;
-        const fontSizePx = `${fontSize}px`;
-        const fontWeight = "normal";
-        const fontFamily = "Perfect DOS VGA 437 Win";
+        const text = new Text(canvas, label);
 
-        const ctx = utils.getContext2D(this.canvas);
-
-        ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
-        const textWidth = ctx.measureText(label).width;
-
+        const textWidth = text.measureText().width;
         const padding = 16;
 
         box.w = finalOptions.w || textWidth + padding;
@@ -330,27 +321,22 @@ class Button
         // Draw button's label.
         //
 
-        // TODO: Make this a part of `Button Theme` ?
-        const fontSize = 18;
-        const fontSizePx = `${fontSize}px`;
-        const fontWeight = "normal";
-        const fontFamily = "Perfect DOS VGA 437 Win";
-
-        let fillStyle = this.isHovered
+        const foregroundColor = this.isHovered
             ? this.theme.hover.foregroundColor
             : this.isActive
             ? this.theme.active.foregroundColor
             : this.theme.foregroundColor;
 
-        const ctx = utils.getContext2D(this.canvas);
-
-        // TODO: Make a new type called "Text".
-        ctx.font = `${fontWeight} ${fontSizePx} '${fontFamily}'`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = fillStyle;
-
-        ctx.fillText(this.label, this.x + this.w / 2, this.y + this.h / 2);
+        new Text(
+            this.canvas,
+            this.label,
+            { x: this.x + this.w / 2, y: this.y + this.h / 2 },
+            {
+                foregroundColor,
+                textAlign: "center",
+                textBaseline: "middle",
+            }
+        ).draw();
     }
 
     public destroy(): void {

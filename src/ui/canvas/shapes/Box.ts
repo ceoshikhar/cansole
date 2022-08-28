@@ -33,6 +33,8 @@ type BoxTheme = {
     borderWidth: number;
 };
 
+type BoxThemeOptions = Partial<BoxTheme>;
+
 const defaultBoxOptions: BoxOptions = {
     x: 0,
     y: 0,
@@ -80,7 +82,7 @@ class Box
     constructor(
         canvas: HTMLCanvasElement,
         options: BoxOptions = defaultBoxOptions,
-        theme: Partial<BoxTheme> = {}
+        theme: BoxThemeOptions = {}
     ) {
         this.canvas = canvas;
         this.theme = { ...defaultBoxTheme, ...theme };
@@ -390,4 +392,4 @@ class Box
     }
 }
 
-export { Box, BoxTheme, defaultBoxTheme };
+export { Box };

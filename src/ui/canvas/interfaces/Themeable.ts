@@ -1,4 +1,6 @@
-type Themeables = {
+/*
+    Themeables that you can pick to compose your own <T> to pass to Themeable:
+
     backgroundColor: string;
     borderColor: string;
     borderWidth: number;
@@ -9,10 +11,10 @@ type Themeables = {
     foregroundColor: string;
     textAlign: CanvasTextAlign;
     textBaseline: CanvasTextBaseline;
-};
+*/
 
 interface Themeable<T> {
-    readonly theme: T;
+    theme: T;
 }
 
-export { Themeable, Themeables };
+export { Themeable };
