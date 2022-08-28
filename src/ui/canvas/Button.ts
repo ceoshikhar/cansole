@@ -2,8 +2,6 @@ import * as constants from "../../constants";
 import { EventEmitter } from "../../event-emitter";
 import * as events from "../../events";
 
-import { Box } from "./shapes/Box";
-import { Text } from "./Text";
 import {
     Activable,
     ActiveEventCallback,
@@ -17,6 +15,8 @@ import {
     HoverLostEventCallback,
     Themeable,
 } from "./interfaces";
+import { Box } from "./shapes";
+import { Text } from "./Text";
 
 type ButtonOptions = {
     x: number;

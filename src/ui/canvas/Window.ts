@@ -3,7 +3,6 @@ import * as events from "../../events";
 import { EventEmitter } from "../../event-emitter";
 import { Cansole } from "../../Cansole";
 
-import { Box } from "./shapes/Box";
 import { Button } from "./Button";
 import {
     Destroyable,
@@ -13,6 +12,7 @@ import {
     Resizable,
     ResizeEventCallback,
 } from "./interfaces";
+import { Box } from "./shapes";
 import { Text } from "./Text";
 
 type WindowOptions = {
