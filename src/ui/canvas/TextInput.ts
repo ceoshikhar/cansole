@@ -4,10 +4,11 @@ import * as events from "../../events";
 
 import { Box } from "./shapes/Box";
 import {
-    Drawable,
-    Destroyable,
     Clickable,
     ClickEventCallback,
+    Drawable,
+    Destroyable,
+    HasDisplayName,
 } from "./interfaces";
 
 type TextInputOptions = {
@@ -66,8 +67,12 @@ const defaultTextInputTheme: TextInputTheme = {
     },
 };
 
-class TextInput implements Clickable<TextInput>, Drawable, Destroyable {
+class TextInput
+    implements Clickable<TextInput>, Drawable, Destroyable, HasDisplayName
+{
     public theme: TextInputTheme;
+
+    public displayName: string = "TextInput";
 
     private box: Box;
     private canvas: HTMLCanvasElement;
@@ -75,6 +80,7 @@ class TextInput implements Clickable<TextInput>, Drawable, Destroyable {
     private ee: EventEmitter;
 
     private isHovered = false;
+    private isActive = false;
 
     constructor(
         canvas: HTMLCanvasElement,
@@ -128,6 +134,10 @@ class TextInput implements Clickable<TextInput>, Drawable, Destroyable {
             this.box.theme = this.theme;
             this.canvas.style.cursor = "auto";
         });
+    }
+
+    public setDisplayName(name: string): void {
+        this.displayName = name;
     }
 
     public get x(): number {
@@ -209,6 +219,14 @@ class TextInput implements Clickable<TextInput>, Drawable, Destroyable {
     }
 
     public draw(): void {
+        if (this.isHovered) {
+            console.log(this.displayName, "is hovered");
+        }
+
+        if (this.isActive) {
+            console.log(this.displayName, "is active");
+        }
+
         this.box.draw();
     }
 

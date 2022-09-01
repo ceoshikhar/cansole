@@ -9,6 +9,7 @@ export { Clickable, ClickEvent, ClickEventCallback } from "./Clickable";
 export { Destroyable } from "./Destroyable";
 export { Draggable, DragEvent, DragEventCallback } from "./Draggable";
 export { Drawable } from "./Drawable";
+export { HasDisplayName } from "./HasDisplayName";
 export {
     Hoverable,
     HoverEvent,

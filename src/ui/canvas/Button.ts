@@ -10,6 +10,7 @@ import {
     ClickEventCallback,
     Drawable,
     Destroyable,
+    HasDisplayName,
     Hoverable,
     HoverEventCallback,
     HoverLostEventCallback,
@@ -80,10 +81,13 @@ class Button
         Clickable<Button>,
         Destroyable,
         Drawable,
+        HasDisplayName,
         Hoverable<Button>,
         Themeable<ButtonTheme>
 {
     public theme: ButtonTheme;
+
+    public displayName: string = "Button";
 
     private canvas: HTMLCanvasElement;
     private box: Box;
@@ -174,6 +178,10 @@ class Button
 
         this.box.w = options.w || textWidth + padding;
         this.box.h = options.h || 24 + padding;
+    }
+
+    public setDisplayName(name: string): void {
+        this.displayName = name;
     }
 
     public get x(): number {
@@ -298,11 +306,11 @@ class Button
 
     public draw(): void {
         if (this.isHovered) {
-            console.log(this.label, "is hovered");
+            console.log(this.displayName, "is hovered");
         }
 
         if (this.isActive) {
-            console.log(this.label, "is active");
+            console.log(this.displayName, "is active");
         }
 
         //

@@ -62,6 +62,8 @@ class CanvasUI implements Destroyable, Drawable {
             "Submit"
         );
 
+        submit.setDisplayName("Submit");
+
         submit.onClick(() => {
             console.log("Clicked on Submit");
         });
@@ -69,6 +71,8 @@ class CanvasUI implements Destroyable, Drawable {
         const input = new TextInput(cansole.element as HTMLCanvasElement, {
             h: submit.h,
         });
+
+        input.setDisplayName("CommandTextInput");
 
         this.entities = [];
 
@@ -142,7 +146,6 @@ class CanvasUI implements Destroyable, Drawable {
     private resizeInputOnWindowReize(input: TextInput, submit: Button) {
         const gapBetweenInputAndSubmit = 16;
 
-        console.log(input, submit);
         input.setW(submit.x - input.x - gapBetweenInputAndSubmit);
     }
 }
