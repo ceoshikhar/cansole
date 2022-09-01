@@ -87,9 +87,9 @@ class CanvasUI implements Destroyable, Drawable {
         // Need to position and resize the elements on the init as well.
         positionAndResizeElements();
 
-        cansoleWindow.onDrag(() =>
-            this.positionSubmitOnWindowResize(submit, cansoleWindow)
-        );
+        cansoleWindow.onDrag(() => {
+            positionAndResizeElements();
+        });
 
         cansoleWindow.onDragEnd((e) => {
             const pos: Vec2<number> = new Vec2(e.target.x, e.target.y);
