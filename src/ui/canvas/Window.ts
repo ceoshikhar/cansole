@@ -29,7 +29,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
 
     private canvas: HTMLCanvasElement;
 
-    // TODO: rename `box` something else like "drawableArea"?
+    // TODO: rename `box` something else like `drawableArea` or `content`?
     private box: Box;
     private crossButton: Button;
     private resizer: Box;
@@ -38,9 +38,11 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
     private ee: EventEmitter;
 
     constructor({ x, y, w, h, title, cansole }: WindowOptions) {
+        this.title = title;
+
         this.canvas = cansole.element as HTMLCanvasElement;
 
-        const box: Box = new Box(
+        this.box = new Box(
             cansole.element as HTMLCanvasElement,
             {
                 x,
@@ -53,7 +55,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
             }
         );
 
-        const crossButton: Button = new Button(
+        this.crossButton = new Button(
             cansole.element as HTMLCanvasElement,
             "X",
             {
@@ -75,12 +77,12 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
             }
         );
 
-        crossButton.onClick(() => {
+        this.crossButton.onClick(() => {
             console.log("Clicked on X");
             cansole.hide();
         });
 
-        const titleBar: Box = new Box(
+        this.titleBar = new Box(
             cansole.element as HTMLCanvasElement,
             {
                 x,
@@ -94,7 +96,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
         );
 
         // TODO: Make a new type called `Resizer`?
-        const resizer: Box = new Box(
+        this.resizer = new Box(
             cansole.element as HTMLCanvasElement,
             {
                 x: x + w - 10,
@@ -107,16 +109,10 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
             }
         );
 
-        this.title = title;
-        this.box = box;
-        this.crossButton = crossButton;
-        this.resizer = resizer;
-        this.titleBar = titleBar;
-
         this.ee = new EventEmitter();
 
         this.makeDraggable();
-        this.makeResizable(cansole);
+        this.makeResizable();
 
         cansole.onHide(() => this.destroy());
     }
@@ -229,25 +225,25 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
         this.ee.on(events.MouseEvents.DragStart, cb);
     }
 
-    private makeResizable(cansole: Cansole): void {
+    private makeResizable(): void {
         this.resizer.makeActivable();
         this.resizer.makeDraggable();
         this.resizer.makeHoverable();
 
         this.resizer.onHover(() => {
-            cansole.element.style.cursor = "se-resize";
+            this.canvas.style.cursor = "se-resize";
         });
 
         this.resizer.onHoverLost(() => {
-            cansole.element.style.cursor = "auto";
+            this.canvas.style.cursor = "auto";
         });
 
-        this.resizer.onDragEnd((e) => {
+        this.resizer.onDragEnd(() => {
             console.log("Resizing window end");
             this.ee.emit(events.WindowEvents.ResizeEnd, { target: this.box });
         });
 
-        this.resizer.onDragStart((e) => {
+        this.resizer.onDragStart(() => {
             console.log("Resizing window start");
             this.ee.emit(events.WindowEvents.ResizeStart, { target: this });
         });
@@ -268,7 +264,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
             // Keep the crossButton at the top right.
             this.crossButton.setX(this.crossButton.x + dx);
 
-            // Reisze the title bar's width.
+            // Resize the title bar's width.
             this.titleBar.setW(this.titleBar.w + dx);
 
             // Keep the resize at the bottom right.

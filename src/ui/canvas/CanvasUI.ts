@@ -5,6 +5,7 @@ import { Vec2 } from "../../math";
 import { Button } from "./Button";
 import { Drawable, Destroyable } from "./interfaces";
 import { Window } from "./Window";
+import { TextInput } from "./TextInput";
 
 const WINDOW_POS_STORAGE_KEY = "window_pos";
 const WINDOW_SIZE_STORAGE_KEY = "window_size";
@@ -47,7 +48,7 @@ class CanvasUI implements Destroyable, Drawable {
                 ? DEFAULT_WINDOW_SIZE
                 : JSON.parse(initSizeStr);
 
-        const myWindow = new Window({
+        const cansoleWindow = new Window({
             x: initPos.v1,
             y: initPos.v2,
             w: initSize.v1,
@@ -56,27 +57,41 @@ class CanvasUI implements Destroyable, Drawable {
             cansole: cansole,
         });
 
-        const submitButton = new Button(
+        const submit = new Button(
             cansole.element as HTMLCanvasElement,
             "Submit"
         );
 
-        submitButton.onClick(() => {
+        submit.onClick(() => {
             console.log("Clicked on Submit");
+        });
+
+        const input = new TextInput(cansole.element as HTMLCanvasElement, {
+            h: submit.h,
         });
 
         this.entities = [];
 
-        this.entities.push(myWindow);
-        this.entities.push(submitButton);
+        this.entities.push(cansoleWindow);
+        this.entities.push(submit);
+        this.entities.push(input);
 
-        this.positionButtonRelativeToWindow(submitButton, myWindow);
+        // TODO: instead of this we should have "child" <-> "parent" elements
+        // to be "drawn" relative to each other instead of the entire canvas.
+        const positionAndResizeElements = () => {
+            this.positionSubmitOnWindowResize(submit, cansoleWindow);
+            this.positionInputOnWindowResize(input, cansoleWindow);
+            this.resizeInputOnWindowReize(input, submit);
+        };
 
-        myWindow.onDrag(() =>
-            this.positionButtonRelativeToWindow(submitButton, myWindow)
+        // Need to position and resize the elements on the init as well.
+        positionAndResizeElements();
+
+        cansoleWindow.onDrag(() =>
+            this.positionSubmitOnWindowResize(submit, cansoleWindow)
         );
 
-        myWindow.onDragEnd((e) => {
+        cansoleWindow.onDragEnd((e) => {
             const pos: Vec2<number> = new Vec2(e.target.x, e.target.y);
             window.localStorage.setItem(
                 WINDOW_POS_STORAGE_KEY,
@@ -84,11 +99,11 @@ class CanvasUI implements Destroyable, Drawable {
             );
         });
 
-        myWindow.onResize(() =>
-            this.positionButtonRelativeToWindow(submitButton, myWindow)
-        );
+        cansoleWindow.onResize(() => {
+            positionAndResizeElements();
+        });
 
-        myWindow.onResizeEnd((e) => {
+        cansoleWindow.onResizeEnd((e) => {
             const size: Vec2<number> = new Vec2(e.target.w, e.target.h);
             window.localStorage.setItem(
                 WINDOW_SIZE_STORAGE_KEY,
@@ -107,16 +122,28 @@ class CanvasUI implements Destroyable, Drawable {
         this.entities = [];
     }
 
-    // TODO: instead of this we should have "child" <-> "parent" elements to be
-    // "drawn" relative to each other?
-    private positionButtonRelativeToWindow(
-        button: Button,
-        window: Window
-    ): void {
+    private positionSubmitOnWindowResize(submit: Button, window: Window): void {
         const buttonPaddingWithWindow = 16;
 
-        button.setR(window.r - buttonPaddingWithWindow);
-        button.setB(window.b - buttonPaddingWithWindow);
+        submit.setR(window.r - buttonPaddingWithWindow);
+        submit.setB(window.b - buttonPaddingWithWindow);
+    }
+
+    private positionInputOnWindowResize(
+        input: TextInput,
+        window: Window
+    ): void {
+        const inputPaddingWithWindow = 16;
+
+        input.setL(window.l + inputPaddingWithWindow);
+        input.setB(window.b - inputPaddingWithWindow);
+    }
+
+    private resizeInputOnWindowReize(input: TextInput, submit: Button) {
+        const gapBetweenInputAndSubmit = 16;
+
+        console.log(input, submit);
+        input.setW(submit.x - input.x - gapBetweenInputAndSubmit);
     }
 }
 

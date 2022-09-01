@@ -141,10 +141,6 @@ class Button
         this.makeActivable();
         this.makeHoverable();
 
-        //
-        // Attach event listeners to `box`.
-        //
-
         this.box.onHover(() => {
             this.box.theme = this.theme.hover;
             this.canvas.style.cursor = this.theme.hover.cursor;
