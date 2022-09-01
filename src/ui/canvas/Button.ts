@@ -19,10 +19,10 @@ import { Box } from "./shapes";
 import { Text } from "./Text";
 
 type ButtonOptions = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
+    x?: number;
+    y?: number;
+    w?: number;
+    h?: number;
 };
 
 type ButtonThemeables = {
@@ -43,7 +43,7 @@ type ButtonThemeOptions = Partial<ButtonThemeables> & {
     active?: Partial<ButtonThemeables>;
 };
 
-const defaultButtonOptions: ButtonOptions = {
+const defaultButtonOptions = {
     x: 0,
     y: 0,
     w: 0,
@@ -52,8 +52,8 @@ const defaultButtonOptions: ButtonOptions = {
 
 const defaultButtonThemeables: ButtonThemeables = {
     backgroundColor: constants.colors.primary,
-    borderWidth: 0,
     borderColor: "white",
+    borderWidth: 0,
     cursor: "auto",
     foregroundColor: constants.colors.onPrimary,
 };
@@ -97,7 +97,7 @@ class Button
     constructor(
         canvas: HTMLCanvasElement,
         label: string,
-        options: Partial<ButtonOptions> = {},
+        options: ButtonOptions = {},
         theme: ButtonThemeOptions = {}
     ) {
         this.canvas = canvas;
@@ -116,27 +116,20 @@ class Button
             },
         };
 
-        const finalOptions: ButtonOptions = {
-            ...defaultButtonOptions,
-            ...options,
-        };
-
-        const box = new Box(
+        this.box = new Box(
             canvas,
             {
-                x: finalOptions.x,
-                y: finalOptions.y,
-                w: finalOptions.w,
-                h: finalOptions.h,
+                x: options.x || defaultButtonOptions.x,
+                y: options.y || defaultButtonOptions.y,
+                w: options.w || defaultButtonOptions.w,
+                h: options.h || defaultButtonOptions.h,
             },
             {
                 backgroundColor: this.theme.backgroundColor,
-                borderWidth: this.theme.borderWidth,
                 borderColor: this.theme.borderColor,
+                borderWidth: this.theme.borderWidth,
             }
         );
-
-        this.box = box;
 
         //
         // Make this `Button` interactive.
@@ -152,30 +145,30 @@ class Button
         // Attach event listeners to `box`.
         //
 
-        box.onHover(() => {
-            box.theme = this.theme.hover;
+        this.box.onHover(() => {
+            this.box.theme = this.theme.hover;
             this.canvas.style.cursor = this.theme.hover.cursor;
         });
 
-        box.onHoverLost(() => {
-            box.theme = this.theme;
+        this.box.onHoverLost(() => {
+            this.box.theme = this.theme;
             this.canvas.style.cursor = "auto";
         });
 
-        box.onActive(() => {
+        this.box.onActive(() => {
             if (this.box.isHovered) {
-                box.theme = this.theme.active;
+                this.box.theme = this.theme.active;
                 this.canvas.style.cursor = this.theme.active.cursor;
             }
             // Is it even possible for Button to be active if it's not hvoered?
         });
 
-        box.onActiveLost(() => {
-            if (box.isHovered) {
-                box.theme = this.theme.hover;
+        this.box.onActiveLost(() => {
+            if (this.box.isHovered) {
+                this.box.theme = this.theme.hover;
                 this.canvas.style.cursor = this.theme.hover.cursor;
             } else {
-                box.theme = this.theme;
+                this.box.theme = this.theme;
                 this.canvas.style.cursor = "auto";
             }
         });
@@ -183,8 +176,8 @@ class Button
         const textWidth = new Text(canvas, label).measureText().width;
         const padding = 16;
 
-        box.w = finalOptions.w || textWidth + padding;
-        box.h = finalOptions.h || 24 + padding;
+        this.box.w = options.w || textWidth + padding;
+        this.box.h = options.h || 24 + padding;
     }
 
     public get x(): number {
@@ -218,12 +211,21 @@ class Button
     public get b(): number {
         return this.box.b;
     }
+
     public setX(newX: number): void {
         this.box.setX(newX);
     }
 
     public setY(newY: number): void {
         this.box.setY(newY);
+    }
+
+    public setW(newW: number): void {
+        this.box.setW(newW);
+    }
+
+    public setH(newH: number): void {
+        this.box.setH(newH);
     }
 
     public setL(newL: number): void {

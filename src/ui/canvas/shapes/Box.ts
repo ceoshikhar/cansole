@@ -21,11 +21,18 @@ import {
 } from "../interfaces";
 
 type BoxOptions = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
+    x?: number;
+    y?: number;
+    w?: number;
+    h?: number;
 };
+
+const defaultBoxOptions = {
+    x: 0,
+    y: 0,
+    w: 100,
+    h: 100,
+} as const;
 
 type BoxTheme = {
     backgroundColor: string;
@@ -34,13 +41,6 @@ type BoxTheme = {
 };
 
 type BoxThemeOptions = Partial<BoxTheme>;
-
-const defaultBoxOptions: BoxOptions = {
-    x: 0,
-    y: 0,
-    w: 100,
-    h: 100,
-};
 
 const defaultBoxTheme: BoxTheme = {
     backgroundColor: "#EFEFEF",
@@ -81,16 +81,16 @@ class Box
 
     constructor(
         canvas: HTMLCanvasElement,
-        options: BoxOptions = defaultBoxOptions,
+        options: BoxOptions,
         theme: BoxThemeOptions = {}
     ) {
         this.canvas = canvas;
         this.theme = { ...defaultBoxTheme, ...theme };
 
-        this.x = options.x;
-        this.y = options.y;
-        this.w = options.w;
-        this.h = options.h;
+        this.x = options.x || defaultBoxOptions.x;
+        this.y = options.y || defaultBoxOptions.y;
+        this.w = options.w || defaultBoxOptions.w;
+        this.h = options.h || defaultBoxOptions.h;
 
         this.l = this.x;
         this.t = this.y;

@@ -7,7 +7,7 @@ const colors = {
     background2: '#003459',
     background3: '#003F6B',
     brightBlue: '#8ECAE6',
-    disabledBorder: '#0066AE',
+    borderPrimaryDisabled: '#0066AE',
     disabledError: '#7A2727',
     disabledPrimary: '#00477A',
     disabledSecondary: '#7A5801',
