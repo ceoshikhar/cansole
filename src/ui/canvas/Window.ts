@@ -12,7 +12,7 @@ import {
     Resizable,
     ResizeEventCallback,
 } from "./interfaces";
-import { Box } from "./shapes";
+import { Box } from "./Box";
 import { Text } from "./Text";
 
 type WindowOptions = {

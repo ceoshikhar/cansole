@@ -1,3 +1,5 @@
+import { Vec4 } from "../../../math";
+
 /**
  * Themeables that you can pick to compose your own <T> to pass to Themeable:
  */
@@ -10,6 +12,7 @@ type Themeables = {
     fontSize: number;
     fontWeight: "normal" | "bold"; // TODO: better typing, any more variants?
     foregroundColor: string;
+    padding: Vec4<number>;
     textAlign: CanvasTextAlign;
     textBaseline: CanvasTextBaseline;
 };

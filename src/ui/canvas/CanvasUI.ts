@@ -69,6 +69,10 @@ class CanvasUI implements Destroyable, Drawable {
         });
 
         const input = new TextInput(cansole.element as HTMLCanvasElement, {
+            // FIXME: This height should come from a "Container", "Layout",
+            // "FlexBox" or whatever that "holds" 2 child (submit and input)
+            // and then that "Container" height will get passed to both
+            // children, etc. Just like DOM.
             h: submit.h,
         });
 
@@ -84,7 +88,7 @@ class CanvasUI implements Destroyable, Drawable {
         this.entities.push(submit);
         this.entities.push(input);
 
-        // TODO: instead of this we should have "child" <-> "parent" elements
+        // FIXME: instead of this we should have "child" <-> "parent" elements
         // to be "drawn" relative to each other instead of the entire canvas.
         const positionAndResizeElements = () => {
             this.positionSubmitOnWindowResize(submit, cansoleWindow);

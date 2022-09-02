@@ -1,9 +1,10 @@
 import * as constants from "../../constants";
 import { EventEmitter } from "../../event-emitter";
 import * as events from "../../events";
-import { Vec2 } from "../../math";
+import { Vec2, Vec4 } from "../../math";
 
-import { Box } from "./shapes/Box";
+import { Rect } from "./shapes";
+import { Box } from "./Box";
 import {
     Activable,
     ActiveEventCallback,
@@ -42,7 +43,9 @@ type TextInputThemeables = Pick<
     | "cursor"
     | "fontFamily"
     | "fontSize"
+    | "fontWeight"
     | "foregroundColor"
+    | "padding"
     | "textAlign"
     | "textBaseline"
 >;
@@ -66,6 +69,7 @@ const defaultTextInputThemeables: TextInputThemeables = {
     fontSize: 18,
     fontWeight: "normal",
     foregroundColor: constants.colors.onDisabled,
+    padding: new Vec4(4, 8, 4, 8),
     textAlign: "start",
     textBaseline: "alphabetic",
 };
@@ -101,14 +105,14 @@ class TextInput
 
     public displayName: string = "TextInput";
 
-    private box: Box;
     private canvas: HTMLCanvasElement;
+    private box: Box;
+    private cursor: Box;
 
     private ee: EventEmitter;
 
     private isActive = false;
     private isHovered = false;
-    private isTypable = false;
 
     constructor(
         canvas: HTMLCanvasElement,
@@ -143,6 +147,16 @@ class TextInput
                 borderColor: this.theme.borderColor,
                 borderWidth: this.theme.borderWidth,
             }
+        );
+
+        this.box.setH(
+            options.h ||
+                this.box.h + this.theme.padding.v1 + this.theme.padding.v3
+        );
+
+        this.box.setW(
+            options.w ||
+                this.box.w + this.theme.padding.v2 + this.theme.padding.v4
         );
 
         //
@@ -186,6 +200,8 @@ class TextInput
                 this.canvas.style.cursor = "auto";
             }
         });
+
+        this.cursor = new Box(canvas);
     }
 
     public setDisplayName(name: string): void {
@@ -279,8 +295,8 @@ class TextInput
             this.ee.emit(events.MouseEvents.Click, { target: this });
         });
 
-        this.canvas.addEventListener("mouseup", (e) => {
-            // Clicked on canvas somewhere outside this `TextBox`.
+        this.canvas.addEventListener("mousedown", (e) => {
+            // Somewhere on canvas outside this `TextBox`.
             if (!this.box.contains(new Vec2(e.offsetX, e.offsetY))) {
                 if (this.isActive) {
                     this.isActive = false;
@@ -322,9 +338,46 @@ class TextInput
         }
 
         this.box.draw();
+
+        if (this.isActive) {
+            const pos = this.calculateCursorPosition();
+
+            this.cursor.setX(pos.v1);
+            this.cursor.setY(pos.v2);
+
+            const size = this.calculateCursorSize();
+
+            this.cursor.setW(size.v1);
+            this.cursor.setH(size.v2);
+
+            this.cursor.draw();
+        }
     }
 
     public destroy(): void {}
+
+    private calculateTypableRect(): Rect {
+        return new Rect({
+            x: this.box.x + this.theme.padding.v4,
+            y: this.box.y + this.theme.padding.v1,
+            w: this.box.w - this.theme.padding.v2 - this.theme.padding.v4,
+            h: this.box.h - this.theme.padding.v1 - this.theme.padding.v3,
+        });
+    }
+
+    private calculateCursorPosition(): Vec2<number> {
+        const rect = this.calculateTypableRect();
+
+        console.log({ rect, box: this.box, padding: this.theme.padding });
+        return new Vec2(
+            rect.x,
+            rect.y + (rect.b - rect.t - this.theme.fontSize) / 2
+        );
+    }
+
+    private calculateCursorSize(): Vec2<number> {
+        return new Vec2(5, this.theme.fontSize);
+    }
 }
 
 export { TextInput };
