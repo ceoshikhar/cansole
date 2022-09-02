@@ -1,1 +1,1 @@
-export { Box } from "./Box";
+export { Rect, RectOptions } from "./Rect";

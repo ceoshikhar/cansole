@@ -1,8 +1,8 @@
-import { Vec2 } from "../../../math";
-import { EventEmitter } from "../../../event-emitter";
+import { Vec2 } from "../../math";
+import { EventEmitter } from "../../event-emitter";
 
-import * as events from "../../../events";
-import * as utils from "../../../utils";
+import * as events from "../../events";
+import * as utils from "../../utils";
 
 import {
     Activable,
@@ -19,14 +19,11 @@ import {
     Destroyable,
     Themeable,
     Themeables,
-} from "../interfaces";
+} from "./interfaces";
 
-type BoxOptions = {
-    x?: number;
-    y?: number;
-    w?: number;
-    h?: number;
-};
+import { Rect, RectOptions } from "./shapes";
+
+type BoxOptions = RectOptions;
 
 const defaultBoxOptions = {
     x: 0,
@@ -50,6 +47,7 @@ const defaultBoxTheme: BoxTheme = {
 };
 
 class Box
+    extends Rect
     implements
         Activable<Box>,
         Clickable<Box>,
@@ -59,16 +57,6 @@ class Box
         Hoverable<Box>,
         Themeable<BoxTheme>
 {
-    public x: number;
-    public y: number;
-    public w: number;
-    public h: number;
-
-    public l: number;
-    public t: number;
-    public r: number;
-    public b: number;
-
     public theme: BoxTheme;
 
     public isActive: boolean;
@@ -84,18 +72,10 @@ class Box
         options: BoxOptions = {},
         theme: BoxThemeOptions = {}
     ) {
+        super(options);
+
         this.canvas = canvas;
         this.theme = { ...defaultBoxTheme, ...theme };
-
-        this.x = options.x || defaultBoxOptions.x;
-        this.y = options.y || defaultBoxOptions.y;
-        this.w = options.w || defaultBoxOptions.w;
-        this.h = options.h || defaultBoxOptions.h;
-
-        this.l = this.x;
-        this.t = this.y;
-        this.r = this.x + this.w;
-        this.b = this.y + this.h;
 
         this.ee = new EventEmitter();
         this.isActive = false;
@@ -156,71 +136,6 @@ class Box
 
     public onDragStart(cb: DragEventCallback<this>): void {
         this.ee.on(events.MouseEvents.DragStart, cb);
-    }
-
-    public setX(newX: number): void {
-        this.x = newX;
-        this.l = newX;
-        this.r = newX + this.w;
-    }
-
-    public setY(newY: number): void {
-        this.y = newY;
-        this.t = newY;
-        this.b = newY + this.h;
-    }
-
-    public setW(newW: number): void {
-        this.w = newW;
-        this.r = this.x + newW;
-    }
-
-    public setH(newH: number): void {
-        this.h = newH;
-        this.b = this.y + newH;
-    }
-
-    public setL(newL: number): void {
-        const newR = newL + this.w;
-
-        this.l = newL;
-        this.x = newL;
-        this.r = newR;
-    }
-
-    public setT(newT: number): void {
-        const newB = newT + this.h;
-
-        this.t = newT;
-        this.y = newT;
-        this.b = newB;
-    }
-
-    public setR(newR: number): void {
-        const newX = newR - this.w;
-
-        this.r = newR;
-        this.x = newX;
-        this.l = newX;
-    }
-
-    public setB(newB: number): void {
-        const newY = newB - this.h;
-
-        this.b = newB;
-        this.y = newY;
-        this.t = newY;
-    }
-
-    public contains(coords: Vec2<number>): boolean {
-        const x = coords.v1;
-        const y = coords.v2;
-
-        if (x >= this.l && x <= this.r && y >= this.t && y <= this.b) {
-            return true;
-        }
-
-        return false;
     }
 
     public makeHoverable(): void {
