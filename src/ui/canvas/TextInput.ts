@@ -20,6 +20,7 @@ import {
     Themeable,
     Themeables,
 } from "./interfaces";
+import { Text } from "./Text";
 
 type TextInputOptions = {
     x?: number;
@@ -71,7 +72,7 @@ const defaultTextInputThemeables: TextInputThemeables = {
     foregroundColor: constants.colors.onDisabled,
     padding: new Vec4(4, 8, 4, 8),
     textAlign: "start",
-    textBaseline: "alphabetic",
+    textBaseline: "middle",
 };
 
 const defaultTextInputTheme: TextInputTheme = {
@@ -101,9 +102,10 @@ class TextInput
         Hoverable<TextInput>,
         Themeable<TextInputTheme>
 {
+    public displayName: string = "TextInput";
     public theme: TextInputTheme;
 
-    public displayName: string = "TextInput";
+    public value: string;
 
     private canvas: HTMLCanvasElement;
     private box: Box;
@@ -133,6 +135,8 @@ class TextInput
                 ...theme.active,
             },
         };
+
+        this.value = "";
 
         this.box = new Box(
             canvas,
@@ -169,7 +173,9 @@ class TextInput
         this.makeClickable();
 
         this.box.onHover(() => {
-            if (!this.isActive) {
+            if (this.isActive) {
+                this.box.theme = this.theme.active;
+            } else {
                 this.box.theme = this.theme.hover;
             }
 
@@ -289,10 +295,20 @@ class TextInput
     private makeClickable(): void {
         this.box.makeClickable();
 
+        const onKeyPress = (e: KeyboardEvent) => {
+            this.value += e.key;
+            console.log({ value: this.value });
+        };
+
         this.box.onClick(() => {
-            this.isActive = true;
-            this.ee.emit(events.MouseEvents.Active, { target: this });
             this.ee.emit(events.MouseEvents.Click, { target: this });
+
+            if (!this.isActive) {
+                this.isActive = true;
+
+                this.ee.emit(events.MouseEvents.Active, { target: this });
+                document.addEventListener("keypress", onKeyPress);
+            }
         });
 
         this.canvas.addEventListener("mousedown", (e) => {
@@ -300,9 +316,11 @@ class TextInput
             if (!this.box.contains(new Vec2(e.offsetX, e.offsetY))) {
                 if (this.isActive) {
                     this.isActive = false;
+
                     this.ee.emit(events.MouseEvents.ActiveLost, {
                         target: this,
                     });
+                    document.removeEventListener("keypress", onKeyPress);
                 }
             }
         });
@@ -339,6 +357,25 @@ class TextInput
 
         this.box.draw();
 
+        const rect = this.calculateTypableRect();
+
+        const foregroundColor = this.isActive
+            ? this.theme.active.foregroundColor
+            : this.theme.foregroundColor;
+
+        new Text(
+            this.canvas,
+            this.value,
+            {
+                x: rect.x,
+                y: rect.y + rect.h / 2,
+            },
+            {
+                foregroundColor,
+                textBaseline: this.theme.textBaseline,
+            }
+        ).draw();
+
         if (this.isActive) {
             const pos = this.calculateCursorPosition();
 
@@ -368,7 +405,6 @@ class TextInput
     private calculateCursorPosition(): Vec2<number> {
         const rect = this.calculateTypableRect();
 
-        console.log({ rect, box: this.box, padding: this.theme.padding });
         return new Vec2(
             rect.x,
             rect.y + (rect.b - rect.t - this.theme.fontSize) / 2

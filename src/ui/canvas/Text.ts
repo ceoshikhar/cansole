@@ -3,8 +3,8 @@ import * as utils from "../../utils";
 import { Drawable, Themeable, Themeables } from "./interfaces";
 
 type TextOptions = {
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
     maxWidth?: number;
 };
 
@@ -20,10 +20,10 @@ type TextTheme = Pick<
 
 type TextThemeOptions = Partial<TextTheme>;
 
-const defaultTextOptions: TextOptions = {
+const defaultTextOptions = {
     x: 0,
     y: 0,
-};
+} as const;
 
 const defaultTextTheme: TextTheme = {
     fontFamily: "Perfect DOS VGA 437 Win",
@@ -47,7 +47,7 @@ class Text implements Drawable, TextOptions, Themeable<TextTheme> {
     constructor(
         canvas: HTMLCanvasElement,
         text: string,
-        options: Partial<TextOptions> = {},
+        options: TextOptions = {},
         theme: TextThemeOptions = {}
     ) {
         this.canvas = canvas;
@@ -55,10 +55,9 @@ class Text implements Drawable, TextOptions, Themeable<TextTheme> {
 
         this.theme = { ...defaultTextTheme, ...theme };
 
-        const finalOptions = { ...defaultTextOptions, ...options };
-        this.x = finalOptions.x;
-        this.y = finalOptions.y;
-        this.maxWidth = finalOptions.maxWidth;
+        this.x = options.x || defaultTextOptions.x;
+        this.y = options.y || defaultTextOptions.y;
+        this.maxWidth = options.maxWidth;
     }
 
     public measureText(): TextMetrics {
