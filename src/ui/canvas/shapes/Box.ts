@@ -18,6 +18,7 @@ import {
     Drawable,
     Destroyable,
     Themeable,
+    Themeables,
 } from "../interfaces";
 
 type BoxOptions = {
@@ -34,11 +35,10 @@ const defaultBoxOptions = {
     h: 100,
 } as const;
 
-type BoxTheme = {
-    backgroundColor: string;
-    borderColor: string;
-    borderWidth: number;
-};
+type BoxTheme = Pick<
+    Themeables,
+    "backgroundColor" | "borderColor" | "borderWidth"
+>;
 
 type BoxThemeOptions = Partial<BoxTheme>;
 
@@ -81,7 +81,7 @@ class Box
 
     constructor(
         canvas: HTMLCanvasElement,
-        options: BoxOptions,
+        options: BoxOptions = {},
         theme: BoxThemeOptions = {}
     ) {
         this.canvas = canvas;

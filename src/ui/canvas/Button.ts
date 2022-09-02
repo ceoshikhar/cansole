@@ -15,6 +15,7 @@ import {
     HoverEventCallback,
     HoverLostEventCallback,
     Themeable,
+    Themeables,
 } from "./interfaces";
 import { Box } from "./shapes";
 import { Text } from "./Text";
@@ -26,13 +27,14 @@ type ButtonOptions = {
     h?: number;
 };
 
-type ButtonThemeables = {
-    backgroundColor: string;
-    borderColor: string;
-    borderWidth: number;
-    cursor: string;
-    foregroundColor: string;
-};
+type ButtonThemeables = Pick<
+    Themeables,
+    | "backgroundColor"
+    | "borderColor"
+    | "borderWidth"
+    | "cursor"
+    | "foregroundColor"
+>;
 
 type ButtonTheme = ButtonThemeables & {
     hover: ButtonThemeables;

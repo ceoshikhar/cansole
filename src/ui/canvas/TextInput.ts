@@ -17,6 +17,7 @@ import {
     HoverEventCallback,
     HoverLostEventCallback,
     Themeable,
+    Themeables,
 } from "./interfaces";
 
 type TextInputOptions = {
@@ -33,13 +34,18 @@ const defaultTextInputOptions = {
     h: 22,
 } as const;
 
-type TextInputThemeables = {
-    backgroundColor: string;
-    borderColor: string;
-    borderWidth: number;
-    cursor: string;
-    foregroundColor: string;
-};
+type TextInputThemeables = Pick<
+    Themeables,
+    | "backgroundColor"
+    | "borderColor"
+    | "borderWidth"
+    | "cursor"
+    | "fontFamily"
+    | "fontSize"
+    | "foregroundColor"
+    | "textAlign"
+    | "textBaseline"
+>;
 
 type TextInputTheme = TextInputThemeables & {
     hover: TextInputThemeables;
@@ -56,7 +62,12 @@ const defaultTextInputThemeables: TextInputThemeables = {
     borderWidth: 0,
     borderColor: constants.colors.borderPrimaryDisabled,
     cursor: "text",
+    fontFamily: "Perfect DOS VGA 437 Win",
+    fontSize: 18,
+    fontWeight: "normal",
     foregroundColor: constants.colors.onDisabled,
+    textAlign: "start",
+    textBaseline: "alphabetic",
 };
 
 const defaultTextInputTheme: TextInputTheme = {

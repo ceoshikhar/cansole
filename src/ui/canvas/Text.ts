@@ -1,6 +1,6 @@
 import * as constants from "../../constants";
 import * as utils from "../../utils";
-import { Drawable, Themeable } from "./interfaces";
+import { Drawable, Themeable, Themeables } from "./interfaces";
 
 type TextOptions = {
     x: number;
@@ -8,14 +8,15 @@ type TextOptions = {
     maxWidth?: number;
 };
 
-type TextTheme = {
-    fontFamily: string;
-    fontSize: number;
-    fontWeight: "normal" | "bold";
-    foregroundColor: string;
-    textAlign: CanvasTextAlign;
-    textBaseline: CanvasTextBaseline;
-};
+type TextTheme = Pick<
+    Themeables,
+    | "fontFamily"
+    | "fontSize"
+    | "fontWeight"
+    | "foregroundColor"
+    | "textAlign"
+    | "textBaseline"
+>;
 
 type TextThemeOptions = Partial<TextTheme>;
 

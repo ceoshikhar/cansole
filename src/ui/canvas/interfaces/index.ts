@@ -18,4 +18,4 @@ export {
     HoverLostEventCallback,
 } from "./Hoverable";
 export { Resizable, ResizeEvent, ResizeEventCallback } from "./Resizable";
-export { Themeable } from "./Themeable";
+export { Themeable, Themeables } from "./Themeable";
