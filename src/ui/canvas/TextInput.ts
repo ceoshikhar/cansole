@@ -1,14 +1,22 @@
 import * as constants from "../../constants";
 import { EventEmitter } from "../../event-emitter";
 import * as events from "../../events";
+import { Vec2 } from "../../math";
 
 import { Box } from "./shapes/Box";
 import {
+    Activable,
+    ActiveEventCallback,
+    ActiveLostEventCallback,
     Clickable,
     ClickEventCallback,
     Drawable,
     Destroyable,
     HasDisplayName,
+    Hoverable,
+    HoverEventCallback,
+    HoverLostEventCallback,
+    Themeable,
 } from "./interfaces";
 
 type TextInputOptions = {
@@ -58,17 +66,25 @@ const defaultTextInputTheme: TextInputTheme = {
         ...defaultTextInputThemeables,
         backgroundColor: "#000000",
         borderColor: constants.colors.primary,
+        borderWidth: 2,
         foregroundColor: constants.colors.textPrimary,
     },
 
     hover: {
         ...defaultTextInputThemeables,
-        borderWidth: 4,
+        borderWidth: 2,
     },
 };
 
 class TextInput
-    implements Clickable<TextInput>, Drawable, Destroyable, HasDisplayName
+    implements
+        Activable<TextInput>,
+        Clickable<TextInput>,
+        Destroyable,
+        Drawable,
+        HasDisplayName,
+        Hoverable<TextInput>,
+        Themeable<TextInputTheme>
 {
     public theme: TextInputTheme;
 
@@ -79,8 +95,9 @@ class TextInput
 
     private ee: EventEmitter;
 
-    private isHovered = false;
     private isActive = false;
+    private isHovered = false;
+    private isTypable = false;
 
     constructor(
         canvas: HTMLCanvasElement,
@@ -124,15 +141,39 @@ class TextInput
         this.ee = new EventEmitter();
 
         this.makeHoverable();
+        this.makeClickable();
 
         this.box.onHover(() => {
-            this.box.theme = this.theme.hover;
+            if (!this.isActive) {
+                this.box.theme = this.theme.hover;
+            }
+
             this.canvas.style.cursor = this.theme.hover.cursor;
         });
 
         this.box.onHoverLost(() => {
-            this.box.theme = this.theme;
+            if (this.isActive) {
+                this.box.theme = this.theme.active;
+            } else {
+                this.box.theme = this.theme;
+            }
+
             this.canvas.style.cursor = "auto";
+        });
+
+        this.onActive(() => {
+            this.box.theme = this.theme.active;
+            this.canvas.style.cursor = this.theme.active.cursor;
+        });
+
+        this.onActiveLost(() => {
+            if (this.box.isHovered) {
+                this.box.theme = this.theme.hover;
+                this.canvas.style.cursor = this.theme.hover.cursor;
+            } else {
+                this.box.theme = this.theme;
+                this.canvas.style.cursor = "auto";
+            }
         });
     }
 
@@ -218,6 +259,48 @@ class TextInput
         });
     }
 
+    private makeClickable(): void {
+        this.box.makeClickable();
+
+        this.box.onClick(() => {
+            this.isActive = true;
+            this.ee.emit(events.MouseEvents.Active, { target: this });
+            this.ee.emit(events.MouseEvents.Click, { target: this });
+        });
+
+        this.canvas.addEventListener("mouseup", (e) => {
+            // Clicked on canvas somewhere outside this `TextBox`.
+            if (!this.box.contains(new Vec2(e.offsetX, e.offsetY))) {
+                if (this.isActive) {
+                    this.isActive = false;
+                    this.ee.emit(events.MouseEvents.ActiveLost, {
+                        target: this,
+                    });
+                }
+            }
+        });
+    }
+
+    public onHover(cb: HoverEventCallback<TextInput>) {
+        this.ee.on(events.MouseEvents.Hover, cb);
+    }
+
+    public onHoverLost(cb: HoverLostEventCallback<TextInput>) {
+        this.ee.on(events.MouseEvents.HoverLost, cb);
+    }
+
+    public onActive(cb: ActiveEventCallback<TextInput>) {
+        this.ee.on(events.MouseEvents.Active, cb);
+    }
+
+    public onActiveLost(cb: ActiveLostEventCallback<TextInput>) {
+        this.ee.on(events.MouseEvents.ActiveLost, cb);
+    }
+
+    public onClick(cb: ClickEventCallback<this>) {
+        this.ee.on(events.MouseEvents.Click, cb);
+    }
+
     public draw(): void {
         if (this.isHovered) {
             console.log(this.displayName, "is hovered");
@@ -228,10 +311,6 @@ class TextInput
         }
 
         this.box.draw();
-    }
-
-    public onClick(cb: ClickEventCallback<this>) {
-        this.ee.on(events.MouseEvents.Click, cb);
     }
 
     public destroy(): void {}

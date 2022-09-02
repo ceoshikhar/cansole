@@ -64,8 +64,8 @@ class CanvasUI implements Destroyable, Drawable {
 
         submit.setDisplayName("Submit");
 
-        submit.onClick(() => {
-            console.log("Clicked on Submit");
+        submit.onClick((e) => {
+            console.log("Clicked on", e.target.displayName);
         });
 
         const input = new TextInput(cansole.element as HTMLCanvasElement, {
@@ -73,6 +73,10 @@ class CanvasUI implements Destroyable, Drawable {
         });
 
         input.setDisplayName("CommandTextInput");
+
+        input.onClick((e) => {
+            console.log("Clicked on", e.target.displayName);
+        });
 
         this.entities = [];
 

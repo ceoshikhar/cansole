@@ -141,9 +141,9 @@ class Button
 
         this.ee = new EventEmitter();
 
-        this.makeClickable();
-        this.makeActivable();
         this.makeHoverable();
+        this.makeActivable();
+        this.makeClickable();
 
         this.box.onHover(() => {
             this.box.theme = this.theme.hover;
@@ -156,11 +156,8 @@ class Button
         });
 
         this.box.onActive(() => {
-            if (this.box.isHovered) {
-                this.box.theme = this.theme.active;
-                this.canvas.style.cursor = this.theme.active.cursor;
-            }
-            // Is it even possible for Button to be active if it's not hvoered?
+            this.box.theme = this.theme.active;
+            this.canvas.style.cursor = this.theme.active.cursor;
         });
 
         this.box.onActiveLost(() => {

@@ -79,8 +79,8 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
 
         this.crossButton.setDisplayName("X");
 
-        this.crossButton.onClick(() => {
-            console.log("Clicked on X");
+        this.crossButton.onClick((e) => {
+            console.log("Clicked on", e.target.displayName);
             cansole.hide();
         });
 
