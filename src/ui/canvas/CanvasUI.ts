@@ -7,8 +7,6 @@ import { Drawable, Destroyable } from "./interfaces";
 import { Window } from "./Window";
 import { TextInput } from "./TextInput";
 
-const WINDOW_POS_STORAGE_KEY = "window_pos";
-const WINDOW_SIZE_STORAGE_KEY = "window_size";
 const DEFAULT_WINDOW_POS: Vec2<number> = new Vec2(150, 150);
 const DEFAULT_WINDOW_SIZE: Vec2<number> = new Vec2(640, 480);
 
@@ -34,19 +32,11 @@ class CanvasUI implements Destroyable, Drawable {
     public init(cansole: Cansole): void {
         console.log("Initialising CanvasUI");
 
-        const initPosStr: string | null = window.localStorage.getItem(
-            WINDOW_POS_STORAGE_KEY
-        );
         const initPos: Vec2<number> =
-            initPosStr === null ? DEFAULT_WINDOW_POS : JSON.parse(initPosStr);
+            cansole.repository.loadWindowPosition() || DEFAULT_WINDOW_POS;
 
-        const initSizeStr: string | null = window.localStorage.getItem(
-            WINDOW_SIZE_STORAGE_KEY
-        );
         const initSize: Vec2<number> =
-            initSizeStr === null
-                ? DEFAULT_WINDOW_SIZE
-                : JSON.parse(initSizeStr);
+            cansole.repository.loadWindowSize() || DEFAULT_WINDOW_SIZE;
 
         const cansoleWindow = new Window(
             cansole.element as HTMLCanvasElement,
@@ -112,10 +102,7 @@ class CanvasUI implements Destroyable, Drawable {
 
         cansoleWindow.onDragEnd((e) => {
             const pos: Vec2<number> = new Vec2(e.target.x, e.target.y);
-            window.localStorage.setItem(
-                WINDOW_POS_STORAGE_KEY,
-                JSON.stringify(pos)
-            );
+            cansole.repository.saveWindowPosition(pos);
         });
 
         cansoleWindow.onResize(() => {
@@ -124,10 +111,7 @@ class CanvasUI implements Destroyable, Drawable {
 
         cansoleWindow.onResizeEnd((e) => {
             const size: Vec2<number> = new Vec2(e.target.w, e.target.h);
-            window.localStorage.setItem(
-                WINDOW_SIZE_STORAGE_KEY,
-                JSON.stringify(size)
-            );
+            cansole.repository.saveWindowSize(size);
         });
     }
 

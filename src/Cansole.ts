@@ -2,6 +2,7 @@ import * as events from "./events";
 import * as utils from "./utils";
 import { CanvasUI, Drawable } from "./ui/canvas";
 import { EventEmitter } from "./event-emitter";
+import { Repository } from "./Repository";
 
 /**
  * Where and how to render the `Cansole`.
@@ -58,9 +59,10 @@ const defaultCansoleOptions: CansoleOptions = {
  */
 class Cansole implements Drawable {
     public element: CansoleElement;
+    public options: CansoleOptions;
+    public repository: Repository;
     public target: Target;
     public visibility: Visibility;
-    public options: CansoleOptions;
 
     private ee: EventEmitter;
 
@@ -79,6 +81,7 @@ class Cansole implements Drawable {
         this.options = { ...defaultCansoleOptions, ...options };
 
         this.ee = new EventEmitter();
+        this.repository = new Repository(window.sessionStorage);
 
         this.canvasUI = null;
 
