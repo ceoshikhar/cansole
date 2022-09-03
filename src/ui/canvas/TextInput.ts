@@ -106,10 +106,17 @@ class TextInput
     public theme: TextInputTheme;
 
     public value: string;
+    /** The part/substring of `value` that is to be drawn in the `box`. */
+    private valueIndexes: Vec2<number>;
 
     private canvas: HTMLCanvasElement;
+
     private box: Box;
+
     private cursor: Box;
+
+    /** Where the cursor is currently present inside the `value`. */
+    private cursorIndex: number;
 
     private ee: EventEmitter;
 
@@ -137,6 +144,7 @@ class TextInput
         };
 
         this.value = "";
+        this.valueIndexes = new Vec2(0, 0);
 
         this.box = new Box(
             canvas,
@@ -208,6 +216,7 @@ class TextInput
         });
 
         this.cursor = new Box(canvas);
+        this.cursorIndex = 0;
     }
 
     public setDisplayName(name: string): void {
@@ -296,7 +305,35 @@ class TextInput
         this.box.makeClickable();
 
         const onKeyPress = (e: KeyboardEvent) => {
-            this.value += e.key;
+            const newValue = this.value + e.key;
+            this.value = newValue;
+            this.cursorIndex += 1;
+
+            const rect = this.calculateTypableRect();
+            const valueToDraw = this.calculateValueToDraw();
+
+            const textWidth = new Text(
+                this.canvas,
+                valueToDraw,
+                {},
+                this.theme
+            ).measureText().width;
+
+            const paddingR = this.theme.padding.v2;
+
+            // We add the `paddingR` to `textWidth` because we want to move
+            // the `valueIndexes` in advance(before) reaching the `rect.w`
+            // otherwise, the `cursor` will draw at the "outside" of
+            // the the "typable" rect's right edge.
+            const isAtValueDrawMaxLimit = textWidth + paddingR >= rect.w;
+
+            if (isAtValueDrawMaxLimit) {
+                // Move start and end of `valueIndexes` forward.
+                this.valueIndexes = this.valueIndexes.add(new Vec2(1, 1));
+            } else {
+                // Move the end of the `valueIndexes` forward.
+                this.valueIndexes = this.valueIndexes.add(new Vec2(0, 1));
+            }
 
             console.log({ value: this.value });
         };
@@ -306,7 +343,24 @@ class TextInput
 
             switch (e.key) {
                 case "Backspace": {
-                    this.value = this.value.substring(0, this.value.length - 1);
+                    const newValue = this.value.substring(
+                        0,
+                        this.value.length - 1
+                    );
+                    this.value = newValue;
+                    this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
+
+                    if (this.valueIndexes.v1) {
+                        this.valueIndexes = this.valueIndexes.sub(
+                            new Vec2(1, 1)
+                        );
+                    } else {
+                        if (this.value) {
+                            this.valueIndexes = this.valueIndexes.sub(
+                                new Vec2(0, 1)
+                            );
+                        }
+                    }
                 }
 
                 default:
@@ -379,9 +433,11 @@ class TextInput
             ? this.theme.active.foregroundColor
             : this.theme.foregroundColor;
 
+        const valueToDraw = this.calculateValueToDraw();
+
         new Text(
             this.canvas,
-            this.value,
+            valueToDraw,
             {
                 x: rect.x,
                 y: rect.y + rect.h / 2,
@@ -420,9 +476,17 @@ class TextInput
 
     private calculateCursorPosition(): Vec2<number> {
         const rect = this.calculateTypableRect();
+        const valueToDraw = this.calculateValueToDraw();
 
         const x =
-            rect.x + new Text(this.canvas, this.value).measureText().width;
+            rect.x +
+            new Text(
+                this.canvas,
+                valueToDraw.substring(
+                    0,
+                    this.cursorIndex - this.valueIndexes.v1
+                )
+            ).measureText().width;
         const y = rect.y + (rect.b - rect.t - this.theme.fontSize) / 2;
 
         return new Vec2(x, y);
@@ -430,6 +494,10 @@ class TextInput
 
     private calculateCursorSize(): Vec2<number> {
         return new Vec2(5, this.theme.fontSize);
+    }
+
+    private calculateValueToDraw(): string {
+        return this.value.substring(this.valueIndexes.v1, this.valueIndexes.v2);
     }
 }
 

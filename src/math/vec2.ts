@@ -11,11 +11,29 @@ class Vec2<T> {
     }
 
     /**
-     * Subtracts `otehr` from `this`.
+     * Adds `other` to `this`.
+     */
+    public add(other: Vec2<number>): Vec2<number> {
+        if (typeof this.v1 !== "number" || typeof this.v2 !== "number") {
+            throw new Error("Vec2: `add` method is only for Vec2<number>.");
+        }
+
+        const v1: number = this.v1;
+        const v2: number = this.v2;
+
+        return new Vec2(v1 + other.v1, v2 + other.v2);
+    }
+
+    /**
+     * Subtracts `other` from `this`.
      */
     public sub(other: Vec2<number>): Vec2<number> {
-        const v1: number = this.v1 as unknown as number;
-        const v2: number = this.v2 as unknown as number;
+        if (typeof this.v1 !== "number" || typeof this.v2 !== "number") {
+            throw new Error("Vec2: `add` method is only for Vec2<number>.");
+        }
+
+        const v1: number = this.v1;
+        const v2: number = this.v2;
 
         return new Vec2(v1 - other.v1, v2 - other.v2);
     }
