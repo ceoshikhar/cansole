@@ -511,7 +511,15 @@ class TextInput
     }
 
     private calculateCursorSize(): Vec2<number> {
-        return new Vec2(5, this.theme.fontSize);
+        const char =
+            this.cursorIndex < this.value.length
+                ? this.value[this.cursorIndex]
+                : "a";
+
+        const width = new Text(this.canvas, char, {}, this.theme).measureText()
+            .width;
+
+        return new Vec2(width, this.theme.fontSize);
     }
 
     private calculateValueToDraw(): string {
