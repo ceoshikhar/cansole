@@ -405,10 +405,11 @@ class TextInput
     private calculateCursorPosition(): Vec2<number> {
         const rect = this.calculateTypableRect();
 
-        return new Vec2(
-            rect.x,
-            rect.y + (rect.b - rect.t - this.theme.fontSize) / 2
-        );
+        const x =
+            rect.x + new Text(this.canvas, this.value).measureText().width;
+        const y = rect.y + (rect.b - rect.t - this.theme.fontSize) / 2;
+
+        return new Vec2(x, y);
     }
 
     private calculateCursorSize(): Vec2<number> {
