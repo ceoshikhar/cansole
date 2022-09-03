@@ -204,24 +204,7 @@ class TextInput
             this.box.theme = this.theme.active;
             this.canvas.style.cursor = this.theme.active.cursor;
 
-            const rect = this.calculateTypableRect();
-            const paddingL = this.theme.padding.v4;
-
-            for (let i = this.value.length; i >= 0; i--) {
-                console.log(this.value.length, i);
-
-                const textWidth = new Text(
-                    this.canvas,
-                    this.value.substring(i, this.value.length),
-                    {},
-                    this.theme
-                ).measureText().width;
-
-                if (rect.r - (textWidth + paddingL) <= rect.l) {
-                    this.valueIndexes = new Vec2(i, this.value.length);
-                    break;
-                }
-            }
+            this.moveValueIndexesToEnd();
         });
 
         this.onActiveLost(() => {
@@ -233,24 +216,7 @@ class TextInput
                 this.canvas.style.cursor = "auto";
             }
 
-            const rect = this.calculateTypableRect();
-            const paddingR = this.theme.padding.v2;
-
-            for (let i = 0; i <= this.value.length; i++) {
-                console.log(this.value.length, i);
-
-                const textWidth = new Text(
-                    this.canvas,
-                    this.value.substring(0, i),
-                    {},
-                    this.theme
-                ).measureText().width;
-
-                if (textWidth + paddingR >= rect.w) {
-                    this.valueIndexes = new Vec2(0, i);
-                    break;
-                }
-            }
+            this.moveValueIndexesToStart();
         });
 
         this.cursor = new Box(canvas);
@@ -434,24 +400,28 @@ class TextInput
         });
     }
 
-    public onHover(cb: HoverEventCallback<TextInput>) {
+    public onHover(cb: HoverEventCallback<TextInput>): void {
         this.ee.on(events.MouseEvents.Hover, cb);
     }
 
-    public onHoverLost(cb: HoverLostEventCallback<TextInput>) {
+    public onHoverLost(cb: HoverLostEventCallback<TextInput>): void {
         this.ee.on(events.MouseEvents.HoverLost, cb);
     }
 
-    public onActive(cb: ActiveEventCallback<TextInput>) {
+    public onActive(cb: ActiveEventCallback<TextInput>): void {
         this.ee.on(events.MouseEvents.Active, cb);
     }
 
-    public onActiveLost(cb: ActiveLostEventCallback<TextInput>) {
+    public onActiveLost(cb: ActiveLostEventCallback<TextInput>): void {
         this.ee.on(events.MouseEvents.ActiveLost, cb);
     }
 
-    public onClick(cb: ClickEventCallback<this>) {
+    public onClick(cb: ClickEventCallback<this>): void {
         this.ee.on(events.MouseEvents.Click, cb);
+    }
+
+    public afterResize(): void {
+        this.moveValueIndexesToStart();
     }
 
     public draw(): void {
@@ -536,6 +506,44 @@ class TextInput
 
     private calculateValueToDraw(): string {
         return this.value.substring(this.valueIndexes.v1, this.valueIndexes.v2);
+    }
+
+    private moveValueIndexesToStart(): void {
+        const rect = this.calculateTypableRect();
+        const paddingR = this.theme.padding.v2;
+
+        for (let i = 0; i <= this.value.length; i++) {
+            const textWidth = new Text(
+                this.canvas,
+                this.value.substring(0, i),
+                {},
+                this.theme
+            ).measureText().width;
+
+            if (textWidth + paddingR >= rect.w) {
+                this.valueIndexes = new Vec2(0, i);
+                break;
+            }
+        }
+    }
+
+    private moveValueIndexesToEnd(): void {
+        const rect = this.calculateTypableRect();
+        const paddingL = this.theme.padding.v4;
+
+        for (let i = this.value.length; i >= 0; i--) {
+            const textWidth = new Text(
+                this.canvas,
+                this.value.substring(i, this.value.length),
+                {},
+                this.theme
+            ).measureText().width;
+
+            if (rect.r - (textWidth + paddingL) <= rect.l) {
+                this.valueIndexes = new Vec2(i, this.value.length);
+                break;
+            }
+        }
     }
 }
 

@@ -94,6 +94,7 @@ class CanvasUI implements Destroyable, Drawable {
             this.positionSubmitOnWindowResize(submit, cansoleWindow);
             this.positionInputOnWindowResize(input, cansoleWindow);
             this.resizeInputOnWindowReize(input, submit);
+            input.afterResize();
         };
 
         // Need to position and resize the elements on the init as well.
