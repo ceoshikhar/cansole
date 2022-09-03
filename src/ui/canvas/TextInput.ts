@@ -203,6 +203,25 @@ class TextInput
         this.onActive(() => {
             this.box.theme = this.theme.active;
             this.canvas.style.cursor = this.theme.active.cursor;
+
+            const rect = this.calculateTypableRect();
+            const paddingL = this.theme.padding.v4;
+
+            for (let i = this.value.length; i >= 0; i--) {
+                console.log(this.value.length, i);
+
+                const textWidth = new Text(
+                    this.canvas,
+                    this.value.substring(i, this.value.length),
+                    {},
+                    this.theme
+                ).measureText().width;
+
+                if (rect.r - (textWidth + paddingL) <= rect.l) {
+                    this.valueIndexes = new Vec2(i, this.value.length);
+                    break;
+                }
+            }
         });
 
         this.onActiveLost(() => {
@@ -212,6 +231,25 @@ class TextInput
             } else {
                 this.box.theme = this.theme;
                 this.canvas.style.cursor = "auto";
+            }
+
+            const rect = this.calculateTypableRect();
+            const paddingR = this.theme.padding.v2;
+
+            for (let i = 0; i <= this.value.length; i++) {
+                console.log(this.value.length, i);
+
+                const textWidth = new Text(
+                    this.canvas,
+                    this.value.substring(0, i),
+                    {},
+                    this.theme
+                ).measureText().width;
+
+                if (textWidth + paddingR >= rect.w) {
+                    this.valueIndexes = new Vec2(0, i);
+                    break;
+                }
             }
         });
 
