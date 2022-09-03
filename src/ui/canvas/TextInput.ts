@@ -22,6 +22,8 @@ import {
 } from "./interfaces";
 import { Text } from "./Text";
 
+const KeysToIgnoreOnKeyPress = ["Enter"];
+
 type TextInputOptions = {
     x?: number;
     y?: number;
@@ -309,8 +311,15 @@ class TextInput
         this.box.makeClickable();
 
         const onKeyPress = (e: KeyboardEvent) => {
-            const newValue = this.value + e.key;
+            console.log("onKeyPress", e);
+            const key = e.key;
+
+            if (KeysToIgnoreOnKeyPress.includes(key)) return;
+
+            const newValue = this.value + key;
+
             this.value = newValue;
+
             this.cursorIndex += 1;
 
             const rect = this.calculateTypableRect();
@@ -344,8 +353,9 @@ class TextInput
 
         const onKeyDown = (e: KeyboardEvent) => {
             console.log("onKeyDown", e);
+            const key = e.key;
 
-            switch (e.key) {
+            switch (key) {
                 case "Backspace": {
                     const newValue = this.value.substring(
                         0,
