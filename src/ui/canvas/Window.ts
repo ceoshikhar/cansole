@@ -16,13 +16,22 @@ import { Box } from "./Box";
 import { Text } from "./Text";
 
 type WindowOptions = {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    title: string;
-    cansole: Cansole;
+    x?: number;
+    y?: number;
+    w?: number;
+    h?: number;
+    minWidth?: number;
+    minHeight?: number;
 };
+
+const defaultWindowOptions = {
+    x: 0,
+    y: 0,
+    w: 640,
+    h: 480,
+    minWidth: 480,
+    minHeight: 360,
+} as const;
 
 class Window implements Destroyable, Drawable, Draggable, Resizable {
     public title: string;
@@ -35,15 +44,30 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
     private resizer: Box;
     private titleBar: Box;
 
+    private minWidth: number;
+    private minHeight: number;
+
     private ee: EventEmitter;
 
-    constructor({ x, y, w, h, title, cansole }: WindowOptions) {
+    constructor(
+        canvas: HTMLCanvasElement,
+        title: string,
+        options: WindowOptions
+    ) {
         this.title = title;
 
-        this.canvas = cansole.element as HTMLCanvasElement;
+        this.canvas = canvas;
+
+        const { x, y, w, h, minWidth, minHeight } = {
+            ...defaultWindowOptions,
+            ...options,
+        };
+
+        this.minWidth = minWidth;
+        this.minHeight = minWidth;
 
         this.box = new Box(
-            cansole.element as HTMLCanvasElement,
+            this.canvas,
             {
                 x,
                 y,
@@ -56,7 +80,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
         );
 
         this.crossButton = new Button(
-            cansole.element as HTMLCanvasElement,
+            this.canvas,
             "X",
             {
                 x: x + w - 30,
@@ -81,11 +105,12 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
 
         this.crossButton.onClick((e) => {
             console.log("Clicked on", e.target.displayName);
-            cansole.hide();
+            this.ee.emit(events.WindowEvents.Close, this);
+            this.destroy();
         });
 
         this.titleBar = new Box(
-            cansole.element as HTMLCanvasElement,
+            this.canvas,
             {
                 x,
                 y,
@@ -99,7 +124,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
 
         // TODO: Make a new type called `Resizer`?
         this.resizer = new Box(
-            cansole.element as HTMLCanvasElement,
+            this.canvas,
             {
                 x: x + w - 10,
                 y: y + h - 10,
@@ -115,8 +140,6 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
 
         this.makeDraggable();
         this.makeResizable();
-
-        cansole.onHide(() => this.destroy());
     }
 
     public get x(): number {
@@ -215,6 +238,10 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
         });
     }
 
+    public onClose(cb: (window: Window) => void): void {
+        this.ee.on(events.WindowEvents.Close, cb);
+    }
+
     public onDrag(cb: DragEventCallback<this>): void {
         this.ee.on(events.MouseEvents.Drag, cb);
     }
@@ -259,19 +286,24 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
             const dx = delta.v1;
             const dy = delta.v2;
 
-            // Resize the box's width and height.
-            this.box.setW(this.box.w + dx);
-            this.box.setH(this.box.h + dy);
+            const newWidth = this.box.w + dx;
+            const newHeight = this.box.h + dy;
 
-            // Keep the crossButton at the top right.
-            this.crossButton.setX(this.crossButton.x + dx);
+            if (newWidth >= this.minWidth && newHeight >= this.minHeight) {
+                // Resize the box's width and height.
+                this.box.setW(newWidth);
+                this.box.setH(newHeight);
 
-            // Resize the title bar's width.
-            this.titleBar.setW(this.titleBar.w + dx);
+                // Keep the crossButton at the top right.
+                this.crossButton.setX(this.crossButton.x + dx);
 
-            // Keep the resize at the bottom right.
-            this.resizer.setX(this.resizer.x + dx);
-            this.resizer.setY(this.resizer.y + dy);
+                // Resize the title bar's width.
+                this.titleBar.setW(this.titleBar.w + dx);
+
+                // Keep the resize at the bottom right.
+                this.resizer.setX(this.resizer.x + dx);
+                this.resizer.setY(this.resizer.y + dy);
+            }
         });
     }
 

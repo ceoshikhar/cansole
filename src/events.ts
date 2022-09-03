@@ -19,6 +19,7 @@ enum MouseEvents {
 }
 
 enum WindowEvents {
+    Close = "Close",
     Resize = "Resize",
     ResizeEnd = "ResizeEnd",
     ResizeStart = "ResizeStart",

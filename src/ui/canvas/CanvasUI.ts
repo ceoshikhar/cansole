@@ -48,14 +48,16 @@ class CanvasUI implements Destroyable, Drawable {
                 ? DEFAULT_WINDOW_SIZE
                 : JSON.parse(initSizeStr);
 
-        const cansoleWindow = new Window({
-            x: initPos.v1,
-            y: initPos.v2,
-            w: initSize.v1,
-            h: initSize.v2,
-            title: cansole.options.title,
-            cansole: cansole,
-        });
+        const cansoleWindow = new Window(
+            cansole.element as HTMLCanvasElement,
+            cansole.options.title,
+            {
+                x: initPos.v1,
+                y: initPos.v2,
+                w: initSize.v1,
+                h: initSize.v2,
+            }
+        );
 
         const submit = new Button(
             cansole.element as HTMLCanvasElement,
@@ -99,6 +101,10 @@ class CanvasUI implements Destroyable, Drawable {
 
         // Need to position and resize the elements on the init as well.
         positionAndResizeElements();
+
+        cansoleWindow.onClose(() => {
+            cansole.hide();
+        });
 
         cansoleWindow.onDrag(() => {
             positionAndResizeElements();
