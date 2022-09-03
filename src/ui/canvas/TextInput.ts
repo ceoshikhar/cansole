@@ -297,7 +297,21 @@ class TextInput
 
         const onKeyPress = (e: KeyboardEvent) => {
             this.value += e.key;
+
             console.log({ value: this.value });
+        };
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            console.log("onKeyDown", e);
+
+            switch (e.key) {
+                case "Backspace": {
+                    this.value = this.value.substring(0, this.value.length - 1);
+                }
+
+                default:
+                    return;
+            }
         };
 
         this.box.onClick(() => {
@@ -308,6 +322,7 @@ class TextInput
 
                 this.ee.emit(events.MouseEvents.Active, { target: this });
                 document.addEventListener("keypress", onKeyPress);
+                document.addEventListener("keydown", onKeyDown);
             }
         });
 
@@ -321,6 +336,7 @@ class TextInput
                         target: this,
                     });
                     document.removeEventListener("keypress", onKeyPress);
+                    document.removeEventListener("keydown", onKeyDown);
                 }
             }
         });
