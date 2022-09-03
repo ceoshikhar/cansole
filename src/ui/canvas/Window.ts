@@ -64,7 +64,7 @@ class Window implements Destroyable, Drawable, Draggable, Resizable {
         };
 
         this.minWidth = minWidth;
-        this.minHeight = minWidth;
+        this.minHeight = minHeight;
 
         this.box = new Box(
             this.canvas,
