@@ -208,6 +208,7 @@ class TextInput
             this.box.theme = this.theme.active;
             this.canvas.style.cursor = this.theme.active.cursor;
 
+            this.cursorIndex = this.value.length;
             this.moveValueIndexesToEnd();
         });
 
@@ -220,6 +221,7 @@ class TextInput
                 this.canvas.style.cursor = "auto";
             }
 
+            this.cursorIndex = 0;
             this.moveValueIndexesToStart();
         });
 
@@ -535,22 +537,22 @@ class TextInput
             this.cursor.setH(size.v2);
 
             this.cursor.draw();
-        }
 
-        // Cursor is not at the end so there could be some text under it.
-        if (this.cursorIndex < this.value.length) {
-            new Text(
-                this.canvas,
-                this.value[this.cursorIndex],
-                {
-                    x: this.calculateCursorPosition().v1,
-                    y: rect.y + rect.h / 2,
-                },
-                {
-                    foregroundColor: this.theme.backgroundColor,
-                    textBaseline: this.theme.textBaseline,
-                }
-            ).draw();
+            // Cursor is not at the end so there could be some text under it.
+            if (this.cursorIndex < this.value.length) {
+                new Text(
+                    this.canvas,
+                    this.value[this.cursorIndex],
+                    {
+                        x: this.calculateCursorPosition().v1,
+                        y: rect.y + rect.h / 2,
+                    },
+                    {
+                        foregroundColor: this.theme.backgroundColor,
+                        textBaseline: this.theme.textBaseline,
+                    }
+                ).draw();
+            }
         }
     }
 
