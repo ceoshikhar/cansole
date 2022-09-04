@@ -338,7 +338,8 @@ class TextInput
             // the `valueIndexes` in advance(before) reaching the `rect.w`
             // otherwise, the `cursor` will draw at the "outside" of
             // the the "typable" rect's right edge.
-            const isAtValueDrawMaxLimit = textWidth + paddingR >= rect.w;
+            const isAtValueDrawMaxLimit =
+                textWidth + paddingR + this.calculateCursorSize().v1 >= rect.w;
 
             if (isAtValueDrawMaxLimit) {
                 // Move start and end of `valueIndexes` forward.
@@ -557,7 +558,14 @@ class TextInput
                 this.theme
             ).measureText().width;
 
-            if (rect.r - (textWidth + paddingL) <= rect.l) {
+            // When moving the `valueIndexes` to the end, we need to take in
+            // consideration about the cursor's width but NOT while moving
+            // the `valueIndexes` to the start.
+            if (
+                rect.r -
+                    (textWidth + paddingL + this.calculateCursorSize().v1) <=
+                rect.l
+            ) {
                 this.valueIndexes = new Vec2(i, this.value.length);
                 break;
             }
