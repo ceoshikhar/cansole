@@ -347,13 +347,14 @@ class TextInput
             ).measureText().width;
 
             const paddingR = this.theme.padding.v2;
+            const cursorWidth = this.calculateCursorSize().v1;
 
-            // We add the `paddingR` to `textWidth` because we want to move
-            // the `valueIndexes` in advance(before) reaching the `rect.w`
-            // otherwise, the `cursor` will draw at the "outside" of
-            // the the "typable" rect's right edge.
+            // We add the `paddingR` & `cursorWidth` to `textWidth` because we
+            // want to move the `valueIndexes` in advance(before) reaching the
+            // `rect.w` otherwise, the `cursor` will be drawn at the "outside"
+            // of the the "typable" rect's right edge.
             const isAtValueDrawMaxLimit =
-                textWidth + paddingR + this.calculateCursorSize().v1 >= rect.w;
+                textWidth + paddingR + cursorWidth >= rect.w;
 
             if (isAtValueDrawMaxLimit) {
                 // Move start and end of `valueIndexes` forward.
@@ -563,6 +564,7 @@ class TextInput
     private moveValueIndexesToEnd(): void {
         const rect = this.calculateTypableRect();
         const paddingL = this.theme.padding.v4;
+        const cursorWidth = this.calculateCursorSize().v1;
 
         for (let i = this.value.length; i >= 0; i--) {
             const textWidth = new Text(
@@ -575,11 +577,7 @@ class TextInput
             // When moving the `valueIndexes` to the end, we need to take in
             // consideration about the cursor's width but NOT while moving
             // the `valueIndexes` to the start.
-            if (
-                rect.r -
-                    (textWidth + paddingL + this.calculateCursorSize().v1) <=
-                rect.l
-            ) {
+            if (rect.r - (textWidth + paddingL + cursorWidth) <= rect.l) {
                 this.valueIndexes = new Vec2(i, this.value.length);
                 break;
             }
