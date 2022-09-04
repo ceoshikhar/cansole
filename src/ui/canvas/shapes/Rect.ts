@@ -1,4 +1,5 @@
 import { Vec2 } from "../../../math";
+import { IRect } from "../interfaces";
 
 type RectOptions = {
     x?: number;
@@ -14,7 +15,7 @@ const defaultRectOptions = {
     h: 0,
 } as const;
 
-class Rect {
+class Rect implements IRect {
     public x: number;
     public y: number;
     public w: number;
@@ -35,6 +36,16 @@ class Rect {
         this.t = this.y;
         this.r = this.x + this.w;
         this.b = this.y + this.h;
+    }
+
+    public setPos(newPos: Vec2<number>): void {
+        this.setX(newPos.v1);
+        this.setY(newPos.v2);
+    }
+
+    public setSize(newSize: Vec2<number>): void {
+        this.setW(newSize.v1);
+        this.setH(newSize.v2);
     }
 
     public setX(newX: number): void {
@@ -91,9 +102,9 @@ class Rect {
         this.t = newY;
     }
 
-    public contains(coords: Vec2<number>): boolean {
-        const x = coords.v1;
-        const y = coords.v2;
+    public contains(point: Vec2<number>): boolean {
+        const x = point.v1;
+        const y = point.v2;
 
         if (x >= this.l && x <= this.r && y >= this.t && y <= this.b) {
             return true;

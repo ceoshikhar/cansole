@@ -17,6 +17,7 @@ import {
     IHoverable,
     HoverEventCallback,
     HoverLostEventCallback,
+    IRect,
     IThemeable,
     Themeables,
 } from "./interfaces";
@@ -102,6 +103,7 @@ class TextInput
         IDrawable,
         IDisplayName,
         IHoverable<TextInput>,
+        IRect,
         IThemeable<TextInputTheme>
 {
     public displayName: string = "TextInput";
@@ -261,6 +263,14 @@ class TextInput
         return this.box.b;
     }
 
+    public setPos(newPos: Vec2<number>): void {
+        this.box.setPos(newPos);
+    }
+
+    public setSize(newSize: Vec2<number>): void {
+        this.box.setSize(newSize);
+    }
+
     public setX(newX: number): void {
         this.box.setX(newX);
     }
@@ -291,6 +301,10 @@ class TextInput
 
     public setB(newB: number): void {
         this.box.setB(newB);
+    }
+
+    public contains(point: Vec2<number>): boolean {
+        return this.box.contains(point);
     }
 
     private makeHoverable(): void {
