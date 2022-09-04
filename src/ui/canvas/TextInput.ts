@@ -392,11 +392,14 @@ class TextInput
                 }
 
                 case "Backspace": {
-                    const newValue = this.value.substring(
-                        0,
-                        this.value.length - 1
+                    const left = this.value.substring(0, this.cursorIndex - 1);
+                    const right = this.value.substring(
+                        this.cursorIndex,
+                        this.value.length
                     );
-                    this.value = newValue;
+
+                    this.value = left + right;
+
                     this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
 
                     if (this.valueIndexes.v1) {
