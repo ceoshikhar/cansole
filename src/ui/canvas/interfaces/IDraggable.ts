@@ -22,7 +22,7 @@ type DragEventCallback<Target> = (e: DragEvent<Target>) => void;
 /**
  * Implement this interface for any type that can be dragged.
  */
-interface Draggable<Target = unknown> {
+interface IDraggable<Target = unknown> {
     onDrag: (cb: DragEventCallback<Target>) => void;
 
     onDragEnd: (cb: DragEventCallback<Target>) => void;
@@ -30,4 +30,4 @@ interface Draggable<Target = unknown> {
     onDragStart: (cb: DragEventCallback<Target>) => void;
 }
 
-export { Draggable, DragEvent, DragEventCallback };
+export { IDraggable, DragEvent, DragEventCallback };

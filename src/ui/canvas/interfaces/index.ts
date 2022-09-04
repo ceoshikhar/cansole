@@ -1,21 +1,21 @@
 export {
-    Activable,
+    IActivable,
     ActiveEvent,
     ActiveEventCallback,
     ActiveLostEvent,
     ActiveLostEventCallback,
-} from "./Activable";
-export { Clickable, ClickEvent, ClickEventCallback } from "./Clickable";
-export { Destroyable } from "./Destroyable";
-export { Draggable, DragEvent, DragEventCallback } from "./Draggable";
-export { Drawable } from "./Drawable";
-export { HasDisplayName } from "./HasDisplayName";
+} from "./IActivable";
+export { IClickable, ClickEvent, ClickEventCallback } from "./IClickable";
+export { IDestroyable } from "./IDestroyable";
+export { IDraggable, DragEvent, DragEventCallback } from "./IDraggable";
+export { IDrawable } from "./IDrawable";
+export { IDisplayName } from "./IDisplayName";
 export {
-    Hoverable,
+    IHoverable,
     HoverEvent,
     HoverEventCallback,
     HoverLostEvent,
     HoverLostEventCallback,
-} from "./Hoverable";
-export { Resizable, ResizeEvent, ResizeEventCallback } from "./Resizable";
-export { Themeable, Themeables } from "./Themeable";
+} from "./IHoverable";
+export { IResizable, ResizeEvent, ResizeEventCallback } from "./IResizable";
+export { IThemeable, Themeables } from "./IThemeable";

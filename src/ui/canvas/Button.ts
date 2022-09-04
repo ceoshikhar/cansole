@@ -3,18 +3,18 @@ import { EventEmitter } from "../../event-emitter";
 import * as events from "../../events";
 
 import {
-    Activable,
+    IActivable,
     ActiveEventCallback,
     ActiveLostEventCallback,
-    Clickable,
+    IClickable,
     ClickEventCallback,
-    Drawable,
-    Destroyable,
-    HasDisplayName,
-    Hoverable,
+    IDrawable,
+    IDestroyable,
+    IDisplayName,
+    IHoverable,
     HoverEventCallback,
     HoverLostEventCallback,
-    Themeable,
+    IThemeable,
     Themeables,
 } from "./interfaces";
 import { Box } from "./Box";
@@ -79,13 +79,13 @@ const defaultButtonTheme: ButtonTheme = {
 
 class Button
     implements
-        Activable<Button>,
-        Clickable<Button>,
-        Destroyable,
-        Drawable,
-        HasDisplayName,
-        Hoverable<Button>,
-        Themeable<ButtonTheme>
+        IActivable<Button>,
+        IClickable<Button>,
+        IDestroyable,
+        IDrawable,
+        IDisplayName,
+        IHoverable<Button>,
+        IThemeable<ButtonTheme>
 {
     public theme: ButtonTheme;
 

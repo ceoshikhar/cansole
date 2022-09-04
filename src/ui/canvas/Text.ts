@@ -1,6 +1,6 @@
 import * as constants from "../../constants";
 import * as utils from "../../utils";
-import { Drawable, Themeable, Themeables } from "./interfaces";
+import { IDrawable, IThemeable, Themeables } from "./interfaces";
 
 type TextOptions = {
     x?: number;
@@ -34,7 +34,7 @@ const defaultTextTheme: TextTheme = {
     textBaseline: "alphabetic",
 };
 
-class Text implements Drawable, TextOptions, Themeable<TextTheme> {
+class Text implements IDrawable, TextOptions, IThemeable<TextTheme> {
     public text: string;
 
     private canvas: HTMLCanvasElement;

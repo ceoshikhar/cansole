@@ -5,19 +5,19 @@ import * as events from "../../events";
 import * as utils from "../../utils";
 
 import {
-    Activable,
+    IActivable,
     ActiveEventCallback,
     ActiveLostEventCallback,
-    Clickable,
+    IClickable,
     ClickEventCallback,
-    Draggable,
+    IDraggable,
     DragEventCallback,
-    Hoverable,
+    IHoverable,
     HoverEventCallback,
     HoverLostEventCallback,
-    Drawable,
-    Destroyable,
-    Themeable,
+    IDrawable,
+    IDestroyable,
+    IThemeable,
     Themeables,
 } from "./interfaces";
 
@@ -49,13 +49,13 @@ const defaultBoxTheme: BoxTheme = {
 class Box
     extends Rect
     implements
-        Activable<Box>,
-        Clickable<Box>,
-        Draggable<Box>,
-        Drawable,
-        Destroyable,
-        Hoverable<Box>,
-        Themeable<BoxTheme>
+        IActivable<Box>,
+        IClickable<Box>,
+        IDraggable<Box>,
+        IDrawable,
+        IDestroyable,
+        IHoverable<Box>,
+        IThemeable<BoxTheme>
 {
     public theme: BoxTheme;
 

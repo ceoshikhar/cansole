@@ -31,14 +31,14 @@ type ActiveLostEventCallback<Target> = (e: ActiveLostEvent<Target>) => void;
 /**
  * Implement this interface for any type that can be activated.
  */
-interface Activable<Target = unknown> {
+interface IActivable<Target = unknown> {
     onActive: (cb: ActiveEventCallback<Target>) => void;
 
     onActiveLost: (cb: ActiveLostEventCallback<Target>) => void;
 }
 
 export {
-    Activable,
+    IActivable,
     ActiveEvent,
     ActiveEventCallback,
     ActiveLostEvent,

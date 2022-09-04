@@ -16,8 +16,8 @@ type ClickEventCallback<Target> = (e: ClickEvent<Target>) => void;
 /**
  * Implement this interface for any type that can be clicked.
  */
-interface Clickable<Target = unknown> {
+interface IClickable<Target = unknown> {
     onClick: (cb: ClickEventCallback<Target>) => void;
 }
 
-export { Clickable, ClickEvent, ClickEventCallback };
+export { IClickable, ClickEvent, ClickEventCallback };

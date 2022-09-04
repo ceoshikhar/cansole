@@ -22,7 +22,7 @@ type ResizeEventCallback<Target> = (e: ResizeEvent<Target>) => void;
 /**
  * Implement this interface for any type that can be resized.
  */
-interface Resizable<Target = unknown> {
+interface IResizable<Target = unknown> {
     onResize: (cb: ResizeEventCallback<Target>) => void;
 
     onResizeEnd: (cb: ResizeEventCallback<Target>) => void;
@@ -30,4 +30,4 @@ interface Resizable<Target = unknown> {
     onResizeStart: (cb: ResizeEventCallback<Target>) => void;
 }
 
-export { Resizable, ResizeEvent, ResizeEventCallback };
+export { IResizable, ResizeEvent, ResizeEventCallback };

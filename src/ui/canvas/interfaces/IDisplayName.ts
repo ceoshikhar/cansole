@@ -7,10 +7,10 @@
  * what it does, but giving it a `displayName` of `Login`, it becomes clear
  * that it is a button to login.
  */
-interface HasDisplayName {
+interface IDisplayName {
     displayName: string;
 
     setDisplayName: (name: string) => void;
 }
 
-export { HasDisplayName };
+export { IDisplayName };

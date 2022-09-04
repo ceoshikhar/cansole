@@ -6,18 +6,18 @@ import { Vec2, Vec4 } from "../../math";
 import { Rect } from "./shapes";
 import { Box } from "./Box";
 import {
-    Activable,
+    IActivable,
     ActiveEventCallback,
     ActiveLostEventCallback,
-    Clickable,
+    IClickable,
     ClickEventCallback,
-    Drawable,
-    Destroyable,
-    HasDisplayName,
-    Hoverable,
+    IDrawable,
+    IDestroyable,
+    IDisplayName,
+    IHoverable,
     HoverEventCallback,
     HoverLostEventCallback,
-    Themeable,
+    IThemeable,
     Themeables,
 } from "./interfaces";
 import { Text } from "./Text";
@@ -96,13 +96,13 @@ const defaultTextInputTheme: TextInputTheme = {
 
 class TextInput
     implements
-        Activable<TextInput>,
-        Clickable<TextInput>,
-        Destroyable,
-        Drawable,
-        HasDisplayName,
-        Hoverable<TextInput>,
-        Themeable<TextInputTheme>
+        IActivable<TextInput>,
+        IClickable<TextInput>,
+        IDestroyable,
+        IDrawable,
+        IDisplayName,
+        IHoverable<TextInput>,
+        IThemeable<TextInputTheme>
 {
     public displayName: string = "TextInput";
     public theme: TextInputTheme;

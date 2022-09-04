@@ -17,8 +17,8 @@ type Themeables = {
     textBaseline: CanvasTextBaseline;
 };
 
-interface Themeable<T> {
+interface IThemeable<T> {
     theme: T;
 }
 
-export { Themeable, Themeables };
+export { IThemeable, Themeables };

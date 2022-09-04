@@ -5,8 +5,8 @@
  *
  * For our use-case in s8ly we are drawing to an `HTMLCanvasElement`.
  */
-interface Drawable {
+interface IDrawable {
     draw: () => void;
 }
 
-export { Drawable };
+export { IDrawable };

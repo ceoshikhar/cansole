@@ -3,16 +3,16 @@ import * as utils from "../../utils";
 import { Vec2 } from "../../math";
 
 import { Button } from "./Button";
-import { Drawable, Destroyable } from "./interfaces";
+import { IDrawable, IDestroyable } from "./interfaces";
 import { Window } from "./Window";
 import { TextInput } from "./TextInput";
 
 const DEFAULT_WINDOW_POS: Vec2<number> = new Vec2(150, 150);
 const DEFAULT_WINDOW_SIZE: Vec2<number> = new Vec2(640, 480);
 
-type Entities = Array<Destroyable & Drawable>;
+type Entities = Array<IDestroyable & IDrawable>;
 
-class CanvasUI implements Destroyable, Drawable {
+class CanvasUI implements IDestroyable, IDrawable {
     private entities: Entities;
 
     constructor(cansole: Cansole) {

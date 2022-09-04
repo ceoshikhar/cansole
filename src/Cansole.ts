@@ -1,6 +1,6 @@
 import * as events from "./events";
 import * as utils from "./utils";
-import { CanvasUI, Drawable } from "./ui/canvas";
+import { CanvasUI, IDrawable } from "./ui/canvas";
 import { EventEmitter } from "./event-emitter";
 import { Repository } from "./Repository";
 
@@ -57,7 +57,7 @@ const defaultCansoleOptions: CansoleOptions = {
 /**
  * Represents a `Cansole`.
  */
-class Cansole implements Drawable {
+class Cansole implements IDrawable {
     public element: CansoleElement;
     public options: CansoleOptions;
     public repository: Repository;

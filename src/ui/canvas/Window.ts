@@ -5,11 +5,11 @@ import { Cansole } from "../../Cansole";
 
 import { Button } from "./Button";
 import {
-    Destroyable,
-    Draggable,
+    IDestroyable,
+    IDraggable,
     DragEventCallback,
-    Drawable,
-    Resizable,
+    IDrawable,
+    IResizable,
     ResizeEventCallback,
 } from "./interfaces";
 import { Box } from "./Box";
@@ -33,7 +33,7 @@ const defaultWindowOptions = {
     minHeight: 360,
 } as const;
 
-class Window implements Destroyable, Drawable, Draggable, Resizable {
+class Window implements IDestroyable, IDrawable, IDraggable, IResizable {
     public title: string;
 
     private canvas: HTMLCanvasElement;

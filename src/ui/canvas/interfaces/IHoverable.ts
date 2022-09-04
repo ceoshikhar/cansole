@@ -31,14 +31,14 @@ type HoverLostEventCallback<Target> = (e: HoverLostEvent<Target>) => void;
 /**
  * Implement this interface for any type that can be hovered.
  */
-interface Hoverable<Target = unknown> {
+interface IHoverable<Target = unknown> {
     onHover: (cb: HoverEventCallback<Target>) => void;
 
     onHoverLost: (cb: HoverLostEventCallback<Target>) => void;
 }
 
 export {
-    Hoverable,
+    IHoverable,
     HoverEvent,
     HoverEventCallback,
     HoverLostEvent,
