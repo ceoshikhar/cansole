@@ -379,15 +379,32 @@ class TextInput
 
             switch (key) {
                 case "ArrowLeft": {
-                    this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
+                    const newCursorIndex = Math.max(this.cursorIndex - 1, 0);
+                    this.cursorIndex = newCursorIndex;
+
+                    // Cursor is moving past the most left visible character.
+                    if (newCursorIndex < this.valueIndexes.v1) {
+                        this.valueIndexes = this.valueIndexes.sub(
+                            new Vec2(1, 1)
+                        );
+                    }
+
                     break;
                 }
 
                 case "ArrowRight": {
-                    this.cursorIndex = Math.min(
+                    const newCursorIndex = Math.min(
                         this.cursorIndex + 1,
                         this.value.length
                     );
+                    this.cursorIndex = newCursorIndex;
+
+                    // Cursor is moving past the most right visible character.
+                    if (newCursorIndex > this.valueIndexes.v2) {
+                        this.valueIndexes = this.valueIndexes.add(
+                            new Vec2(1, 1)
+                        );
+                    }
                     break;
                 }
 
