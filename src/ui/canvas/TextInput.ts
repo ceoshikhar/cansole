@@ -330,7 +330,13 @@ class TextInput
 
             if (KeysToIgnoreOnKeyPress.includes(key)) return;
 
-            const newValue = this.value + key;
+            const left = this.value.substring(0, this.cursorIndex);
+            const right = this.value.substring(
+                this.cursorIndex,
+                this.value.length
+            );
+
+            const newValue = left + key + right;
 
             this.value = newValue;
 
@@ -372,6 +378,19 @@ class TextInput
             const key = e.key;
 
             switch (key) {
+                case "ArrowLeft": {
+                    this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
+                    break;
+                }
+
+                case "ArrowRight": {
+                    this.cursorIndex = Math.min(
+                        this.cursorIndex + 1,
+                        this.value.length
+                    );
+                    break;
+                }
+
                 case "Backspace": {
                     const newValue = this.value.substring(
                         0,
@@ -391,6 +410,8 @@ class TextInput
                             );
                         }
                     }
+
+                    break;
                 }
 
                 default:
@@ -494,6 +515,22 @@ class TextInput
             this.cursor.setH(size.v2);
 
             this.cursor.draw();
+        }
+
+        // Cursor is not at the end so there could be some text under it.
+        if (this.cursorIndex < this.value.length) {
+            new Text(
+                this.canvas,
+                this.value[this.cursorIndex],
+                {
+                    x: this.calculateCursorPosition().v1,
+                    y: rect.y + rect.h / 2,
+                },
+                {
+                    foregroundColor: this.theme.backgroundColor,
+                    textBaseline: this.theme.textBaseline,
+                }
+            ).draw();
         }
     }
 
