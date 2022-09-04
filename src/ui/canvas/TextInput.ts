@@ -271,6 +271,7 @@ class TextInput
 
     public setSize(newSize: Vec2<number>): void {
         this.box.setSize(newSize);
+        this.afterWidthChange();
     }
 
     public setX(newX: number): void {
@@ -283,6 +284,7 @@ class TextInput
 
     public setW(newW: number): void {
         this.box.setW(newW);
+        this.afterWidthChange();
     }
 
     public setH(newH: number): void {
@@ -489,10 +491,6 @@ class TextInput
         this.ee.on(events.MouseEvents.Click, cb);
     }
 
-    public afterResize(): void {
-        this.moveValueIndexesToStart();
-    }
-
     public draw(): void {
         if (this.isHovered) {
             console.log(this.displayName, "is hovered");
@@ -558,6 +556,10 @@ class TextInput
 
     public destroy(): void {}
 
+    private afterWidthChange(): void {
+        this.moveValueIndexesToStart();
+    }
+
     private calculateTypableRect(): Rect {
         return new Rect({
             x: this.box.x + this.theme.padding.v4,
@@ -605,19 +607,22 @@ class TextInput
         const rect = this.calculateTypableRect();
         const paddingR = this.theme.padding.v2;
 
-        for (let i = 0; i <= this.value.length; i++) {
+        let end = 0;
+
+        for (end; end < this.value.length; end++) {
             const textWidth = new Text(
                 this.canvas,
-                this.value.substring(0, i),
+                this.value.substring(0, end),
                 {},
                 this.theme
             ).measureText().width;
 
             if (textWidth + paddingR >= rect.w) {
-                this.valueIndexes = new Vec2(0, i);
                 break;
             }
         }
+
+        this.valueIndexes = new Vec2(0, end);
     }
 
     private moveValueIndexesToEnd(): void {

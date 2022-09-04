@@ -86,7 +86,6 @@ class CanvasUI implements IDestroyable, IDrawable {
             this.positionSubmitOnWindowResize(submit, cansoleWindow);
             this.positionInputOnWindowResize(input, cansoleWindow);
             this.resizeInputOnWindowReize(input, submit);
-            input.afterResize();
         };
 
         // Need to position and resize the elements on the init as well.
@@ -145,7 +144,12 @@ class CanvasUI implements IDestroyable, IDrawable {
     private resizeInputOnWindowReize(input: TextInput, submit: Button) {
         const gapBetweenInputAndSubmit = 16;
 
-        input.setW(submit.x - input.x - gapBetweenInputAndSubmit);
+        const size = new Vec2(
+            submit.x - input.x - gapBetweenInputAndSubmit,
+            input.h
+        );
+
+        input.setSize(size);
     }
 }
 
