@@ -207,9 +207,6 @@ class TextInput
         this.onActive(() => {
             this.box.theme = this.theme.active;
             this.canvas.style.cursor = this.theme.active.cursor;
-
-            this.cursorIndex = this.value.length;
-            this.moveValueIndexesToEnd();
         });
 
         this.onActiveLost(() => {
@@ -221,7 +218,6 @@ class TextInput
                 this.canvas.style.cursor = "auto";
             }
 
-            this.cursorIndex = 0;
             this.moveValueIndexesToStart();
         });
 
@@ -329,7 +325,6 @@ class TextInput
         this.box.makeClickable();
 
         const onKeyPress = (e: KeyboardEvent) => {
-            console.log("onKeyPress", e);
             const key = e.key;
 
             if (KeysToIgnoreOnKeyPress.includes(key)) return;
@@ -373,12 +368,9 @@ class TextInput
                 // Move the end of the `valueIndexes` forward.
                 this.valueIndexes = this.valueIndexes.add(new Vec2(0, 1));
             }
-
-            console.log({ value: this.value });
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
-            console.log("onKeyDown", e);
             const key = e.key;
 
             switch (key) {
@@ -443,18 +435,21 @@ class TextInput
             }
         };
 
-        this.box.onClick(() => {
-            this.ee.emit(events.MouseEvents.Click, { target: this });
         this.box.onClick((e) => {
             this.ee.emit(events.MouseEvents.Click, {
                 native: e.target,
                 target: this,
             });
 
+            const x = e.native.offsetX;
+            const y = e.native.offsetY;
+
+            this.cursorIndex = this.calculateCursorIndexAt(new Vec2(x, y));
+
             if (!this.isActive) {
                 this.isActive = true;
-
                 this.ee.emit(events.MouseEvents.Active, { target: this });
+
                 document.addEventListener("keypress", onKeyPress);
                 document.addEventListener("keydown", onKeyDown);
             }
@@ -497,14 +492,6 @@ class TextInput
     }
 
     public draw(): void {
-        if (this.isHovered) {
-            console.log(this.displayName, "is hovered");
-        }
-
-        if (this.isActive) {
-            console.log(this.displayName, "is active");
-        }
-
         this.box.draw();
 
         const rect = this.calculateTypableRect();
@@ -602,6 +589,40 @@ class TextInput
             .width;
 
         return new Vec2(width, this.theme.fontSize);
+    }
+
+    private calculateCursorIndexAt(point: Vec2<number>): number {
+        // This shouldn't happen but if it did, we put the cursor at the end.
+        if (!this.box.contains(point)) return this.value.length;
+
+        const rect = this.calculateTypableRect();
+        const valueToDraw = this.calculateValueToDraw();
+
+        let i = 0;
+
+        for (i; i < this.value.length; i++) {
+            const x1 =
+                rect.x +
+                new Text(this.canvas, valueToDraw.substring(0, i)).measureText()
+                    .width;
+
+            const x2 =
+                rect.x +
+                new Text(
+                    this.canvas,
+                    valueToDraw.substring(0, i + 1)
+                ).measureText().width;
+
+            // The current cursor index at the point where it was clicked.
+            if (x1 <= point.v1 && point.v1 <= x2) {
+                break;
+            }
+
+            // If we clicked somewhere outside the `valueToDraw`, the cursor
+            // index would be at the end.
+        }
+
+        return i;
     }
 
     private calculateValueToDraw(): string {
