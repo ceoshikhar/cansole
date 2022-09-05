@@ -30,8 +30,6 @@ class CanvasUI implements IDestroyable, IDrawable {
     }
 
     public init(cansole: Cansole): void {
-        console.log("Initialising CanvasUI");
-
         const initPos: Vec2<number> =
             cansole.repository.loadWindowPosition() || DEFAULT_WINDOW_POS;
 
@@ -119,7 +117,6 @@ class CanvasUI implements IDestroyable, IDrawable {
     }
 
     public destroy(): void {
-        console.log("Destroying CanvasUI");
         this.entities.forEach((entity) => entity.destroy());
         this.entities = [];
     }

@@ -210,7 +210,10 @@ class Box
             if (!this.contains(new Vec2(event.offsetX, event.offsetY))) return;
             if (this.isDragging) return;
 
-            this.ee.emit(events.MouseEvents.Click, { target: this });
+            this.ee.emit(events.MouseEvents.Click, {
+                native: event,
+                target: this,
+            });
         };
 
         const onMouseDown = (event: MouseEvent) => {
@@ -298,7 +301,6 @@ class Box
     }
 
     public destroy(): void {
-        console.log("Destroying Box");
         this.ee.emit(events.CoreEvents.Destroy);
     }
 

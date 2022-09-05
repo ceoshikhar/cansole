@@ -1,7 +1,6 @@
 import * as constants from "../../constants";
 import * as events from "../../events";
 import { EventEmitter } from "../../event-emitter";
-import { Cansole } from "../../Cansole";
 
 import { Button } from "./Button";
 import {
@@ -104,7 +103,6 @@ class Window implements IDestroyable, IDrawable, IDraggable, IResizable {
         this.crossButton.setDisplayName("X");
 
         this.crossButton.onClick((e) => {
-            console.log("Clicked on", e.target.displayName);
             this.ee.emit(events.WindowEvents.Close, this);
             this.destroy();
         });
@@ -201,7 +199,6 @@ class Window implements IDestroyable, IDrawable, IDraggable, IResizable {
         this.titleBar.makeDraggable();
 
         this.titleBar.onDrag((e) => {
-            console.log("Dragging window");
             const { delta } = e;
             const dx = delta.v1;
             const dy = delta.v2;
@@ -268,18 +265,14 @@ class Window implements IDestroyable, IDrawable, IDraggable, IResizable {
         });
 
         this.resizer.onDragEnd(() => {
-            console.log("Resizing window end");
             this.ee.emit(events.WindowEvents.ResizeEnd, { target: this.box });
         });
 
         this.resizer.onDragStart(() => {
-            console.log("Resizing window start");
             this.ee.emit(events.WindowEvents.ResizeStart, { target: this });
         });
 
         this.resizer.onDrag((e) => {
-            console.log("Resizing window");
-
             this.ee.emit(events.WindowEvents.Resize, { target: this });
 
             const { delta } = e;
@@ -349,8 +342,6 @@ class Window implements IDestroyable, IDrawable, IDraggable, IResizable {
     }
 
     public destroy(): void {
-        console.log("Destroying Window");
-
         this.box.destroy();
         this.titleBar.destroy();
         this.crossButton.destroy();

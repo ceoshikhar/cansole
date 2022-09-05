@@ -293,8 +293,11 @@ class Button
     private makeClickable(): void {
         this.box.makeClickable();
 
-        this.box.onClick(() => {
-            this.ee.emit(events.MouseEvents.Click, { target: this });
+        this.box.onClick((e) => {
+            this.ee.emit(events.MouseEvents.Click, {
+                native: e.native,
+                target: this,
+            });
         });
     }
 
@@ -319,14 +322,6 @@ class Button
     }
 
     public draw(): void {
-        if (this.isHovered) {
-            console.log(this.displayName, "is hovered");
-        }
-
-        if (this.isActive) {
-            console.log(this.displayName, "is active");
-        }
-
         //
         // Draw button's rectangle.
         //
@@ -356,7 +351,6 @@ class Button
     }
 
     public destroy(): void {
-        console.log("Destroying Button", this.label);
         this.box.destroy();
     }
 }

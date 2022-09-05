@@ -445,6 +445,11 @@ class TextInput
 
         this.box.onClick(() => {
             this.ee.emit(events.MouseEvents.Click, { target: this });
+        this.box.onClick((e) => {
+            this.ee.emit(events.MouseEvents.Click, {
+                native: e.target,
+                target: this,
+            });
 
             if (!this.isActive) {
                 this.isActive = true;
