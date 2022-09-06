@@ -111,7 +111,9 @@ class TextInput
 
     public value: string;
     /** The part/substring of `value` that is to be drawn in the `box`. */
-    private valueIndexes: Vec2<number>;
+    private valueVisible: Vec2<number>;
+    /** The part/substring of `value` that is selected/highlighted. */
+    private valueSelected: Vec2<number>;
 
     private canvas: HTMLCanvasElement;
 
@@ -147,8 +149,9 @@ class TextInput
             },
         };
 
-        this.value = "";
-        this.valueIndexes = new Vec2(0, 0);
+        this.value = "Shikhar Sharma is an amazing dev! - Shikhar, Sharma";
+        this.valueVisible = new Vec2(0, 0);
+        this.valueSelected = new Vec2(3, 10);
 
         this.box = new Box(
             canvas,
@@ -221,7 +224,13 @@ class TextInput
             this.moveValueIndexesToStart();
         });
 
-        this.cursor = new Box(canvas);
+        this.cursor = new Box(
+            canvas,
+            {},
+            {
+                backgroundColor: constants.colors.textPrimary,
+            }
+        );
         this.cursorIndex = 0;
     }
 
@@ -363,10 +372,10 @@ class TextInput
 
             if (isAtValueDrawMaxLimit) {
                 // Move start and end of `valueIndexes` forward.
-                this.valueIndexes = this.valueIndexes.add(new Vec2(1, 1));
+                this.valueVisible = this.valueVisible.add(new Vec2(1, 1));
             } else {
                 // Move the end of the `valueIndexes` forward.
-                this.valueIndexes = this.valueIndexes.add(new Vec2(0, 1));
+                this.valueVisible = this.valueVisible.add(new Vec2(0, 1));
             }
         };
 
@@ -379,8 +388,8 @@ class TextInput
                     this.cursorIndex = newCursorIndex;
 
                     // Cursor is moving past the most left visible character.
-                    if (newCursorIndex < this.valueIndexes.v1) {
-                        this.valueIndexes = this.valueIndexes.sub(
+                    if (newCursorIndex < this.valueVisible.v1) {
+                        this.valueVisible = this.valueVisible.sub(
                             new Vec2(1, 1)
                         );
                     }
@@ -396,8 +405,8 @@ class TextInput
                     this.cursorIndex = newCursorIndex;
 
                     // Cursor is moving past the most right visible character.
-                    if (newCursorIndex > this.valueIndexes.v2) {
-                        this.valueIndexes = this.valueIndexes.add(
+                    if (newCursorIndex > this.valueVisible.v2) {
+                        this.valueVisible = this.valueVisible.add(
                             new Vec2(1, 1)
                         );
                     }
@@ -415,13 +424,13 @@ class TextInput
 
                     this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
 
-                    if (this.valueIndexes.v1) {
-                        this.valueIndexes = this.valueIndexes.sub(
+                    if (this.valueVisible.v1) {
+                        this.valueVisible = this.valueVisible.sub(
                             new Vec2(1, 1)
                         );
                     } else {
                         if (this.value) {
-                            this.valueIndexes = this.valueIndexes.sub(
+                            this.valueVisible = this.valueVisible.sub(
                                 new Vec2(0, 1)
                             );
                         }
@@ -537,6 +546,52 @@ class TextInput
                     }
                 ).draw();
             }
+
+            if (this.valueSelected.v2) {
+                const valueSelectedAndVisible = new Vec2(
+                    Math.max(this.valueVisible.v1, this.valueSelected.v1),
+                    Math.min(this.valueVisible.v2, this.valueSelected.v2)
+                );
+
+                const textWidthLeftOfSelection = new Text(
+                    this.canvas,
+                    this.value.substring(
+                        this.valueVisible.v1,
+                        this.valueSelected.v1
+                    )
+                ).measureText().width;
+
+                const x = rect.x + textWidthLeftOfSelection;
+
+                const selectedText = new Text(
+                    this.canvas,
+                    this.value.substring(
+                        valueSelectedAndVisible.v1,
+                        valueSelectedAndVisible.v2
+                    ),
+                    { x, y: rect.y + rect.h / 2 },
+                    {
+                        foregroundColor: this.theme.backgroundColor,
+                        textBaseline: this.theme.textBaseline,
+                    }
+                );
+
+                const selectionBox = new Box(
+                    this.canvas,
+                    {
+                        x,
+                        y: rect.y,
+                        h: rect.h,
+                        w: selectedText.measureText().width,
+                    },
+                    {
+                        backgroundColor: foregroundColor,
+                    }
+                );
+
+                selectionBox.draw();
+                selectedText.draw();
+            }
         }
     }
 
@@ -565,7 +620,7 @@ class TextInput
                 this.canvas,
                 valueToDraw.substring(
                     0,
-                    this.cursorIndex - this.valueIndexes.v1
+                    this.cursorIndex - this.valueVisible.v1
                 )
             ).measureText().width;
         const y = rect.y + (rect.b - rect.t - this.theme.fontSize) / 2;
@@ -620,7 +675,7 @@ class TextInput
     }
 
     private calculateValueToDraw(): string {
-        return this.value.substring(this.valueIndexes.v1, this.valueIndexes.v2);
+        return this.value.substring(this.valueVisible.v1, this.valueVisible.v2);
     }
 
     private moveValueIndexesToStart(): void {
@@ -642,7 +697,7 @@ class TextInput
             }
         }
 
-        this.valueIndexes = new Vec2(0, end);
+        this.valueVisible = new Vec2(0, end);
     }
 
     private moveValueIndexesToEnd(): void {
@@ -662,7 +717,7 @@ class TextInput
             // consideration about the cursor's width but NOT while moving
             // the `valueIndexes` to the start.
             if (rect.r - (textWidth + paddingL + cursorWidth) <= rect.l) {
-                this.valueIndexes = new Vec2(i, this.value.length);
+                this.valueVisible = new Vec2(i, this.value.length);
                 break;
             }
         }
