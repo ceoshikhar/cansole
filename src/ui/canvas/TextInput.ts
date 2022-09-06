@@ -109,11 +109,12 @@ class TextInput
     public displayName: string = "TextInput";
     public theme: TextInputTheme;
 
-    public value: string;
+    public value: string =
+        "Shikhar Sharma is an amazing dev! - Shikhar, Sharma";
     /** The part/substring of `value` that is to be drawn in the `box`. */
-    private valueVisible: Vec2<number>;
+    private valueVisible: Vec2<number> = new Vec2(0, 0);
     /** The part/substring of `value` that is selected/highlighted. */
-    private valueSelected: Vec2<number>;
+    private valueSelected: Vec2<number> = new Vec2(0, 0);
 
     private canvas: HTMLCanvasElement;
 
@@ -122,12 +123,13 @@ class TextInput
     private cursor: Box;
 
     /** Where the cursor is currently present inside the `value`. */
-    private cursorIndex: number;
+    private cursorIndex: number = 0;
 
     private ee: EventEmitter;
 
-    private isActive = false;
-    private isHovered = false;
+    private isActive: boolean = false;
+    private isHovered: boolean = false;
+    private isSelecting: boolean = false;
 
     constructor(
         canvas: HTMLCanvasElement,
@@ -148,10 +150,6 @@ class TextInput
                 ...theme.active,
             },
         };
-
-        this.value = "Shikhar Sharma is an amazing dev! - Shikhar, Sharma";
-        this.valueVisible = new Vec2(0, 0);
-        this.valueSelected = new Vec2(3, 10);
 
         this.box = new Box(
             canvas,
@@ -186,6 +184,7 @@ class TextInput
 
         this.makeActivable();
         this.makeHoverable();
+        this.makeSelectable();
 
         this.box.onHover(() => {
             if (this.isActive) {
@@ -222,6 +221,7 @@ class TextInput
             }
 
             this.moveValueIndexesToStart();
+            this.valueSelected = new Vec2(0, 0);
         });
 
         this.cursor = new Box(
@@ -231,7 +231,6 @@ class TextInput
                 backgroundColor: constants.colors.textPrimary,
             }
         );
-        this.cursorIndex = 0;
     }
 
     public setDisplayName(name: string): void {
@@ -445,10 +444,13 @@ class TextInput
         };
 
         this.box.onPress((e) => {
+            if (this.isSelecting) return;
+
             const x = e.native.offsetX;
             const y = e.native.offsetY;
 
             this.cursorIndex = this.calculateCursorIndexAt(new Vec2(x, y));
+            this.valueSelected = new Vec2(0, 0);
 
             if (!this.isActive) {
                 this.isActive = true;
@@ -475,6 +477,27 @@ class TextInput
         });
     }
 
+    private makeSelectable(): void {
+        this.box.makeDraggable();
+
+        this.box.onDrag((e) => {
+            if (!this.isActive) return;
+
+            const start = this.calculateCursorIndexAt(e.start);
+            const end = this.calculateCursorIndexAt(e.end);
+
+            this.isSelecting = true;
+            this.valueSelected = new Vec2(
+                Math.min(start, end),
+                Math.max(start, end)
+            );
+        });
+
+        this.box.onDragEnd(() => {
+            this.isSelecting = false;
+        });
+    }
+
     public onActive(cb: ActiveEventCallback<TextInput>): void {
         this.ee.on(events.MouseEvents.Active, cb);
     }
@@ -495,8 +518,14 @@ class TextInput
     }
 
     public draw(): void {
+        //
+        // Draw the main box.
+        //
         this.box.draw();
 
+        //
+        // Draw the typable box and text for the visible value.
+        //
         const rect = this.calculateTypableRect();
 
         const foregroundColor = this.isActive
@@ -518,7 +547,62 @@ class TextInput
             }
         ).draw();
 
-        if (this.isActive) {
+        // Continue drawing if this `TextInput` is active.
+        if (!this.isActive) return;
+
+        if (this.valueSelected.v1 || this.valueSelected.v2) {
+            console.log(1);
+            //
+            // Draw the text selection.
+            //
+            const valueSelectedAndVisible = new Vec2(
+                Math.max(this.valueVisible.v1, this.valueSelected.v1),
+                Math.min(this.valueVisible.v2, this.valueSelected.v2)
+            );
+
+            const textWidthLeftOfSelection = new Text(
+                this.canvas,
+                this.value.substring(
+                    this.valueVisible.v1,
+                    this.valueSelected.v1
+                )
+            ).measureText().width;
+
+            const x = rect.x + textWidthLeftOfSelection;
+
+            const selectedText = new Text(
+                this.canvas,
+                this.value.substring(
+                    valueSelectedAndVisible.v1,
+                    valueSelectedAndVisible.v2
+                ),
+                { x, y: rect.y + rect.h / 2 },
+                {
+                    foregroundColor: this.theme.backgroundColor,
+                    textBaseline: this.theme.textBaseline,
+                }
+            );
+
+            const selectionBox = new Box(
+                this.canvas,
+                {
+                    x,
+                    y: rect.y,
+                    h: rect.h,
+                    w: selectedText.measureText().width,
+                },
+                {
+                    backgroundColor: foregroundColor,
+                }
+            );
+
+            selectionBox.draw();
+            selectedText.draw();
+        } else {
+            console.log(2);
+            //
+            // Draw the cursor.
+            //
             const pos = this.calculateCursorPosition();
 
             this.cursor.setX(pos.v1);
@@ -545,52 +629,6 @@ class TextInput
                         textBaseline: this.theme.textBaseline,
                     }
                 ).draw();
-            }
-
-            if (this.valueSelected.v2) {
-                const valueSelectedAndVisible = new Vec2(
-                    Math.max(this.valueVisible.v1, this.valueSelected.v1),
-                    Math.min(this.valueVisible.v2, this.valueSelected.v2)
-                );
-
-                const textWidthLeftOfSelection = new Text(
-                    this.canvas,
-                    this.value.substring(
-                        this.valueVisible.v1,
-                        this.valueSelected.v1
-                    )
-                ).measureText().width;
-
-                const x = rect.x + textWidthLeftOfSelection;
-
-                const selectedText = new Text(
-                    this.canvas,
-                    this.value.substring(
-                        valueSelectedAndVisible.v1,
-                        valueSelectedAndVisible.v2
-                    ),
-                    { x, y: rect.y + rect.h / 2 },
-                    {
-                        foregroundColor: this.theme.backgroundColor,
-                        textBaseline: this.theme.textBaseline,
-                    }
-                );
-
-                const selectionBox = new Box(
-                    this.canvas,
-                    {
-                        x,
-                        y: rect.y,
-                        h: rect.h,
-                        w: selectedText.measureText().width,
-                    },
-                    {
-                        backgroundColor: foregroundColor,
-                    }
-                );
-
-                selectionBox.draw();
-                selectedText.draw();
             }
         }
     }
