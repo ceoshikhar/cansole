@@ -301,7 +301,7 @@ class Box
         const onMouseUp = (event: MouseEvent) => {
             if (!this.contains(new Vec2(event.offsetX, event.offsetY))) return;
 
-            this.ee.emit(events.MouseEvents.PressLost, {
+            this.ee.emit(events.MouseEvents.Press, {
                 native: event,
                 target: this,
             });

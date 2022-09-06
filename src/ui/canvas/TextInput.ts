@@ -181,8 +181,8 @@ class TextInput
 
         this.ee = new EventEmitter();
 
+        this.makeActivable();
         this.makeHoverable();
-        this.makePressable();
 
         this.box.onHover(() => {
             if (this.isActive) {
@@ -321,7 +321,7 @@ class TextInput
         });
     }
 
-    private makePressable(): void {
+    private makeActivable(): void {
         this.box.makePressable();
 
         const onKeyPress = (e: KeyboardEvent) => {
@@ -436,11 +436,6 @@ class TextInput
         };
 
         this.box.onPress((e) => {
-            this.ee.emit(events.MouseEvents.Click, {
-                native: e.target,
-                target: this,
-            });
-
             const x = e.native.offsetX;
             const y = e.native.offsetY;
 
@@ -471,6 +466,13 @@ class TextInput
         });
     }
 
+    public onActive(cb: ActiveEventCallback<TextInput>): void {
+        this.ee.on(events.MouseEvents.Active, cb);
+    }
+
+    public onActiveLost(cb: ActiveLostEventCallback<TextInput>): void {
+        this.ee.on(events.MouseEvents.ActiveLost, cb);
+    }
     public onHover(cb: HoverEventCallback<TextInput>): void {
         this.ee.on(events.MouseEvents.Hover, cb);
     }
@@ -479,15 +481,7 @@ class TextInput
         this.ee.on(events.MouseEvents.HoverLost, cb);
     }
 
-    public onActive(cb: ActiveEventCallback<TextInput>): void {
-        this.ee.on(events.MouseEvents.Active, cb);
-    }
-
-    public onActiveLost(cb: ActiveLostEventCallback<TextInput>): void {
-        this.ee.on(events.MouseEvents.ActiveLost, cb);
-    }
-
-    public onClick(cb: ClickEventCallback<this>): void {
+    public onClick(cb: ClickEventCallback<TextInput>): void {
         this.ee.on(events.MouseEvents.Click, cb);
     }
 
