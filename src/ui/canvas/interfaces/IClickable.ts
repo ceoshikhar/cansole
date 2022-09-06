@@ -2,7 +2,7 @@
  * The event that is passed to all the listeners for `onClick`.
  */
 type ClickEvent<Target> = {
-    /** Native DOM event that triggered this click. */
+    /** Native DOM event that triggered this event. */
     native: MouseEvent;
     /** What was clicked. */
     target: Target;

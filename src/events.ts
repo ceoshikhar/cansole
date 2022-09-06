@@ -16,6 +16,8 @@ enum MouseEvents {
     DragStart = "DragStart",
     Hover = "Hover",
     HoverLost = "HoverLost",
+    Press = "Press",
+    PressLost = "PressLost",
 }
 
 enum WindowEvents {

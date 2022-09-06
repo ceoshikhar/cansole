@@ -17,6 +17,7 @@ export {
     HoverLostEvent,
     HoverLostEventCallback,
 } from "./IHoverable";
+export { IPressable, PressEvent, PressEventCallback } from "./IPressable";
 export { IRect } from "./IRect";
 export { IResizable, ResizeEvent, ResizeEventCallback } from "./IResizable";
 export { IThemeable, Themeables } from "./IThemeable";

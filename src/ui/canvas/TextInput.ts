@@ -182,7 +182,7 @@ class TextInput
         this.ee = new EventEmitter();
 
         this.makeHoverable();
-        this.makeClickable();
+        this.makePressable();
 
         this.box.onHover(() => {
             if (this.isActive) {
@@ -321,8 +321,8 @@ class TextInput
         });
     }
 
-    private makeClickable(): void {
-        this.box.makeClickable();
+    private makePressable(): void {
+        this.box.makePressable();
 
         const onKeyPress = (e: KeyboardEvent) => {
             const key = e.key;
@@ -435,7 +435,7 @@ class TextInput
             }
         };
 
-        this.box.onClick((e) => {
+        this.box.onPress((e) => {
             this.ee.emit(events.MouseEvents.Click, {
                 native: e.target,
                 target: this,
