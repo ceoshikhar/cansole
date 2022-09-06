@@ -228,7 +228,7 @@ class Box
             const start = new Vec2(event.offsetX, event.offsetY);
 
             const onMouseMove = (event: MouseEvent) => {
-                const end = new Vec2(event.offsetX, event.offsetX);
+                const end = new Vec2(event.offsetX, event.offsetY);
                 const diff = end.sub(start);
                 const delta = new Vec2(event.movementX, event.movementY);
 
