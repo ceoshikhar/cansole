@@ -4,9 +4,9 @@ import { Vec2 } from "../../../math";
  * The event that is passed to all the listeners for `onDrag`.
  */
 type DragEvent<Target> = {
+    curr: Vec2<number>;
     diff: Vec2<number>;
     delta: Vec2<number>;
-    end: Vec2<number>;
     start: Vec2<number>;
     /** What was dragged. */
     target: Target;
