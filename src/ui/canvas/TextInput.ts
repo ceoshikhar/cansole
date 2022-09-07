@@ -128,8 +128,6 @@ class TextInput
     private ee: EventEmitter;
 
     private isActive: boolean = false;
-    private isHovered: boolean = false;
-    private isSelecting: boolean = false;
 
     constructor(
         canvas: HTMLCanvasElement,
@@ -228,7 +226,7 @@ class TextInput
             canvas,
             {},
             {
-                backgroundColor: constants.colors.textPrimary,
+                backgroundColor: this.theme.active.foregroundColor,
             }
         );
     }
@@ -319,12 +317,10 @@ class TextInput
         this.box.makeHoverable();
 
         this.box.onHover(() => {
-            this.isHovered = true;
             this.ee.emit(events.MouseEvents.Hover, { target: this });
         });
 
         this.box.onHoverLost(() => {
-            this.isHovered = false;
             this.ee.emit(events.MouseEvents.HoverLost, { target: this });
         });
     }
@@ -444,8 +440,6 @@ class TextInput
         };
 
         this.box.onPress((e) => {
-            if (this.isSelecting) return;
-
             const x = e.native.offsetX;
             const y = e.native.offsetY;
 
@@ -484,17 +478,16 @@ class TextInput
             if (!this.isActive) return;
 
             const start = this.calculateCursorIndexAt(e.start);
-            const end = this.calculateCursorIndexAt(e.end);
+            const curr = this.calculateCursorIndexAt(e.curr);
 
-            this.isSelecting = true;
-            this.valueSelected = new Vec2(
-                Math.min(start, end),
-                Math.max(start, end)
-            );
-        });
+            // The drag has just started. We are still at the same value index.
+            if (start === curr) return;
 
-        this.box.onDragEnd(() => {
-            this.isSelecting = false;
+            if (curr < start) {
+                this.valueSelected = new Vec2(curr, start);
+            } else {
+                this.valueSelected = new Vec2(start, curr);
+            }
         });
     }
 
@@ -551,7 +544,6 @@ class TextInput
         if (!this.isActive) return;
 
         if (this.valueSelected.v1 || this.valueSelected.v2) {
-            console.log(1);
             //
             // Draw the text selection.
             //
@@ -559,6 +551,12 @@ class TextInput
                 Math.max(this.valueVisible.v1, this.valueSelected.v1),
                 Math.min(this.valueVisible.v2, this.valueSelected.v2)
             );
+
+            console.log({
+                valueVisible: this.valueVisible,
+                valueSelected: this.valueSelected,
+                valueSelectedAndVisible,
+            });
 
             const textWidthLeftOfSelection = new Text(
                 this.canvas,
@@ -574,7 +572,14 @@ class TextInput
                 this.canvas,
                 this.value.substring(
                     valueSelectedAndVisible.v1,
-                    valueSelectedAndVisible.v2
+                    // `Math.min` because we are doing `+1` but don't want to
+                    // go out of the `valueVisible` range.
+                    Math.min(
+                        // `+1` to include the index where the selection
+                        // started and we selecting towards left.
+                        valueSelectedAndVisible.v2 + 1,
+                        this.valueVisible.v2
+                    )
                 ),
                 { x, y: rect.y + rect.h / 2 },
                 {
@@ -587,19 +592,18 @@ class TextInput
                 this.canvas,
                 {
                     x,
-                    y: rect.y,
-                    h: rect.h,
+                    y: this.calculateCursorPosition().v2,
+                    h: this.calculateCursorSize().v2,
                     w: selectedText.measureText().width,
                 },
                 {
-                    backgroundColor: foregroundColor,
+                    backgroundColor: this.theme.active.foregroundColor,
                 }
             );
 
             selectionBox.draw();
             selectedText.draw();
         } else {
-            console.log(2);
             //
             // Draw the cursor.
             //
@@ -679,11 +683,18 @@ class TextInput
     }
 
     private calculateCursorIndexAt(point: Vec2<number>): number {
-        // This shouldn't happen but if it did, we put the cursor at the end.
-        if (!this.box.contains(point)) return this.value.length;
-
         const rect = this.calculateTypableRect();
         const valueToDraw = this.calculateValueToDraw();
+
+        if (!rect.contains(point)) {
+            if (point.v1 <= rect.l) {
+                return this.valueVisible.v1;
+            }
+
+            if (point.v1 >= rect.r) {
+                return this.valueVisible.v2;
+            }
+        }
 
         let i = 0;
 

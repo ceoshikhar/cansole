@@ -228,8 +228,8 @@ class Box
             const start = new Vec2(event.offsetX, event.offsetY);
 
             const onMouseMove = (event: MouseEvent) => {
-                const end = new Vec2(event.offsetX, event.offsetY);
-                const diff = end.sub(start);
+                const curr = new Vec2(event.offsetX, event.offsetY);
+                const diff = curr.sub(start);
                 const delta = new Vec2(event.movementX, event.movementY);
 
                 // Drag start?
@@ -239,16 +239,16 @@ class Box
                     this.ee.emit(events.MouseEvents.DragStart, {
                         diff,
                         delta,
-                        end,
+                        end: curr,
                         start,
                         target: this,
                     });
                 }
 
                 this.ee.emit(events.MouseEvents.Drag, {
+                    curr,
                     diff,
                     delta,
-                    end,
                     start,
                     target: this,
                 });
@@ -301,7 +301,7 @@ class Box
         const onMouseUp = (event: MouseEvent) => {
             if (!this.contains(new Vec2(event.offsetX, event.offsetY))) return;
 
-            this.ee.emit(events.MouseEvents.Press, {
+            this.ee.emit(events.MouseEvents.PressLost, {
                 native: event,
                 target: this,
             });
