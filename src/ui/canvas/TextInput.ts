@@ -366,8 +366,10 @@ class TextInput
                 textWidth + paddingR + cursorWidth >= rect.w;
 
             if (isAtValueDrawMaxLimit) {
-                // Move start and end of `valueIndexes` forward.
-                this.valueVisible = this.valueVisible.add(new Vec2(1, 1));
+                if (this.cursorIndex >= this.valueVisible.v2) {
+                    // Move start and end of `valueIndexes` forward.
+                    this.valueVisible = this.valueVisible.add(new Vec2(1, 1));
+                }
             } else {
                 // Move the end of the `valueIndexes` forward.
                 this.valueVisible = this.valueVisible.add(new Vec2(0, 1));
@@ -484,6 +486,14 @@ class TextInput
                 this.valueSelected = new Vec2(curr, start);
             } else {
                 this.valueSelected = new Vec2(start, curr);
+            }
+        });
+
+        this.box.onDragEnd((e) => {
+            if (!this.isActive) return;
+
+            if (this.valueSelected.v1 === this.valueSelected.v2) {
+                this.valueSelected = new Vec2(0, 0);
             }
         });
     }
