@@ -480,9 +480,6 @@ class TextInput
             const start = this.calculateCursorIndexAt(e.start);
             const curr = this.calculateCursorIndexAt(e.curr);
 
-            // The drag has just started. We are still at the same value index.
-            if (start === curr) return;
-
             if (curr < start) {
                 this.valueSelected = new Vec2(curr, start);
             } else {
