@@ -390,6 +390,12 @@ class TextInput
 
             switch (key) {
                 case "ArrowLeft": {
+                    if (this.valueSelected) {
+                        this.cursorIndex = this.valueSelected.v1 - 1;
+                        this.valueSelected = null;
+                        break;
+                    }
+
                     const newCursorIndex = Math.max(this.cursorIndex - 1, 0);
                     this.cursorIndex = newCursorIndex;
 
@@ -404,6 +410,12 @@ class TextInput
                 }
 
                 case "ArrowRight": {
+                    if (this.valueSelected) {
+                        this.cursorIndex = this.valueSelected.v2 + 1;
+                        this.valueSelected = null;
+                        break;
+                    }
+
                     const newCursorIndex = Math.min(
                         this.cursorIndex + 1,
                         this.value.length
