@@ -114,7 +114,7 @@ class TextInput
     /** The part/substring of `value` that is to be drawn in the `box`. */
     private valueVisible: Vec2<number> = new Vec2(0, 0);
     /** The part/substring of `value` that is selected/highlighted. */
-    private valueSelected: Vec2<number> = new Vec2(0, 0);
+    private valueSelected: Vec2<number> | null = null;
 
     private canvas: HTMLCanvasElement;
 
@@ -219,7 +219,7 @@ class TextInput
             }
 
             this.moveValueIndexesToStart();
-            this.valueSelected = new Vec2(0, 0);
+            this.valueSelected = null;
         });
 
         this.cursor = new Box(
@@ -333,17 +333,26 @@ class TextInput
 
             if (KeysToIgnoreOnKeyPress.includes(key)) return;
 
-            const left = this.value.substring(0, this.cursorIndex);
-            const right = this.value.substring(
-                this.cursorIndex,
-                this.value.length
-            );
+            if (!this.valueSelected) {
+                const left = this.value.substring(0, this.cursorIndex);
+                const right = this.value.substring(
+                    this.cursorIndex,
+                    this.value.length
+                );
 
-            const newValue = left + key + right;
+                this.value = left + key + right;
+                this.cursorIndex += 1;
+            } else {
+                const left = this.value.substring(0, this.valueSelected.v1);
+                const right = this.value.substring(
+                    this.valueSelected.v2 + 1,
+                    this.value.length
+                );
 
-            this.value = newValue;
-
-            this.cursorIndex += 1;
+                this.value = left + key + right;
+                this.cursorIndex = this.valueSelected.v1 + 1;
+                this.valueSelected = null;
+            }
 
             const rect = this.calculateTypableRect();
             const valueToDraw = this.calculateValueToDraw();
@@ -446,7 +455,7 @@ class TextInput
             const y = e.native.offsetY;
 
             this.cursorIndex = this.calculateCursorIndexAt(new Vec2(x, y));
-            this.valueSelected = new Vec2(0, 0);
+            this.valueSelected = null;
 
             if (!this.isActive) {
                 this.isActive = true;
@@ -491,6 +500,7 @@ class TextInput
 
         this.box.onDragEnd((e) => {
             if (!this.isActive) return;
+            if (!this.valueSelected) return;
 
             if (this.valueSelected.v1 === this.valueSelected.v2) {
                 this.valueSelected = new Vec2(0, 0);
@@ -550,7 +560,10 @@ class TextInput
         // Continue drawing if this `TextInput` is active.
         if (!this.isActive) return;
 
-        if (this.valueSelected.v1 || this.valueSelected.v2) {
+        if (
+            this.valueSelected &&
+            (this.valueSelected.v1 || this.valueSelected.v2)
+        ) {
             //
             // Draw the text selection.
             //
