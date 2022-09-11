@@ -414,16 +414,17 @@ class TextInput
             switch (key) {
                 case "ArrowLeft": {
                     if (this.valueSelected) {
-                        this.cursorIndex = this.valueSelected.v1 - 1;
+                        this.cursorIndex = Math.max(
+                            this.valueSelected.v1 - 1,
+                            this.valueVisible.v1
+                        );
                         this.valueSelected = null;
-                        break;
+                    } else {
+                        this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
                     }
 
-                    const newCursorIndex = Math.max(this.cursorIndex - 1, 0);
-                    this.cursorIndex = newCursorIndex;
-
                     // Cursor is moving past the most left visible character.
-                    if (newCursorIndex < this.valueVisible.v1) {
+                    if (this.cursorIndex < this.valueVisible.v1) {
                         this.valueVisible = this.valueVisible.sub(
                             new Vec2(1, 1)
                         );
@@ -434,19 +435,20 @@ class TextInput
 
                 case "ArrowRight": {
                     if (this.valueSelected) {
-                        this.cursorIndex = this.valueSelected.v2 + 1;
+                        this.cursorIndex = Math.min(
+                            this.valueSelected.v2 + 1,
+                            this.valueVisible.v2
+                        );
                         this.valueSelected = null;
-                        break;
+                    } else {
+                        this.cursorIndex = Math.min(
+                            this.cursorIndex + 1,
+                            this.value.length
+                        );
                     }
 
-                    const newCursorIndex = Math.min(
-                        this.cursorIndex + 1,
-                        this.value.length
-                    );
-                    this.cursorIndex = newCursorIndex;
-
                     // Cursor is moving past the most right visible character.
-                    if (newCursorIndex > this.valueVisible.v2) {
+                    if (this.cursorIndex >= this.valueVisible.v2) {
                         this.valueVisible = this.valueVisible.add(
                             new Vec2(1, 1)
                         );
