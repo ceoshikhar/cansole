@@ -333,16 +333,7 @@ class TextInput
 
             if (KeysToIgnoreOnKeyPress.includes(key)) return;
 
-            if (!this.valueSelected) {
-                const left = this.value.substring(0, this.cursorIndex);
-                const right = this.value.substring(
-                    this.cursorIndex,
-                    this.value.length
-                );
-
-                this.value = left + key + right;
-                this.cursorIndex += 1;
-            } else {
+            if (this.valueSelected) {
                 const left = this.value.substring(0, this.valueSelected.v1);
                 const right = this.value.substring(
                     this.valueSelected.v2 + 1,
@@ -351,7 +342,30 @@ class TextInput
 
                 this.value = left + key + right;
                 this.cursorIndex = this.valueSelected.v1 + 1;
+
+                console.log("BEFORE", {
+                    valueVisible: this.valueVisible,
+                });
+
+                const moveBy =
+                    this.valueSelected.v2 - this.valueSelected.v1 - 1;
+                this.valueVisible = this.valueVisible.add(new Vec2(0, moveBy));
+
+                console.log("AFTER", {
+                    moveBy,
+                    valueVisible: this.valueVisible,
+                });
+
                 this.valueSelected = null;
+            } else {
+                const left = this.value.substring(0, this.cursorIndex);
+                const right = this.value.substring(
+                    this.cursorIndex,
+                    this.value.length
+                );
+
+                this.value = left + key + right;
+                this.cursorIndex += 1;
             }
 
             const rect = this.calculateTypableRect();
@@ -365,24 +379,33 @@ class TextInput
             ).measureText().width;
 
             const paddingR = this.theme.padding.v2;
-            const cursorWidth = this.calculateCursorSize().v1;
 
-            // We add the `paddingR` & `cursorWidth` to `textWidth` because we
-            // want to move the `valueIndexes` in advance(before) reaching the
-            // `rect.w` otherwise, the `cursor` will be drawn at the "outside"
-            // of the the "typable" rect's right edge.
-            const isAtValueDrawMaxLimit =
-                textWidth + paddingR + cursorWidth >= rect.w;
+            // We add the `paddingR` to `textWidth` because we want to move the
+            // `valueIndexes` in advance(before) reaching the `rect.w`
+            // otherwise, the `cursor` will be drawn at the "outside" of the
+            // the "typable" rect's right edge.
+            let widthToCheck = textWidth + paddingR;
+
+            // If the `cursor` is at the end of the text, we need to consider
+            // it's width as well, otherwise the cursor will go outside.
+            if (this.cursorIndex >= this.valueVisible.v2 - 1) {
+                const cursorWidth = this.calculateCursorSize().v1;
+                widthToCheck += cursorWidth;
+            }
+
+            let isAtValueDrawMaxLimit = widthToCheck >= rect.w;
 
             if (isAtValueDrawMaxLimit) {
                 if (this.cursorIndex >= this.valueVisible.v2) {
-                    // Move start and end of `valueIndexes` forward.
+                    // Move start and end of `valueVisible` forward.
                     this.valueVisible = this.valueVisible.add(new Vec2(1, 1));
                 }
             } else {
-                // Move the end of the `valueIndexes` forward.
-                this.valueVisible = this.valueVisible.add(new Vec2(0, 1));
+                // Move the end of the `valueVisible` forward.
+                this.valueVisible = new Vec2(0, this.value.length);
             }
+
+            console.log(this.valueVisible);
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
@@ -515,7 +538,7 @@ class TextInput
             if (!this.valueSelected) return;
 
             if (this.valueSelected.v1 === this.valueSelected.v2) {
-                this.valueSelected = new Vec2(0, 0);
+                this.valueSelected = null;
             }
         });
     }
