@@ -529,7 +529,6 @@ class TextInput
     }
 
     public draw(): void {
-        console.log(this.valueVisible);
         //
         // Draw the main box.
         //
@@ -573,12 +572,6 @@ class TextInput
                 Math.max(this.valueVisible.v1, this.valueSelected.v1),
                 Math.min(this.valueVisible.v2, this.valueSelected.v2)
             );
-
-            // console.log({
-            //     valueVisible: this.valueVisible,
-            //     valueSelected: this.valueSelected,
-            //     valueSelectedAndVisible,
-            // });
 
             const textWidthLeftOfSelection = new Text(
                 this.canvas,
