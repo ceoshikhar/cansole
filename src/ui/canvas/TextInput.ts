@@ -69,7 +69,7 @@ const defaultTextInputThemeables: TextInputThemeables = {
     borderWidth: 0,
     borderColor: constants.colors.borderPrimaryDisabled,
     cursor: "text",
-    fontFamily: "Perfect DOS VGA 437 Win",
+    fontFamily: "Dank Mono",
     fontSize: 18,
     fontWeight: "normal",
     foregroundColor: constants.colors.onDisabled,

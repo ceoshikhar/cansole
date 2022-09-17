@@ -26,7 +26,7 @@ const defaultTextOptions = {
 } as const;
 
 const defaultTextTheme: TextTheme = {
-    fontFamily: "Perfect DOS VGA 437 Win",
+    fontFamily: "Dank Mono",
     fontSize: 18,
     fontWeight: "normal",
     foregroundColor: constants.colors.textPrimary,
