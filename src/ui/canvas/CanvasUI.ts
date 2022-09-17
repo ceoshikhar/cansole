@@ -17,10 +17,7 @@ class CanvasUI implements IDestroyable, IDrawable {
 
     constructor(cansole: Cansole) {
         if (!utils.isCanvas(cansole.element)) {
-            throw new Error(
-                "CanvasUI.constructor: cansole.element is not an" +
-                    " HTMLCanvasElement."
-            );
+            throw new Error("CanvasUI.constructor: cansole.element is not an" + " HTMLCanvasElement.");
         }
 
         this.entities = [];
@@ -30,27 +27,18 @@ class CanvasUI implements IDestroyable, IDrawable {
     }
 
     public init(cansole: Cansole): void {
-        const initPos: Vec2<number> =
-            cansole.repository.loadWindowPosition() || DEFAULT_WINDOW_POS;
+        const initPos: Vec2<number> = cansole.repository.loadWindowPosition() || DEFAULT_WINDOW_POS;
 
-        const initSize: Vec2<number> =
-            cansole.repository.loadWindowSize() || DEFAULT_WINDOW_SIZE;
+        const initSize: Vec2<number> = cansole.repository.loadWindowSize() || DEFAULT_WINDOW_SIZE;
 
-        const cansoleWindow = new Window(
-            cansole.element as HTMLCanvasElement,
-            cansole.options.title,
-            {
-                x: initPos.v1,
-                y: initPos.v2,
-                w: initSize.v1,
-                h: initSize.v2,
-            }
-        );
+        const cansoleWindow = new Window(cansole.element as HTMLCanvasElement, cansole.options.title, {
+            x: initPos.v1,
+            y: initPos.v2,
+            w: initSize.v1,
+            h: initSize.v2,
+        });
 
-        const submit = new Button(
-            cansole.element as HTMLCanvasElement,
-            "Submit"
-        );
+        const submit = new Button(cansole.element as HTMLCanvasElement, "Submit");
 
         submit.setDisplayName("Submit");
 
@@ -128,10 +116,7 @@ class CanvasUI implements IDestroyable, IDrawable {
         submit.setB(window.b - buttonPaddingWithWindow);
     }
 
-    private positionInputOnWindowResize(
-        input: TextInput,
-        window: Window
-    ): void {
+    private positionInputOnWindowResize(input: TextInput, window: Window): void {
         const inputPaddingWithWindow = 16;
 
         input.setL(window.l + inputPaddingWithWindow);
@@ -141,10 +126,7 @@ class CanvasUI implements IDestroyable, IDrawable {
     private resizeInputOnWindowReize(input: TextInput, submit: Button) {
         const gapBetweenInputAndSubmit = 16;
 
-        const size = new Vec2(
-            submit.x - input.x - gapBetweenInputAndSubmit,
-            input.h
-        );
+        const size = new Vec2(submit.x - input.x - gapBetweenInputAndSubmit, input.h);
 
         input.setSize(size);
     }

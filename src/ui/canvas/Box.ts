@@ -34,10 +34,7 @@ const defaultBoxOptions = {
     h: 100,
 } as const;
 
-type BoxTheme = Pick<
-    Themeables,
-    "backgroundColor" | "borderColor" | "borderWidth"
->;
+type BoxTheme = Pick<Themeables, "backgroundColor" | "borderColor" | "borderWidth">;
 
 type BoxThemeOptions = Partial<BoxTheme>;
 
@@ -70,11 +67,7 @@ class Box
 
     private ee: EventEmitter;
 
-    constructor(
-        canvas: HTMLCanvasElement,
-        options: BoxOptions = {},
-        theme: BoxThemeOptions = {}
-    ) {
+    constructor(canvas: HTMLCanvasElement, options: BoxOptions = {}, theme: BoxThemeOptions = {}) {
         super(options);
 
         this.canvas = canvas;
@@ -94,7 +87,7 @@ class Box
         this.ee.on(events.MouseEvents.ActiveLost, cb);
     }
 
-    public onClick<T extends unknown = this>(cb: ClickEventCallback<T>): void {
+    public onClick(cb: ClickEventCallback<this>): void {
         this.ee.on(events.MouseEvents.Click, cb);
     }
 
@@ -330,12 +323,7 @@ class Box
             ctx.lineWidth = bw;
             ctx.strokeStyle = this.theme.borderColor;
 
-            ctx.strokeRect(
-                this.x + bw / 2,
-                this.y + bw / 2,
-                this.w - bw,
-                this.h - bw
-            );
+            ctx.strokeRect(this.x + bw / 2, this.y + bw / 2, this.w - bw, this.h - bw);
         }
     }
 

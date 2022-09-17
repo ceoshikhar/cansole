@@ -31,11 +31,7 @@ type ButtonOptions = {
 
 type ButtonThemeables = Pick<
     Themeables,
-    | "backgroundColor"
-    | "borderColor"
-    | "borderWidth"
-    | "cursor"
-    | "foregroundColor"
+    "backgroundColor" | "borderColor" | "borderWidth" | "cursor" | "foregroundColor"
 >;
 
 type ButtonTheme = ButtonThemeables & {
@@ -92,7 +88,7 @@ class Button
 {
     public theme: ButtonTheme;
 
-    public displayName: string = "Button";
+    public displayName = "Button";
 
     private canvas: HTMLCanvasElement;
     private box: Box;
@@ -103,12 +99,7 @@ class Button
     private isActive = false;
     private isHovered = false;
 
-    constructor(
-        canvas: HTMLCanvasElement,
-        label: string,
-        options: ButtonOptions = {},
-        theme: ButtonThemeOptions = {}
-    ) {
+    constructor(canvas: HTMLCanvasElement, label: string, options: ButtonOptions = {}, theme: ButtonThemeOptions = {}) {
         this.canvas = canvas;
         this.label = label;
 

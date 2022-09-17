@@ -37,10 +37,4 @@ interface IActivable<Target = unknown> {
     onActiveLost: (cb: ActiveLostEventCallback<Target>) => void;
 }
 
-export {
-    IActivable,
-    ActiveEvent,
-    ActiveEventCallback,
-    ActiveLostEvent,
-    ActiveLostEventCallback,
-};
+export { IActivable, ActiveEvent, ActiveEventCallback, ActiveLostEvent, ActiveLostEventCallback };

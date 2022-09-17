@@ -71,10 +71,7 @@ class Cansole implements IDrawable {
     /**
      * Create a new instance of `Cansole`.
      */
-    constructor(
-        element: CansoleElement,
-        options: Partial<CansoleOptions> = {}
-    ) {
+    constructor(element: CansoleElement, options: Partial<CansoleOptions> = {}) {
         this.element = element;
         this.target = this.detectTarget(element);
         this.visibility = Visibility.Hidden;

@@ -10,12 +10,7 @@ type TextOptions = {
 
 type TextTheme = Pick<
     Themeables,
-    | "fontFamily"
-    | "fontSize"
-    | "fontWeight"
-    | "foregroundColor"
-    | "textAlign"
-    | "textBaseline"
+    "fontFamily" | "fontSize" | "fontWeight" | "foregroundColor" | "textAlign" | "textBaseline"
 >;
 
 type TextThemeOptions = Partial<TextTheme>;
@@ -44,12 +39,7 @@ class Text implements IDrawable, TextOptions, IThemeable<TextTheme> {
     public y: number;
     public maxWidth?: number;
 
-    constructor(
-        canvas: HTMLCanvasElement,
-        text: string,
-        options: TextOptions = {},
-        theme: TextThemeOptions = {}
-    ) {
+    constructor(canvas: HTMLCanvasElement, text: string, options: TextOptions = {}, theme: TextThemeOptions = {}) {
         this.canvas = canvas;
         this.text = text;
 

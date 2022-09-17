@@ -1,8 +1,6 @@
 import { Cansole } from "./api";
 
-const canvas: HTMLCanvasElement = document.getElementById(
-    "my-canvas"
-) as HTMLCanvasElement;
+const canvas: HTMLCanvasElement = document.getElementById("my-canvas") as HTMLCanvasElement;
 
 canvas.height = window.innerHeight - 10;
 canvas.width = window.innerWidth - 10;
@@ -33,5 +31,4 @@ function renderLoop(t1: number) {
     };
 }
 
-// @ts-ignore
-globalThis.cansole = cansole;
+(globalThis as any).cansole = cansole;

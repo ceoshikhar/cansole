@@ -36,9 +36,7 @@ class Repository {
     private load<V>(key: string): LoadReturn<V> {
         const valueStr: string | null = this.storage.getItem(key);
 
-        return valueStr === null
-            ? null
-            : (JSON.parse(valueStr) as unknown as V);
+        return valueStr === null ? null : (JSON.parse(valueStr) as unknown as V);
     }
 }
 

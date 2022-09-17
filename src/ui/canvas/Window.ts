@@ -3,14 +3,7 @@ import * as events from "../../events";
 import { EventEmitter } from "../../event-emitter";
 
 import { Button } from "./Button";
-import {
-    IDestroyable,
-    IDraggable,
-    DragEventCallback,
-    IDrawable,
-    IResizable,
-    ResizeEventCallback,
-} from "./interfaces";
+import { IDestroyable, IDraggable, DragEventCallback, IDrawable, IResizable, ResizeEventCallback } from "./interfaces";
 import { Box } from "./Box";
 import { Text } from "./Text";
 
@@ -48,11 +41,7 @@ class Window implements IDestroyable, IDrawable, IDraggable, IResizable {
 
     private ee: EventEmitter;
 
-    constructor(
-        canvas: HTMLCanvasElement,
-        title: string,
-        options: WindowOptions
-    ) {
+    constructor(canvas: HTMLCanvasElement, title: string, options: WindowOptions) {
         this.title = title;
 
         this.canvas = canvas;

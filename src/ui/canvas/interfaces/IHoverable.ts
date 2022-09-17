@@ -37,10 +37,4 @@ interface IHoverable<Target = unknown> {
     onHoverLost: (cb: HoverLostEventCallback<Target>) => void;
 }
 
-export {
-    IHoverable,
-    HoverEvent,
-    HoverEventCallback,
-    HoverLostEvent,
-    HoverLostEventCallback,
-};
+export { IHoverable, HoverEvent, HoverEventCallback, HoverLostEvent, HoverLostEventCallback };
