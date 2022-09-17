@@ -32,3 +32,6 @@ function renderLoop(t1: number) {
         }
     };
 }
+
+// @ts-ignore
+globalThis.cansole = cansole;
