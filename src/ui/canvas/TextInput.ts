@@ -349,7 +349,12 @@ class TextInput
 
                 const moveBy =
                     this.valueSelected.v2 - this.valueSelected.v1 - 1;
-                this.valueVisible = this.valueVisible.add(new Vec2(0, moveBy));
+
+                console.log("FUCK", this.isFilledCompletely());
+
+                if (!this.isFilledCompletely()) {
+                    this.valueVisible = new Vec2(0, this.value.length);
+                }
 
                 console.log("AFTER", {
                     moveBy,
