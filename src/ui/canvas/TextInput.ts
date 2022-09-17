@@ -529,6 +529,7 @@ class TextInput
     }
 
     public draw(): void {
+        console.log(this.valueVisible);
         //
         // Draw the main box.
         //
@@ -707,19 +708,26 @@ class TextInput
         const rect = this.calculateTypableRect();
         const valueToDraw = this.calculateValueToDraw();
 
+        // THe `point` can be outside of the typable rect but definitely has to
+        // be inside the `this.box`. Should we throw if `point` is outside?
         if (!rect.contains(point)) {
             if (point.v1 <= rect.l) {
                 return this.valueVisible.v1;
             }
 
             if (point.v1 >= rect.r) {
-                return this.valueVisible.v2;
+                // -1 because for some reason the `valueVisible.v1` lies on the
+                // right edge of the `this.box` which is weird.
+                return this.valueVisible.v2 - 1;
             }
         }
 
         let i = 0;
 
         for (i; i < this.value.length; i++) {
+            // Same reasoning for -1 given few lines above.
+            if (i >= this.valueVisible.v2 - 1) break;
+
             const x1 =
                 rect.x +
                 new Text(this.canvas, valueToDraw.substring(0, i)).measureText()
@@ -734,12 +742,16 @@ class TextInput
 
             // The current cursor index at the point where it was clicked.
             if (x1 <= point.v1 && point.v1 <= x2) {
+                i = Math.min(i, this.valueVisible.v2);
+                console.log(3, i);
                 break;
             }
 
             // If we clicked somewhere outside the `valueToDraw`, the cursor
             // index would be at the end.
         }
+
+        console.log("Cursor Index:", i);
 
         return i;
     }
