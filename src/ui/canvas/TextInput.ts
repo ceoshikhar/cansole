@@ -343,23 +343,9 @@ class TextInput
                 this.value = left + key + right;
                 this.cursorIndex = this.valueSelected.v1 + 1;
 
-                console.log("BEFORE", {
-                    valueVisible: this.valueVisible,
-                });
-
-                const moveBy =
-                    this.valueSelected.v2 - this.valueSelected.v1 - 1;
-
-                console.log("FUCK", this.isFilledCompletely());
-
                 if (!this.isFilledCompletely()) {
                     this.valueVisible = new Vec2(0, this.value.length);
                 }
-
-                console.log("AFTER", {
-                    moveBy,
-                    valueVisible: this.valueVisible,
-                });
 
                 this.valueSelected = null;
             } else {
@@ -382,8 +368,6 @@ class TextInput
                 // Move the end of the `valueVisible` forward.
                 this.valueVisible = new Vec2(0, this.value.length);
             }
-
-            console.log(this.valueVisible);
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
@@ -587,11 +571,11 @@ class TextInput
                 Math.min(this.valueVisible.v2, this.valueSelected.v2)
             );
 
-            console.log({
-                valueVisible: this.valueVisible,
-                valueSelected: this.valueSelected,
-                valueSelectedAndVisible,
-            });
+            // console.log({
+            //     valueVisible: this.valueVisible,
+            //     valueSelected: this.valueSelected,
+            //     valueSelectedAndVisible,
+            // });
 
             const textWidthLeftOfSelection = new Text(
                 this.canvas,
@@ -782,29 +766,6 @@ class TextInput
         }
 
         this.valueVisible = new Vec2(0, end);
-    }
-
-    private moveValueIndexesToEnd(): void {
-        const rect = this.calculateTypableRect();
-        const paddingL = this.theme.padding.v4;
-        const cursorWidth = this.calculateCursorSize().v1;
-
-        for (let i = this.value.length; i >= 0; i--) {
-            const textWidth = new Text(
-                this.canvas,
-                this.value.substring(i, this.value.length),
-                {},
-                this.theme
-            ).measureText().width;
-
-            // When moving the `valueIndexes` to the end, we need to take in
-            // consideration about the cursor's width but NOT while moving
-            // the `valueIndexes` to the start.
-            if (rect.r - (textWidth + paddingL + cursorWidth) <= rect.l) {
-                this.valueVisible = new Vec2(i, this.value.length);
-                break;
-            }
-        }
     }
 
     private isFilledCompletely(): boolean {
