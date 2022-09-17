@@ -373,34 +373,7 @@ class TextInput
                 this.cursorIndex += 1;
             }
 
-            const rect = this.calculateTypableRect();
-            const valueToDraw = this.calculateValueToDraw();
-
-            const textWidth = new Text(
-                this.canvas,
-                valueToDraw,
-                {},
-                this.theme
-            ).measureText().width;
-
-            const paddingR = this.theme.padding.v2;
-
-            // We add the `paddingR` to `textWidth` because we want to move the
-            // `valueIndexes` in advance(before) reaching the `rect.w`
-            // otherwise, the `cursor` will be drawn at the "outside" of the
-            // the "typable" rect's right edge.
-            let widthToCheck = textWidth + paddingR;
-
-            // If the `cursor` is at the end of the text, we need to consider
-            // it's width as well, otherwise the cursor will go outside.
-            if (this.cursorIndex >= this.valueVisible.v2 - 1) {
-                const cursorWidth = this.calculateCursorSize().v1;
-                widthToCheck += cursorWidth;
-            }
-
-            let isAtValueDrawMaxLimit = widthToCheck >= rect.w;
-
-            if (isAtValueDrawMaxLimit) {
+            if (this.isFilledCompletely()) {
                 if (this.cursorIndex >= this.valueVisible.v2) {
                     // Move start and end of `valueVisible` forward.
                     this.valueVisible = this.valueVisible.add(new Vec2(1, 1));
@@ -832,6 +805,35 @@ class TextInput
                 break;
             }
         }
+    }
+
+    private isFilledCompletely(): boolean {
+        const rect = this.calculateTypableRect();
+        const valueToDraw = this.calculateValueToDraw();
+
+        const textWidth = new Text(
+            this.canvas,
+            valueToDraw,
+            {},
+            this.theme
+        ).measureText().width;
+
+        const paddingR = this.theme.padding.v2;
+
+        // We add the `paddingR` to `textWidth` because we want to move the
+        // `valueIndexes` in advance(before) reaching the `rect.w`
+        // otherwise, the `cursor` will be drawn at the "outside" of the
+        // the "typable" rect's right edge.
+        let widthToCheck = textWidth + paddingR;
+
+        // If the `cursor` is at the end of the text, we need to consider
+        // it's width as well, otherwise the cursor will go outside.
+        if (this.cursorIndex >= this.valueVisible.v2 - 1) {
+            const cursorWidth = this.calculateCursorSize().v1;
+            widthToCheck += cursorWidth;
+        }
+
+        return widthToCheck >= rect.w;
     }
 }
 
