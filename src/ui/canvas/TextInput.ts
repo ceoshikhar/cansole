@@ -412,7 +412,10 @@ class TextInput
                     }
 
                     // Cursor is moving past the most right visible character.
-                    if (this.cursorIndex >= this.valueVisible.v2) {
+                    if (
+                        this.isFilledCompletely() &&
+                        this.cursorIndex >= this.valueVisible.v2
+                    ) {
                         this.valueVisible = this.valueVisible.add(
                             new Vec2(1, 1)
                         );
