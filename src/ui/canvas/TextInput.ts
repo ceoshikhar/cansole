@@ -344,6 +344,8 @@ class TextInput
                 this.cursorIndex = this.valueSelected.v1 + 1;
 
                 if (!this.isFilledCompletely()) {
+                    // The new `value` is not completly filling the text input.
+                    // Which means, the `valueVisible` ends with the `value`.
                     this.valueVisible = new Vec2(0, this.value.length);
                 }
 
