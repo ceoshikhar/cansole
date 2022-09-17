@@ -706,7 +706,6 @@ class TextInput
 
     private calculateCursorIndexAt(point: Vec2<number>): number {
         const rect = this.calculateTypableRect();
-        const valueToDraw = this.calculateValueToDraw();
 
         // THe `point` can be outside of the typable rect but definitely has to
         // be inside the `this.box`. Should we throw if `point` is outside?
@@ -722,28 +721,29 @@ class TextInput
             }
         }
 
-        let i = 0;
+        let idx = this.valueVisible.v1;
 
-        for (i; i < this.value.length; i++) {
+        for (idx; idx < this.value.length; idx++) {
             // Same reasoning for -1 given few lines above.
-            if (i >= this.valueVisible.v2 - 1) break;
+            if (idx >= this.valueVisible.v2 - 1) break;
 
             const x1 =
                 rect.x +
-                new Text(this.canvas, valueToDraw.substring(0, i)).measureText()
-                    .width;
+                new Text(
+                    this.canvas,
+                    this.value.substring(this.valueVisible.v1, idx)
+                ).measureText().width;
 
             const x2 =
                 rect.x +
                 new Text(
                     this.canvas,
-                    valueToDraw.substring(0, i + 1)
+                    this.value.substring(this.valueVisible.v1, idx + 1)
                 ).measureText().width;
 
             // The current cursor index at the point where it was clicked.
             if (x1 <= point.v1 && point.v1 <= x2) {
-                i = Math.min(i, this.valueVisible.v2);
-                console.log(3, i);
+                idx = Math.min(idx, this.valueVisible.v2);
                 break;
             }
 
@@ -751,9 +751,7 @@ class TextInput
             // index would be at the end.
         }
 
-        console.log("Cursor Index:", i);
-
-        return i;
+        return idx;
     }
 
     private calculateValueToDraw(): string {
