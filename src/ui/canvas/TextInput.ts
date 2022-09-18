@@ -127,6 +127,7 @@ class TextInput
     private ee: EventEmitter;
 
     private isActive = false;
+    private isDragging = false;
 
     constructor(canvas: HTMLCanvasElement, options: TextInputOptions = {}, theme: TextInputThemeOptions = {}) {
         this.canvas = canvas;
@@ -367,7 +368,7 @@ class TextInput
                         this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
                     }
 
-                    // Cursor is moving past the most left visible character.
+                    // Cursor is moving past the left most visible character.
                     if (this.cursorIndex < this.valueVisible.v1) {
                         this.valueVisible = this.valueVisible.sub(new Vec2(1, 1));
                     }
@@ -383,7 +384,7 @@ class TextInput
                         this.cursorIndex = Math.min(this.cursorIndex + 1, this.value.length);
                     }
 
-                    // Cursor is moving past the most right visible character.
+                    // Cursor is moving past the right most visible character.
                     if (this.isFilledCompletely() && this.cursorIndex >= this.valueVisible.v2) {
                         this.valueVisible = this.valueVisible.add(new Vec2(1, 1));
                     }
@@ -391,18 +392,31 @@ class TextInput
                 }
 
                 case "Backspace": {
-                    const left = this.value.substring(0, this.cursorIndex - 1);
-                    const right = this.value.substring(this.cursorIndex, this.value.length);
+                    if (this.valueSelected) {
+                        const left = this.value.substring(0, this.valueSelected.v1);
+                        const right = this.value.substring(this.valueSelected.v2 + 1, this.value.length);
 
-                    this.value = left + right;
+                        this.value = left + right;
+                        this.cursorIndex = this.valueSelected.v1;
 
-                    this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
+                        if (!this.isFilledCompletely()) {
+                            // The new `value` is not completly filling the text input.
+                            // Which means, the `valueVisible` ends with the `value`.
+                            this.valueVisible = new Vec2(0, this.value.length);
+                        }
 
-                    if (this.valueVisible.v1) {
-                        this.valueVisible = this.valueVisible.sub(new Vec2(1, 1));
+                        this.valueSelected = null;
                     } else {
-                        if (this.value) {
-                            this.valueVisible = this.valueVisible.sub(new Vec2(0, 1));
+                        const left = this.value.substring(0, this.cursorIndex - 1);
+                        const right = this.value.substring(this.cursorIndex, this.value.length);
+
+                        this.value = left + right;
+
+                        this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
+
+                        // Check if the left most character is not in the `valueVisible`.
+                        if (this.valueVisible.v1) {
+                            this.valueVisible = this.valueVisible.sub(new Vec2(1, 1));
                         }
                     }
 
@@ -452,6 +466,8 @@ class TextInput
         this.box.onDrag((e) => {
             if (!this.isActive) return;
 
+            this.isDragging = true;
+
             const start = this.calculateCursorIndexAt(e.start);
             const curr = this.calculateCursorIndexAt(e.curr);
 
@@ -464,6 +480,9 @@ class TextInput
 
         this.box.onDragEnd(() => {
             if (!this.isActive) return;
+
+            this.isDragging = false;
+
             if (!this.valueSelected) return;
 
             if (this.valueSelected.v1 === this.valueSelected.v2) {
@@ -646,7 +665,7 @@ class TextInput
     }
 
     private calculateCursorIndexAt(point: Vec2<number>): number {
-        if (!this.box.contains(point)) {
+        if (!this.box.contains(point) && !this.isDragging) {
             throw new Error("The given `point` is not inside of `box`.");
         }
 
