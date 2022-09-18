@@ -646,10 +646,12 @@ class TextInput
     }
 
     private calculateCursorIndexAt(point: Vec2<number>): number {
+        if (!this.box.contains(point)) {
+            throw new Error("The given `point` is not inside of `box`.");
+        }
+
         const rect = this.calculateTypableRect();
 
-        // THe `point` can be outside of the typable rect but definitely has to
-        // be inside the `this.box`. Should we throw if `point` is outside?
         if (!rect.contains(point)) {
             if (point.v1 <= rect.l) {
                 return this.valueVisible.v1;
