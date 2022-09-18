@@ -333,7 +333,7 @@ class TextInput
                 if (!this.isFilledCompletely()) {
                     // The new `value` is not completly filling the text input.
                     // Which means, the `valueVisible` ends with the `value`.
-                    this.valueVisible = new Vec2(0, this.value.length);
+                    this.valueVisible = new Vec2(this.valueVisible.v1, this.value.length);
                 }
 
                 this.valueSelected = null;
@@ -352,7 +352,7 @@ class TextInput
                 }
             } else {
                 // Move the end of the `valueVisible` forward.
-                this.valueVisible = new Vec2(0, this.value.length);
+                this.valueVisible = new Vec2(this.valueVisible.v1, this.value.length);
             }
         };
 
@@ -402,7 +402,7 @@ class TextInput
                         if (!this.isFilledCompletely()) {
                             // The new `value` is not completly filling the text input.
                             // Which means, the `valueVisible` ends with the `value`.
-                            this.valueVisible = new Vec2(0, this.value.length);
+                            this.valueVisible = new Vec2(this.valueVisible.v1, this.value.length);
                         }
 
                         this.valueSelected = null;
