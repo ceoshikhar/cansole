@@ -43,7 +43,6 @@ class CanvasUI implements IDestroyable, IDrawable {
         submit.setDisplayName("Submit");
 
         submit.onClick((e) => {
-            console.log("Clicked on", e.target.displayName);
         });
 
         const input = new TextInput(cansole.element as HTMLCanvasElement, {
@@ -57,7 +56,6 @@ class CanvasUI implements IDestroyable, IDrawable {
         input.setDisplayName("CommandTextInput");
 
         input.onClick((e) => {
-            console.log("Clicked on", e.target.displayName);
         });
 
         this.entities = [];
