@@ -128,6 +128,8 @@ class TextInput
 
     private isActive = false;
     private isDragging = false;
+    /** When selection is done via mouse drag and then moved using Shift+ArrowLeft/ArrowRight */
+    private haveMovedCursorAfterSelection = false; // Not a fan of this but works for now.
 
     constructor(canvas: HTMLCanvasElement, options: TextInputOptions = {}, theme: TextInputThemeOptions = {}) {
         this.canvas = canvas;
@@ -361,11 +363,36 @@ class TextInput
 
             switch (key) {
                 case "ArrowLeft": {
-                    if (this.valueSelected) {
-                        this.cursorIndex = Math.max(this.valueSelected.v1 - 1, this.valueVisible.v1);
-                        this.valueSelected = null;
+                    if (e.shiftKey) {
+                        if (this.valueSelected) {
+                            if (this.haveMovedCursorAfterSelection) {
+                                // The cursor index should be based off of current cursor index because
+                                // the cursor has been moved after doing the selection via mouse drag.
+                                this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
+                                this.valueSelected = this.valueSelected.sub(new Vec2(1, 0));
+                            } else {
+                                // The cursor position should be based off of `valueSelected` because
+                                // text selection was done via mouse drag and not a previously done similar action.
+                                this.cursorIndex = Math.max(this.valueSelected.v1 - 1, 0);
+                                this.valueSelected = this.valueSelected.sub(new Vec2(1, 0));
+                            }
+                        } else {
+                            // It would make sense to select text on the left only if we haven't reached the start.
+                            if (this.cursorIndex > 0) {
+                                this.cursorIndex = this.cursorIndex - 1;
+                                this.valueSelected = new Vec2(this.cursorIndex, this.cursorIndex + 1);
+                            }
+                        }
+
+                        this.haveMovedCursorAfterSelection = true;
                     } else {
-                        this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
+                        if (this.valueSelected && !e.shiftKey) {
+                            this.cursorIndex = Math.max(this.valueSelected.v1 - 1, this.valueVisible.v1);
+                            this.valueSelected = null;
+                            this.haveMovedCursorAfterSelection = false;
+                        } else {
+                            this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
+                        }
                     }
 
                     // Cursor is moving past the left most visible character.
@@ -467,13 +494,16 @@ class TextInput
             if (!this.isActive) return;
 
             this.isDragging = true;
+            this.haveMovedCursorAfterSelection = false;
 
             const start = this.calculateCursorIndexAt(e.start);
             const curr = this.calculateCursorIndexAt(e.curr);
 
             if (curr < start) {
+                // Text selection going from right to left.
                 this.valueSelected = new Vec2(curr, start);
             } else {
+                // Text selection going from left to right.
                 this.valueSelected = new Vec2(start, curr);
             }
         });
