@@ -366,10 +366,17 @@ class TextInput
                     if (e.shiftKey) {
                         if (this.valueSelected) {
                             if (this.haveMovedCursorAfterSelection) {
+                                if (this.cursorIndex > 0) {
+                                    if (this.cursorIndex === this.valueSelected.v1) {
+                                        this.valueSelected = this.valueSelected.sub(new Vec2(1, 0)); // Increase text selection on left.
+                                    } else {
+                                        this.valueSelected = this.valueSelected.sub(new Vec2(0, 1)); // Decreate text selection on right.
+                                    }
+                                }
+
                                 // The cursor index should be based off of current cursor index because
                                 // the cursor has been moved after doing the selection via mouse drag.
                                 this.cursorIndex = Math.max(this.cursorIndex - 1, 0);
-                                this.valueSelected = this.valueSelected.sub(new Vec2(1, 0));
                             } else {
                                 // The cursor position should be based off of `valueSelected` because
                                 // text selection was done via mouse drag and not a previously done similar action.
@@ -386,8 +393,8 @@ class TextInput
 
                         this.haveMovedCursorAfterSelection = true;
                     } else {
-                        if (this.valueSelected && !e.shiftKey) {
-                            this.cursorIndex = Math.max(this.valueSelected.v1 - 1, this.valueVisible.v1);
+                        if (this.valueSelected) {
+                            this.cursorIndex = Math.max(this.valueSelected.v1, this.valueVisible.v1);
                             this.valueSelected = null;
                             this.haveMovedCursorAfterSelection = false;
                         } else {
@@ -404,17 +411,45 @@ class TextInput
                 }
 
                 case "ArrowRight": {
-                    if (this.valueSelected) {
-                        this.cursorIndex = Math.min(this.valueSelected.v2 + 1, this.valueVisible.v2);
-                        this.valueSelected = null;
+                    if (e.shiftKey) {
+                        if (this.valueSelected) {
+                            if (this.haveMovedCursorAfterSelection) {
+                                if (this.cursorIndex < this.value.length) {
+                                    if (this.cursorIndex === this.valueSelected.v2) {
+                                        this.valueSelected = this.valueSelected.add(new Vec2(0, 1)); // Increase text selection on right.
+                                    } else {
+                                        this.valueSelected = this.valueSelected.add(new Vec2(1, 0)); // Decreate text selection on left.
+                                    }
+                                }
+
+                                this.cursorIndex = Math.min(this.cursorIndex + 1, this.value.length);
+                            } else {
+                                this.cursorIndex = Math.max(this.valueSelected.v2 + 1, 0);
+                                this.valueSelected = this.valueSelected.add(new Vec2(0, 1));
+                            }
+                        } else {
+                            if (this.cursorIndex < this.value.length) {
+                                this.cursorIndex = this.cursorIndex + 1;
+                                this.valueSelected = new Vec2(this.cursorIndex - 1, this.cursorIndex);
+                            }
+                        }
+
+                        this.haveMovedCursorAfterSelection = true;
                     } else {
-                        this.cursorIndex = Math.min(this.cursorIndex + 1, this.value.length);
+                        if (this.valueSelected) {
+                            this.cursorIndex = Math.min(this.valueSelected.v2, this.valueVisible.v2);
+                            this.valueSelected = null;
+                            this.haveMovedCursorAfterSelection = false;
+                        } else {
+                            this.cursorIndex = Math.min(this.cursorIndex + 1, this.value.length);
+                        }
                     }
 
                     // Cursor is moving past the right most visible character.
                     if (this.isFilledCompletely() && this.cursorIndex >= this.valueVisible.v2) {
                         this.valueVisible = this.valueVisible.add(new Vec2(1, 1));
                     }
+
                     break;
                 }
 
