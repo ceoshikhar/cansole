@@ -163,7 +163,6 @@ class TextInput
         );
 
         this.box.setH(options.h || this.box.h + this.theme.padding.v1 + this.theme.padding.v3);
-
         this.box.setW(options.w || this.box.w + this.theme.padding.v2 + this.theme.padding.v4);
 
         //
