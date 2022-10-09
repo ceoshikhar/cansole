@@ -250,7 +250,9 @@ class TextArea
     private makeActivable(): void {
         this.box.makePressable();
 
-        this.box.onPress(() => {
+        this.box.onPress((e) => {
+            this.ee.emit(events.MouseEvents.Click, { native: e, target: this });
+
             if (!this.isActive) {
                 this.isActive = true;
                 this.ee.emit(events.MouseEvents.Active, { target: this });

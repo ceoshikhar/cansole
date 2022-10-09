@@ -490,6 +490,8 @@ class TextInput
         };
 
         this.box.onPress((e) => {
+            this.ee.emit(events.MouseEvents.Click, { native: e, target: this });
+
             const x = e.native.offsetX;
             const y = e.native.offsetY;
 

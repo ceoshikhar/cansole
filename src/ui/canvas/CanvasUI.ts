@@ -6,6 +6,8 @@ import { Button } from "./Button";
 import { IDrawable, IDestroyable } from "./interfaces";
 import { Window } from "./Window";
 import { TextInput } from "./TextInput";
+import { Rect } from "./shapes";
+import { TextArea } from "./TextArea";
 
 const DEFAULT_WINDOW_POS: Vec2<number> = new Vec2(150, 150);
 const DEFAULT_WINDOW_SIZE: Vec2<number> = new Vec2(640, 480);
@@ -39,10 +41,9 @@ class CanvasUI implements IDestroyable, IDrawable {
         });
 
         const submit = new Button(cansole.element as HTMLCanvasElement, "Submit");
-
         submit.setDisplayName("Submit");
-
         submit.onClick((e) => {
+            console.log("Clicked on", e.target.displayName);
         });
 
         const input = new TextInput(cansole.element as HTMLCanvasElement, {
@@ -52,17 +53,18 @@ class CanvasUI implements IDestroyable, IDrawable {
             // children, etc. Just like DOM.
             h: submit.h,
         });
-
         input.setDisplayName("CommandTextInput");
-
         input.onClick((e) => {
+            console.log("Clicked on", e.target.displayName);
         });
 
-        this.entities = [];
+        const logs = new TextArea(cansole.element as HTMLCanvasElement, {});
+        logs.setDisplayName("LogsTextArea");
+        logs.onClick((e) => {
+            console.log("Clicked on", e.target.displayName);
+        });
 
-        this.entities.push(cansoleWindow);
-        this.entities.push(submit);
-        this.entities.push(input);
+        this.entities = [cansoleWindow, submit, input, logs];
 
         // FIXME: instead of this we should have "child" <-> "parent" elements
         // to be "drawn" relative to each other instead of the entire canvas.
@@ -114,14 +116,14 @@ class CanvasUI implements IDestroyable, IDrawable {
         submit.setB(window.b - buttonPaddingWithWindow);
     }
 
-    private positionInputOnWindowResize(input: TextInput, window: Window): void {
+    private positionInputOnWindowResize(input: Rect, window: Window): void {
         const inputPaddingWithWindow = 16;
 
         input.setL(window.l + inputPaddingWithWindow);
         input.setB(window.b - inputPaddingWithWindow);
     }
 
-    private resizeInputOnWindowReize(input: TextInput, submit: Button) {
+    private resizeInputOnWindowReize(input: Rect, submit: Button) {
         const gapBetweenInputAndSubmit = 16;
 
         const size = new Vec2(submit.x - input.x - gapBetweenInputAndSubmit, input.h);
